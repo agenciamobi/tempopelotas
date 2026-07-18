@@ -69,6 +69,20 @@ A interface para celulares segue uma linguagem próxima de aplicativo nativo:
 
 Os principais ajustes estão em `app/mobile-app.css` e `components/site-header.tsx`.
 
+## Gráficos meteorológicos
+
+O componente `components/weather-trend-chart.tsx` apresenta a evolução horária sem adicionar bibliotecas externas de gráficos.
+
+Recursos:
+
+- alternância entre temperatura, probabilidade de chuva e rajadas;
+- gráfico SVG responsivo com área, linha, grade e ponto selecionado;
+- seleção de horário por botões acessíveis;
+- resumo numérico atualizado em tempo real;
+- carrossel com scroll snap no celular;
+- tema inicial contextual nas páginas de chuva e vento;
+- uso na página inicial e nas páginas específicas de previsão.
+
 ## Mapa regional
 
 O mapa da página inicial utiliza coordenadas geográficas reais e apresenta marcadores meteorológicos para as cidades monitoradas.
@@ -112,6 +126,6 @@ A página de alertas utiliza critérios internos para destacar chuva, rajadas e 
 
 - integrar alertas oficiais quando houver uma fonte adequada;
 - adicionar câmeras meteorológicas locais;
-- criar histórico e gráficos de temperatura, chuva e vento;
+- criar histórico diário persistente para comparação meteorológica;
 - ampliar a cobertura para mais cidades da Zona Sul;
 - revisar identidade visual e conteúdo com base no uso real.
