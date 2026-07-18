@@ -7,6 +7,7 @@ import "./topic-pages.css";
 import "./home.css";
 import "./map.css";
 import "./mobile-app.css";
+import "./mobile-app-fixes.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
