@@ -1,0 +1,131 @@
+import { WeatherIcon } from "@/components/weather-icon";
+import {
+  currentWeather,
+  dailyForecast,
+  hourlyForecast,
+} from "@/lib/weather-data";
+
+function MetricIcon({ type }: { type: "humidity" | "pressure" | "wind" | "visibility" }) {
+  const paths = {
+    humidity: <path d="M12 3S6.5 9.5 6.5 14a5.5 5.5 0 0 0 11 0C17.5 9.5 12 3 12 3Z" />,
+    pressure: <path d="M4 15a8 8 0 1 1 16 0M12 15l4-5M7 19h10" />,
+    wind: <path d="M3 8h11c4 0 4-6 0-6-2 0-3 1-3 3M3 13h16c4 0 4 7 0 7-2 0-3-1-3-3M3 18h8" />,
+    visibility: <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Zm10-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />,
+  };
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <g fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        {paths[type]}
+      </g>
+    </svg>
+  );
+}
+
+export function WeatherDashboard() {
+  return (
+    <main className="weather-content">
+      <section className="current-weather" id="agora" aria-labelledby="current-title">
+        <div className="current-topline">
+          <div>
+            <span className="eyebrow">Agora em Pelotas</span>
+            <h1 id="current-title">
+              {currentWeather.city}, <span>{currentWeather.state}</span>
+            </h1>
+          </div>
+          <span className="demo-badge">{currentWeather.updatedAt}</span>
+        </div>
+
+        <div className="current-main">
+          <div className="temperature-block">
+            <span className="temperature-value">{currentWeather.temperature}°</span>
+            <div>
+              <strong>{currentWeather.condition}</strong>
+              <span>Sensação de {currentWeather.feelsLike}°</span>
+            </div>
+          </div>
+
+          <div className="hero-weather-icon">
+            <WeatherIcon name={currentWeather.icon} title={currentWeather.condition} />
+          </div>
+        </div>
+
+        <div className="metrics-grid" aria-label="Condições meteorológicas atuais">
+          <article>
+            <MetricIcon type="humidity" />
+            <div><span>Umidade</span><strong>{currentWeather.humidity}%</strong></div>
+          </article>
+          <article>
+            <MetricIcon type="pressure" />
+            <div><span>Pressão</span><strong>{currentWeather.pressure} hPa</strong></div>
+          </article>
+          <article>
+            <MetricIcon type="wind" />
+            <div><span>Vento</span><strong>{currentWeather.windSpeed} km/h {currentWeather.windDirection}</strong></div>
+          </article>
+          <article>
+            <MetricIcon type="visibility" />
+            <div><span>Visibilidade</span><strong>{currentWeather.visibility} km</strong></div>
+          </article>
+        </div>
+      </section>
+
+      <section className="hourly-section" id="horas" aria-labelledby="hourly-title">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Previsão horária</span>
+            <h2 id="hourly-title">Como fica o tempo hoje</h2>
+          </div>
+          <div className="sun-times" aria-label="Horários do nascer e pôr do sol">
+            <span>Nascer <strong>{currentWeather.sunrise}</strong></span>
+            <span>Pôr do sol <strong>{currentWeather.sunset}</strong></span>
+          </div>
+        </div>
+
+        <div className="hourly-list">
+          {hourlyForecast.map((hour, index) => (
+            <article className={index === 0 ? "is-current" : ""} key={hour.time}>
+              <span>{hour.time}</span>
+              <WeatherIcon name={hour.icon} title={`Condição às ${hour.time}`} />
+              <strong>{hour.temperature}°</strong>
+              <small>{hour.precipitation}% chuva</small>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="alert-card" id="alertas" aria-labelledby="alert-title">
+        <div className="alert-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3Zm0 6v5m0 3v.01" /></svg>
+        </div>
+        <div>
+          <span className="eyebrow">Monitoramento local</span>
+          <h2 id="alert-title">Sem alertas severos ativos</h2>
+          <p>Área preparada para avisos da Defesa Civil, chuva intensa, vento forte, granizo e risco de alagamentos.</p>
+        </div>
+        <a href="#semana">Ver previsão completa</a>
+      </section>
+
+      <section className="weekly-section" id="semana" aria-labelledby="weekly-title">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Tendência</span>
+            <h2 id="weekly-title">Próximos 7 dias</h2>
+          </div>
+          <p>Máximas, mínimas e probabilidade de chuva para Pelotas.</p>
+        </div>
+
+        <div className="daily-list">
+          {dailyForecast.map((day, index) => (
+            <article className={index === 0 ? "is-today" : ""} key={`${day.weekday}-${day.date}`}>
+              <div className="daily-day"><strong>{day.weekday}</strong><span>{day.date}</span></div>
+              <WeatherIcon name={day.icon} title={`Previsão para ${day.weekday}`} />
+              <div className="daily-rain"><span aria-hidden="true">●</span>{day.rainChance}%</div>
+              <div className="daily-temp"><strong>{day.max}°</strong><span>{day.min}°</span></div>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
