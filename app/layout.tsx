@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { siteUrl } from "@/lib/site";
+import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 import "./topic-pages.css";
 import "./home.css";
