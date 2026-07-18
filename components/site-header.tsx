@@ -1,14 +1,16 @@
+import Link from "next/link";
+
 const navItems = [
-  { label: "Agora", href: "#agora" },
-  { label: "Próximas horas", href: "#horas" },
-  { label: "7 dias", href: "#semana" },
-  { label: "Região", href: "#regiao" },
+  { label: "Agora", href: "/" },
+  { label: "Hoje", href: "/tempo-hoje-pelotas" },
+  { label: "7 dias", href: "/previsao-7-dias-pelotas" },
+  { label: "Chuva", href: "/chuva-em-pelotas" },
 ];
 
 export function SiteHeader() {
   return (
     <header className="site-header">
-      <a className="brand" href="#agora" aria-label="TEMPO Pelotas — página inicial">
+      <Link className="brand" href="/" aria-label="TEMPO Pelotas — página inicial">
         <span className="brand-symbol" aria-hidden="true">
           <span />
           <span />
@@ -18,20 +20,20 @@ export function SiteHeader() {
           <strong>TEMPO</strong>
           <small>Pelotas</small>
         </span>
-      </a>
+      </Link>
 
       <nav className="main-nav" aria-label="Navegação principal">
         {navItems.map((item) => (
-          <a href={item.href} key={item.href}>
+          <Link href={item.href} key={item.href}>
             {item.label}
-          </a>
+          </Link>
         ))}
       </nav>
 
-      <a className="header-action" href="#alertas">
+      <Link className="header-action" href="/alertas">
         <span className="header-action-dot" aria-hidden="true" />
         Alertas
-      </a>
+      </Link>
     </header>
   );
 }
