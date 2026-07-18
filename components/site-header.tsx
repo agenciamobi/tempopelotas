@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type NavigationIconName = "home" | "today" | "week" | "rain" | "alert";
+type NavigationIconName = "home" | "today" | "week" | "rain" | "camera" | "alert";
 
 type NavigationItem = {
   label: string;
@@ -11,15 +11,19 @@ type NavigationItem = {
   icon: NavigationIconName;
 };
 
-const primaryNavItems: NavigationItem[] = [
+const desktopNavItems: NavigationItem[] = [
   { label: "Agora", href: "/", icon: "home" },
   { label: "Hoje", href: "/tempo-hoje-pelotas", icon: "today" },
   { label: "7 dias", href: "/previsao-7-dias-pelotas", icon: "week" },
   { label: "Chuva", href: "/chuva-em-pelotas", icon: "rain" },
+  { label: "Câmeras", href: "/cameras-ao-vivo-pelotas", icon: "camera" },
 ];
 
 const mobileNavItems: NavigationItem[] = [
-  ...primaryNavItems,
+  { label: "Agora", href: "/", icon: "home" },
+  { label: "Hoje", href: "/tempo-hoje-pelotas", icon: "today" },
+  { label: "7 dias", href: "/previsao-7-dias-pelotas", icon: "week" },
+  { label: "Chuva", href: "/chuva-em-pelotas", icon: "rain" },
   { label: "Alertas", href: "/alertas", icon: "alert" },
 ];
 
@@ -60,6 +64,16 @@ function NavigationIcon({ name }: { name: NavigationIconName }) {
     );
   }
 
+  if (name === "camera") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="6" width="14" height="12" rx="3" />
+        <path d="m17 10 4-2v8l-4-2M7.5 4.5h5" />
+        <circle cx="10" cy="12" r="2.7" />
+      </svg>
+    );
+  }
+
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M12 3 2.8 19h18.4L12 3Z" />
@@ -91,7 +105,7 @@ export function SiteHeader() {
         </Link>
 
         <nav className="main-nav" aria-label="Navegação principal">
-          {primaryNavItems.map((item) => {
+          {desktopNavItems.map((item) => {
             const isActive = isActivePath(pathname, item.href);
 
             return (
