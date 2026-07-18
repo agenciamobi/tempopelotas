@@ -22,6 +22,11 @@ const pages = [
     description: "Velocidade, direção e rajadas.",
   },
   {
+    href: "/historico-climatico-pelotas",
+    title: "Histórico climático",
+    description: "Compare os últimos 30 dias na cidade.",
+  },
+  {
     href: "/alertas",
     title: "Alertas e atenção",
     description: "Leitura automática e fontes oficiais.",
