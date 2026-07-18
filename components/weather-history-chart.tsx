@@ -72,7 +72,7 @@ export function WeatherHistoryChart({ days }: WeatherHistoryChartProps) {
 
   const chart = useMemo(() => {
     const combined = [...values.primary, ...values.secondary];
-    const rawMin = Math.min(...combined, 0);
+    const rawMin = metric === "temperature" ? Math.min(...combined) : 0;
     const rawMax = Math.max(...combined, 1);
     const spread = Math.max(rawMax - rawMin, metric === "temperature" ? 6 : 4);
     const padding = metric === "precipitation" ? Math.max(spread * 0.12, 1) : Math.max(spread * 0.18, 2);
