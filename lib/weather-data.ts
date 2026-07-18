@@ -50,8 +50,8 @@ export type RegionalWeather = {
   city: string;
   temperature: number;
   condition: WeatherIconName;
-  x: number;
-  y: number;
+  latitude: number;
+  longitude: number;
 };
 
 export type WeatherData = {
@@ -103,10 +103,10 @@ export const fallbackWeatherData: WeatherData = {
     { weekday: "Sex", date: "24 jul", min: 13, max: 21, rainChance: 24, precipitation: 0.6, windGust: 29, icon: "partly-cloudy" },
   ],
   regional: [
-    { city: "Pelotas", temperature: 20, condition: "partly-cloudy", x: 61, y: 61 },
-    { city: "Rio Grande", temperature: 19, condition: "cloud", x: 74, y: 72 },
-    { city: "Canguçu", temperature: 18, condition: "rain", x: 45, y: 43 },
-    { city: "São Lourenço", temperature: 19, condition: "partly-cloudy", x: 62, y: 32 },
+    { city: "Pelotas", temperature: 20, condition: "partly-cloudy", latitude: -31.7654, longitude: -52.3376 },
+    { city: "Rio Grande", temperature: 19, condition: "cloud", latitude: -32.035, longitude: -52.0986 },
+    { city: "Canguçu", temperature: 18, condition: "rain", latitude: -31.395, longitude: -52.6756 },
+    { city: "São Lourenço do Sul", temperature: 19, condition: "partly-cloudy", latitude: -31.365, longitude: -51.978 },
   ],
   source: {
     name: "dados demonstrativos",
