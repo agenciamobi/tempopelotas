@@ -1,0 +1,279 @@
+import {
+  fallbackWeatherData,
+  type DailyForecast,
+  type HourlyForecast,
+  type RegionalWeather,
+  type WeatherData,
+  type WeatherIconName,
+} from "@/lib/weather-data";
+
+const FORECAST_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
+const TIMEZONE = "America/Sao_Paulo";
+const REVALIDATE_SECONDS = 600;
+
+const locations = [
+  { city: "Pelotas", latitude: -31.7654, longitude: -52.3376, x: 61, y: 61 },
+  { city: "Rio Grande", latitude: -32.035, longitude: -52.0986, x: 74, y: 72 },
+  { city: "Canguçu", latitude: -31.395, longitude: -52.6756, x: 45, y: 43 },
+  { city: "São Lourenço", latitude: -31.365, longitude: -51.978, x: 62, y: 32 },
+] as const;
+
+type OpenMeteoCurrent = {
+  time: string;
+  temperature_2m: number;
+  relative_humidity_2m: number;
+  apparent_temperature: number;
+  weather_code: number;
+  pressure_msl: number;
+  visibility?: number;
+  wind_speed_10m: number;
+  wind_direction_10m: number;
+  is_day: number;
+};
+
+type OpenMeteoResponse = {
+  timezone: string;
+  current: OpenMeteoCurrent;
+  hourly: {
+    time: string[];
+    temperature_2m: number[];
+    precipitation_probability: number[];
+    weather_code: number[];
+    is_day: number[];
+  };
+  daily: {
+    time: string[];
+    weather_code: number[];
+    temperature_2m_max: number[];
+    temperature_2m_min: number[];
+    precipitation_probability_max: number[];
+    sunrise: string[];
+    sunset: string[];
+  };
+};
+
+type RegionalOpenMeteoResponse = {
+  current: Pick<OpenMeteoCurrent, "temperature_2m" | "weather_code" | "is_day">;
+};
+
+function weatherCodeToPresentation(code: number, isDay = true) {
+  if (code === 0) {
+    return { label: isDay ? "Céu limpo" : "Noite de céu limpo", icon: "sun" as WeatherIconName };
+  }
+
+  if (code === 1 || code === 2) {
+    return { label: "Sol entre nuvens", icon: "partly-cloudy" as WeatherIconName };
+  }
+
+  if (code === 3 || code === 45 || code === 48) {
+    return { label: code >= 45 ? "Neblina" : "Céu nublado", icon: "cloud" as WeatherIconName };
+  }
+
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 86)) {
+    return { label: "Chuva", icon: "rain" as WeatherIconName };
+  }
+
+  if (code >= 71 && code <= 77) {
+    return { label: "Precipitação de inverno", icon: "rain" as WeatherIconName };
+  }
+
+  if (code >= 95) {
+    return { label: "Temporal", icon: "storm" as WeatherIconName };
+  }
+
+  return { label: "Tempo variável", icon: "cloud" as WeatherIconName };
+}
+
+function degreesToCompass(degrees: number) {
+  const directions = ["N", "NNE", "NE", "ENE", "L", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO"];
+  return directions[Math.round((((degrees % 360) + 360) % 360) / 22.5) % 16];
+}
+
+function formatClock(value: string) {
+  const time = value.split("T")[1];
+  return time ? time.slice(0, 5) : value;
+}
+
+function formatUpdatedAt(value: string) {
+  return `Atualizado às ${formatClock(value)}`;
+}
+
+function formatDay(date: string, index: number) {
+  if (index === 0) return "Hoje";
+
+  const formatted = new Intl.DateTimeFormat("pt-BR", {
+    weekday: "short",
+    timeZone: TIMEZONE,
+  }).format(new Date(`${date}T12:00:00-03:00`));
+
+  return formatted.replace(".", "").replace(/^./, (letter) => letter.toUpperCase());
+}
+
+function formatDate(date: string) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    timeZone: TIMEZONE,
+  })
+    .format(new Date(`${date}T12:00:00-03:00`))
+    .replace(" de ", " ")
+    .replace(".", "");
+}
+
+function normalizeHourly(response: OpenMeteoResponse): HourlyForecast[] {
+  const currentIndex = Math.max(
+    0,
+    response.hourly.time.findIndex((time) => time >= response.current.time),
+  );
+
+  return response.hourly.time.slice(currentIndex, currentIndex + 7).map((time, offset) => {
+    const index = currentIndex + offset;
+    const presentation = weatherCodeToPresentation(
+      response.hourly.weather_code[index],
+      response.hourly.is_day[index] === 1,
+    );
+
+    return {
+      time: offset === 0 ? "Agora" : `${formatClock(time).slice(0, 2)}h`,
+      temperature: Math.round(response.hourly.temperature_2m[index]),
+      precipitation: Math.round(response.hourly.precipitation_probability[index] ?? 0),
+      icon: presentation.icon,
+    };
+  });
+}
+
+function normalizeDaily(response: OpenMeteoResponse): DailyForecast[] {
+  return response.daily.time.map((date, index) => ({
+    weekday: formatDay(date, index),
+    date: formatDate(date),
+    min: Math.round(response.daily.temperature_2m_min[index]),
+    max: Math.round(response.daily.temperature_2m_max[index]),
+    rainChance: Math.round(response.daily.precipitation_probability_max[index] ?? 0),
+    icon: weatherCodeToPresentation(response.daily.weather_code[index], true).icon,
+  }));
+}
+
+async function fetchForecast() {
+  const pelotas = locations[0];
+  const params = new URLSearchParams({
+    latitude: String(pelotas.latitude),
+    longitude: String(pelotas.longitude),
+    timezone: TIMEZONE,
+    forecast_days: "7",
+    current: [
+      "temperature_2m",
+      "relative_humidity_2m",
+      "apparent_temperature",
+      "weather_code",
+      "pressure_msl",
+      "visibility",
+      "wind_speed_10m",
+      "wind_direction_10m",
+      "is_day",
+    ].join(","),
+    hourly: [
+      "temperature_2m",
+      "precipitation_probability",
+      "weather_code",
+      "is_day",
+    ].join(","),
+    daily: [
+      "weather_code",
+      "temperature_2m_max",
+      "temperature_2m_min",
+      "precipitation_probability_max",
+      "sunrise",
+      "sunset",
+    ].join(","),
+  });
+
+  const response = await fetch(`${FORECAST_ENDPOINT}?${params}`, {
+    next: { revalidate: REVALIDATE_SECONDS },
+    headers: { Accept: "application/json" },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Open-Meteo respondeu com status ${response.status}`);
+  }
+
+  return (await response.json()) as OpenMeteoResponse;
+}
+
+async function fetchRegionalWeather(): Promise<RegionalWeather[]> {
+  return Promise.all(
+    locations.map(async (location) => {
+      const params = new URLSearchParams({
+        latitude: String(location.latitude),
+        longitude: String(location.longitude),
+        timezone: TIMEZONE,
+        current: "temperature_2m,weather_code,is_day",
+      });
+
+      const response = await fetch(`${FORECAST_ENDPOINT}?${params}`, {
+        next: { revalidate: REVALIDATE_SECONDS },
+        headers: { Accept: "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Falha ao consultar ${location.city}`);
+      }
+
+      const data = (await response.json()) as RegionalOpenMeteoResponse;
+
+      return {
+        city: location.city,
+        temperature: Math.round(data.current.temperature_2m),
+        condition: weatherCodeToPresentation(
+          data.current.weather_code,
+          data.current.is_day === 1,
+        ).icon,
+        x: location.x,
+        y: location.y,
+      };
+    }),
+  );
+}
+
+export async function getPelotasWeather(): Promise<WeatherData> {
+  try {
+    const [forecast, regionalWeather] = await Promise.all([
+      fetchForecast(),
+      fetchRegionalWeather(),
+    ]);
+
+    const currentPresentation = weatherCodeToPresentation(
+      forecast.current.weather_code,
+      forecast.current.is_day === 1,
+    );
+
+    return {
+      current: {
+        city: "Pelotas",
+        state: "RS",
+        temperature: Math.round(forecast.current.temperature_2m),
+        feelsLike: Math.round(forecast.current.apparent_temperature),
+        condition: currentPresentation.label,
+        humidity: Math.round(forecast.current.relative_humidity_2m),
+        pressure: Math.round(forecast.current.pressure_msl),
+        windSpeed: Math.round(forecast.current.wind_speed_10m),
+        windDirection: degreesToCompass(forecast.current.wind_direction_10m),
+        visibility: Math.round((forecast.current.visibility ?? 10000) / 1000),
+        sunrise: formatClock(forecast.daily.sunrise[0]),
+        sunset: formatClock(forecast.daily.sunset[0]),
+        updatedAt: formatUpdatedAt(forecast.current.time),
+        icon: currentPresentation.icon,
+      },
+      hourly: normalizeHourly(forecast),
+      daily: normalizeDaily(forecast),
+      regional: regionalWeather,
+      source: {
+        name: "Open-Meteo",
+        url: "https://open-meteo.com/",
+        isFallback: false,
+      },
+    };
+  } catch (error) {
+    console.error("Falha ao carregar a previsão meteorológica:", error);
+    return fallbackWeatherData;
+  }
+}
