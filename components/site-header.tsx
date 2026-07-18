@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type NavigationIconName = "home" | "today" | "week" | "rain" | "camera" | "alert";
+type NavigationIconName = "home" | "today" | "week" | "rain" | "water" | "alert";
 
 type NavigationItem = {
   label: string;
@@ -16,7 +16,11 @@ const desktopNavItems: NavigationItem[] = [
   { label: "Hoje", href: "/tempo-hoje-pelotas", icon: "today" },
   { label: "7 dias", href: "/previsao-7-dias-pelotas", icon: "week" },
   { label: "Chuva", href: "/chuva-em-pelotas", icon: "rain" },
-  { label: "Câmeras", href: "/cameras-ao-vivo-pelotas", icon: "camera" },
+  {
+    label: "Lagoa",
+    href: "/nivel-da-lagoa-dos-patos-laranjal",
+    icon: "water",
+  },
 ];
 
 const mobileNavItems: NavigationItem[] = [
@@ -64,12 +68,12 @@ function NavigationIcon({ name }: { name: NavigationIconName }) {
     );
   }
 
-  if (name === "camera") {
+  if (name === "water") {
     return (
       <svg viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="3" y="6" width="14" height="12" rx="3" />
-        <path d="m17 10 4-2v8l-4-2M7.5 4.5h5" />
-        <circle cx="10" cy="12" r="2.7" />
+        <path d="M3 15.5c2.2 0 2.2-1.5 4.4-1.5s2.2 1.5 4.4 1.5 2.2-1.5 4.4-1.5 2.2 1.5 4.8 1.5" />
+        <path d="M3 19c2.2 0 2.2-1.5 4.4-1.5S9.6 19 11.8 19s2.2-1.5 4.4-1.5S18.4 19 21 19" />
+        <path d="M12 4.5c2.1 2.5 3.4 4.2 3.4 6a3.4 3.4 0 0 1-6.8 0c0-1.8 1.3-3.5 3.4-6Z" />
       </svg>
     );
   }
