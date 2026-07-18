@@ -35,6 +35,20 @@ export function WeatherIcon({ name, className = "", title }: WeatherIconProps) {
     );
   }
 
+  if (name === "moon") {
+    return (
+      <svg {...commonProps}>
+        {title ? <title>{title}</title> : null}
+        <path
+          d="M70 62c-22 5-40-12-36-34 2-8 6-14 12-19-20 1-36 18-36 39 0 22 18 40 40 40 18 0 33-12 38-28-5 1-11 2-18 2Z"
+          fill="currentColor"
+        />
+        <circle cx="71" cy="23" r="4" fill="currentColor" opacity=".55" />
+        <circle cx="84" cy="39" r="3" fill="currentColor" opacity=".4" />
+      </svg>
+    );
+  }
+
   if (name === "wind") {
     return (
       <svg {...commonProps}>
@@ -50,6 +64,7 @@ export function WeatherIcon({ name, className = "", title }: WeatherIconProps) {
 
   const hasRain = name === "rain" || name === "storm";
   const hasSun = name === "partly-cloudy";
+  const hasMoon = name === "partly-cloudy-night";
 
   return (
     <svg {...commonProps}>
@@ -67,6 +82,13 @@ export function WeatherIcon({ name, className = "", title }: WeatherIconProps) {
             <path d="m80 12-6 6" />
           </g>
         </g>
+      ) : null}
+      {hasMoon ? (
+        <path
+          className="weather-icon-moon"
+          d="M76 43c-15 3-27-8-24-23 1-5 4-9 8-12-14 1-24 12-24 26 0 15 12 27 27 27 12 0 23-8 26-19-4 1-8 1-13 1Z"
+          fill="currentColor"
+        />
       ) : null}
       <path
         d="M70 70H29c-11 0-19-7-19-17 0-9 7-16 16-17 3-12 13-20 26-20 15 0 27 11 28 26 8 2 13 7 13 14 0 8-7 14-16 14h-7Z"
