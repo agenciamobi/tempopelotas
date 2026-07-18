@@ -9,6 +9,7 @@ import "./map.css";
 import "./mobile-app.css";
 import "./mobile-app-fixes.css";
 import "./charts.css";
+import "./history.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
