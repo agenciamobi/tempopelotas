@@ -12,10 +12,10 @@ const TIMEZONE = "America/Sao_Paulo";
 const REVALIDATE_SECONDS = 600;
 
 const locations = [
-  { city: "Pelotas", latitude: -31.7654, longitude: -52.3376, x: 61, y: 61 },
-  { city: "Rio Grande", latitude: -32.035, longitude: -52.0986, x: 74, y: 72 },
-  { city: "Canguçu", latitude: -31.395, longitude: -52.6756, x: 45, y: 43 },
-  { city: "São Lourenço", latitude: -31.365, longitude: -51.978, x: 62, y: 32 },
+  { city: "Pelotas", latitude: -31.7654, longitude: -52.3376 },
+  { city: "Rio Grande", latitude: -32.035, longitude: -52.0986 },
+  { city: "Canguçu", latitude: -31.395, longitude: -52.6756 },
+  { city: "São Lourenço do Sul", latitude: -31.365, longitude: -51.978 },
 ] as const;
 
 type OpenMeteoCurrent = {
@@ -279,8 +279,8 @@ async function fetchRegionalWeather(): Promise<RegionalWeather[]> {
           data.current.weather_code,
           data.current.is_day === 1,
         ).icon,
-        x: location.x,
-        y: location.y,
+        latitude: location.latitude,
+        longitude: location.longitude,
       };
     }),
   );
