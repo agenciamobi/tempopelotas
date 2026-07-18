@@ -5,6 +5,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 import "./topic-pages.css";
 import "./home.css";
+import "./map.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
