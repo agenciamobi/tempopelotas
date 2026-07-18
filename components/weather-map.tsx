@@ -1,7 +1,15 @@
-import { regionalWeather } from "@/lib/weather-data";
 import { WeatherIcon } from "@/components/weather-icon";
+import type { RegionalWeather } from "@/lib/weather-data";
 
-export function WeatherMap() {
+type WeatherMapProps = {
+  regionalWeather: RegionalWeather[];
+};
+
+export function WeatherMap({ regionalWeather }: WeatherMapProps) {
+  const temperatures = regionalWeather.map((item) => item.temperature);
+  const minTemperature = temperatures.length ? Math.min(...temperatures) : 0;
+  const maxTemperature = temperatures.length ? Math.max(...temperatures) : 0;
+
   return (
     <section className="map-panel" id="regiao" aria-labelledby="map-title">
       <div className="map-panel-heading">
@@ -43,7 +51,7 @@ export function WeatherMap() {
             style={{ left: `${item.x}%`, top: `${item.y}%` }}
           >
             <div className="map-marker-icon">
-              <WeatherIcon name={item.condition} />
+              <WeatherIcon name={item.condition} title={`Condição em ${item.city}`} />
             </div>
             <span>{item.temperature}°</span>
             <small>{item.city}</small>
@@ -51,9 +59,9 @@ export function WeatherMap() {
         ))}
 
         <div className="map-legend" aria-hidden="true">
-          <span>10°</span>
+          <span>{minTemperature}°</span>
           <i />
-          <span>25°</span>
+          <span>{maxTemperature}°</span>
         </div>
       </div>
     </section>
