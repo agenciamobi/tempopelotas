@@ -54,6 +54,21 @@ Informações disponíveis:
 
 Os dados são revalidados a cada 10 minutos. Em caso de indisponibilidade da fonte externa, o sistema utiliza uma estrutura de contingência sem interromper a página.
 
+## Experiência mobile
+
+A interface para celulares segue uma linguagem próxima de aplicativo nativo:
+
+- cabeçalho fixo com suporte à área segura de aparelhos com notch;
+- barra inferior com cinco abas, ícones e indicação da rota ativa;
+- navegação preparada para instalação como PWA;
+- cartões compactos com hierarquia adaptada para toque;
+- carrosséis horizontais com scroll snap para previsão horária e conteúdos relacionados;
+- suporte a `viewport-fit=cover` e `safe-area-inset`;
+- manifesto com atalhos para tempo atual, previsão semanal, chuva e alertas;
+- estilos específicos para execução em modo `standalone`.
+
+Os principais ajustes estão em `app/mobile-app.css` e `components/site-header.tsx`.
+
 ## Mapa regional
 
 O mapa da página inicial utiliza coordenadas geográficas reais e apresenta marcadores meteorológicos para as cidades monitoradas.
