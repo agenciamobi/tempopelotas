@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ForecastPageShell } from "@/components/forecast-page-shell";
 import { formatMillimeters, getWeatherAdvisory } from "@/lib/weather-insights";
 import { getPelotasWeather } from "@/lib/weather-service";
@@ -76,6 +77,17 @@ export default async function AlertasPage() {
           <strong>{weather.current.temperature}°C</strong>
           <small>{weather.current.condition}</small>
         </article>
+      </section>
+
+      <section className="lagoon-alert-card" aria-label="Monitoramento do nível da lagoa">
+        <span aria-hidden="true">≋</span>
+        <div>
+          <strong>Nível da Lagoa dos Patos — Estação Laranjal</strong>
+          <small>
+            Consulte o painel público do LabHidroSens / UFPel como informação complementar.
+          </small>
+        </div>
+        <Link href="/nivel-da-lagoa-dos-patos-laranjal">Ver medidor</Link>
       </section>
 
       <section className="topic-section" aria-labelledby="monitoring-title">
