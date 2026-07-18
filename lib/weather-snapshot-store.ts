@@ -92,6 +92,27 @@ function rowToHistoricalDay(row: WeatherSnapshotRow): HistoricalWeatherDay {
   };
 }
 
+function dayToSnapshotRow(
+  day: HistoricalWeatherDay,
+  sourceName: string,
+  sourceUpdatedAt: string,
+): WeatherSnapshotRow {
+  return {
+    location_slug: LOCATION_SLUG,
+    observed_date: day.date,
+    city: "Pelotas",
+    state: "RS",
+    latitude: -31.7654,
+    longitude: -52.3376,
+    temperature_max: day.temperatureMax,
+    temperature_min: day.temperatureMin,
+    precipitation: day.precipitation,
+    wind_gust: day.windGust,
+    source_name: sourceName,
+    source_updated_at: sourceUpdatedAt,
+  };
+}
+
 export async function listWeatherSnapshots(limit = 30): Promise<HistoricalWeatherDay[]> {
   const { url, serviceRoleKey } = getStorageConfig();
 
@@ -121,30 +142,22 @@ export async function listWeatherSnapshots(limit = 30): Promise<HistoricalWeathe
   return rows.reverse().map(rowToHistoricalDay);
 }
 
-export async function upsertWeatherSnapshot(
-  day: HistoricalWeatherDay,
+export async function upsertWeatherSnapshots(
+  days: HistoricalWeatherDay[],
   sourceName: string,
-): Promise<HistoricalWeatherDay> {
+): Promise<HistoricalWeatherDay[]> {
   const { url, serviceRoleKey } = getStorageConfig();
 
   if (!url || !serviceRoleKey) {
     throw new Error("O armazenamento de snapshots meteorológicos não está configurado");
   }
 
-  const row: WeatherSnapshotRow = {
-    location_slug: LOCATION_SLUG,
-    observed_date: day.date,
-    city: "Pelotas",
-    state: "RS",
-    latitude: -31.7654,
-    longitude: -52.3376,
-    temperature_max: day.temperatureMax,
-    temperature_min: day.temperatureMin,
-    precipitation: day.precipitation,
-    wind_gust: day.windGust,
-    source_name: sourceName,
-    source_updated_at: new Date().toISOString(),
-  };
+  if (!days.length) return [];
+
+  const sourceUpdatedAt = new Date().toISOString();
+  const rows = days.map((day) =>
+    dayToSnapshotRow(day, sourceName, sourceUpdatedAt),
+  );
   const params = new URLSearchParams({
     on_conflict: "location_slug,observed_date",
   });
@@ -154,18 +167,29 @@ export async function upsertWeatherSnapshot(
       serviceRoleKey,
       "resolution=merge-duplicates,return=representation",
     ),
-    body: JSON.stringify(row),
+    body: JSON.stringify(rows),
     cache: "no-store",
   });
 
   if (!response.ok) {
     const details = await response.text();
     throw new Error(
-      `Falha ao persistir snapshot meteorológico (${response.status}): ${details.slice(0, 240)}`,
+      `Falha ao persistir snapshots meteorológicos (${response.status}): ${details.slice(0, 240)}`,
     );
   }
 
-  const rows = (await response.json()) as WeatherSnapshotRow[];
+  const storedRows = (await response.json()) as WeatherSnapshotRow[];
 
-  return rowToHistoricalDay(rows[0] ?? row);
+  return storedRows
+    .map(rowToHistoricalDay)
+    .sort((first, second) => first.date.localeCompare(second.date));
+}
+
+export async function upsertWeatherSnapshot(
+  day: HistoricalWeatherDay,
+  sourceName: string,
+): Promise<HistoricalWeatherDay> {
+  const snapshots = await upsertWeatherSnapshots([day], sourceName);
+
+  return snapshots[0] ?? day;
 }
