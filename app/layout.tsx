@@ -11,6 +11,7 @@ import "./mobile-app-fixes.css";
 import "./charts.css";
 import "./history.css";
 import "./cameras.css";
+import "./lagoon-level.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
