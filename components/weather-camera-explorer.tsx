@@ -160,30 +160,33 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
       </div>
 
       <div className="camera-list" aria-label="Resumo dos pontos de câmera">
-        {cameras.map((camera) => (
-          <button
-            id={camera.id}
-            type="button"
-            className={camera.id === selectedCamera.id ? "is-active" : undefined}
-            key={camera.id}
-            onClick={() => selectCamera(camera)}
-          >
-            <span className="camera-list-icon">
-              <CameraIcon />
-            </span>
-            <span>
-              <strong>{camera.shortName}</strong>
-              <small>{camera.area}</small>
-            </span>
-            <i
-              className={`camera-list-state camera-list-state--${camera.status}`}
-              aria-hidden="true"
-            />
-            <span className="sr-only">
-              {camera.status === "online" ? "Disponível" : "Em preparação"}
-            </span>
-          </button>
-        ))}
+        {cameras.map((camera) => {
+          const statusLabel =
+            camera.status === "online" ? "Disponível" : "Em preparação";
+
+          return (
+            <button
+              id={camera.id}
+              type="button"
+              aria-label={`${camera.name}. ${statusLabel}. Selecionar ponto.`}
+              className={camera.id === selectedCamera.id ? "is-active" : undefined}
+              key={camera.id}
+              onClick={() => selectCamera(camera)}
+            >
+              <span className="camera-list-icon">
+                <CameraIcon />
+              </span>
+              <span>
+                <strong>{camera.shortName}</strong>
+                <small>{camera.area}</small>
+              </span>
+              <i
+                className={`camera-list-state camera-list-state--${camera.status}`}
+                aria-hidden="true"
+              />
+            </button>
+          );
+        })}
       </div>
     </section>
   );
