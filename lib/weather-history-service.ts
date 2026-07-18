@@ -3,8 +3,11 @@ import type {
   HistoricalWeatherSummary,
   WeatherHistoryData,
 } from "@/lib/weather-history";
+import { listWeatherSnapshots } from "@/lib/weather-snapshot-store";
 
 const HISTORICAL_ENDPOINT = "https://historical-forecast-api.open-meteo.com/v1/forecast";
+const HISTORICAL_SOURCE_NAME = "Open-Meteo Historical Forecast";
+const HISTORICAL_SOURCE_URL = "https://open-meteo.com/en/docs/historical-forecast-api";
 const TIMEZONE = "America/Sao_Paulo";
 const REVALIDATE_SECONDS = 21600;
 const PELOTAS = { latitude: -31.7654, longitude: -52.3376 } as const;
@@ -122,10 +125,22 @@ function normalizeHistory(response: HistoricalForecastResponse): HistoricalWeath
   });
 }
 
-async function fetchHistory() {
-  const today = localDateString();
-  const endDate = shiftDate(today, -1);
-  const startDate = shiftDate(endDate, -29);
+function mergeHistoryDays(
+  externalDays: HistoricalWeatherDay[],
+  storedDays: HistoricalWeatherDay[],
+) {
+  const daysByDate = new Map(externalDays.map((day) => [day.date, day]));
+
+  for (const day of storedDays) {
+    daysByDate.set(day.date, day);
+  }
+
+  return Array.from(daysByDate.values())
+    .sort((first, second) => first.date.localeCompare(second.date))
+    .slice(-30);
+}
+
+async function fetchHistoryRange(startDate: string, endDate: string) {
   const params = new URLSearchParams({
     latitude: String(PELOTAS.latitude),
     longitude: String(PELOTAS.longitude),
@@ -152,10 +167,34 @@ async function fetchHistory() {
   return (await response.json()) as HistoricalForecastResponse;
 }
 
+export async function getPelotasHistoricalDay(date?: string): Promise<HistoricalWeatherDay> {
+  const targetDate = date ?? shiftDate(localDateString(), -1);
+  const response = await fetchHistoryRange(targetDate, targetDate);
+  const day = normalizeHistory(response)[0];
+
+  if (!day) {
+    throw new Error(`A fonte histórica não retornou dados para ${targetDate}`);
+  }
+
+  return day;
+}
+
 export async function getPelotasWeatherHistory(): Promise<WeatherHistoryData> {
+  let storedDays: HistoricalWeatherDay[] = [];
+
   try {
-    const response = await fetchHistory();
-    const days = normalizeHistory(response);
+    storedDays = await listWeatherSnapshots(30);
+  } catch (error) {
+    console.error("Falha ao consultar snapshots meteorológicos próprios:", error);
+  }
+
+  try {
+    const today = localDateString();
+    const endDate = shiftDate(today, -1);
+    const startDate = shiftDate(endDate, -29);
+    const response = await fetchHistoryRange(startDate, endDate);
+    const externalDays = normalizeHistory(response);
+    const days = mergeHistoryDays(externalDays, storedDays);
 
     if (!days.length) throw new Error("A fonte histórica não retornou dias válidos");
 
@@ -163,13 +202,30 @@ export async function getPelotasWeatherHistory(): Promise<WeatherHistoryData> {
       days,
       summary: buildSummary(days),
       source: {
-        name: "Open-Meteo Historical Forecast",
-        url: "https://open-meteo.com/en/docs/historical-forecast-api",
+        name: storedDays.length
+          ? `Arquivo próprio (${storedDays.length} dias) + ${HISTORICAL_SOURCE_NAME}`
+          : HISTORICAL_SOURCE_NAME,
+        url: HISTORICAL_SOURCE_URL,
         isFallback: false,
       },
     };
   } catch (error) {
-    console.error("Falha ao carregar o histórico meteorológico:", error);
+    console.error("Falha ao carregar o histórico meteorológico externo:", error);
+
+    if (storedDays.length) {
+      const days = storedDays.slice(-30);
+
+      return {
+        days,
+        summary: buildSummary(days),
+        source: {
+          name: "Arquivo meteorológico próprio",
+          url: "",
+          isFallback: false,
+        },
+      };
+    }
+
     const days = createFallbackDays();
 
     return {
