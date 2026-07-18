@@ -35,6 +35,12 @@ export default function manifest(): MetadataRoute.Manifest {
         url: "/chuva-em-pelotas",
       },
       {
+        name: "Câmeras de Pelotas",
+        short_name: "Câmeras",
+        description: "Abrir os pontos de observação visual da cidade.",
+        url: "/cameras-ao-vivo-pelotas",
+      },
+      {
         name: "Histórico de Pelotas",
         short_name: "Histórico",
         description: "Comparar temperatura, chuva e vento dos últimos 30 dias.",
