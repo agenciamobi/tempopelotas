@@ -8,6 +8,7 @@ const routes = [
   { path: "/chuva-em-pelotas", priority: 0.85, changeFrequency: "hourly" },
   { path: "/vento-em-pelotas", priority: 0.85, changeFrequency: "hourly" },
   { path: "/historico-climatico-pelotas", priority: 0.82, changeFrequency: "daily" },
+  { path: "/cameras-ao-vivo-pelotas", priority: 0.82, changeFrequency: "hourly" },
   { path: "/alertas", priority: 0.8, changeFrequency: "hourly" },
 ] as const;
 
