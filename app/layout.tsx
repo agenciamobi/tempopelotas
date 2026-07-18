@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
 import "./topic-pages.css";
+import "./home.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
