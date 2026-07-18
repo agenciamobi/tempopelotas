@@ -6,6 +6,7 @@ import "./globals.css";
 import "./topic-pages.css";
 import "./home.css";
 import "./map.css";
+import "./mobile-app.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -17,9 +18,18 @@ export const metadata: Metadata = {
     "Previsão do tempo em Pelotas, RS, com condições atuais, chuva, vento, alertas e tendência para os próximos dias.",
   applicationName: "TEMPO Pelotas",
   manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Tempo Pelotas",
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
   alternates: { canonical: "/" },
   openGraph: {
@@ -52,6 +62,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   themeColor: "#071e2f",
   colorScheme: "light",
 };
