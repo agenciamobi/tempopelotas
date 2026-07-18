@@ -118,8 +118,8 @@ Características:
 - link opcional para a fonte original;
 - atribuição do provedor por câmera;
 - layout desktop e mobile com linguagem de aplicativo;
-- ItemList em Schema.org e URL incluída no sitemap;
-- atalho próprio no manifesto PWA.
+- ItemList em Schema.org;
+- indexação, sitemap e atalho PWA condicionados à existência de uma transmissão ativa.
 
 Exemplo de configuração:
 
@@ -139,6 +139,23 @@ CAMERA_SAO_GONCALO_PROVIDER=
 
 Sem uma URL de incorporação válida, o ponto permanece identificado como `Em preparação`. O portal não exibe transmissões fictícias nem tenta acessar RTSP diretamente no navegador.
 
+## Nível da Lagoa dos Patos
+
+A página `app/nivel-da-lagoa-dos-patos-laranjal/page.tsx` organiza o acesso ao painel público da Estação Laranjal, fornecido pelo LabHidroSens / UFPel.
+
+Recursos:
+
+- painel externo carregado somente depois da ação do usuário;
+- link permanente para abrir o dashboard original;
+- contexto com vento atual, rajadas e chuva prevista;
+- destaque na página inicial e na página de alertas;
+- metadados, canonical, Schema.org `WebPage` e entrada no sitemap;
+- atalho próprio no manifesto PWA;
+- aviso explícito de que o portal não define cotas de inundação nem converte a leitura em alerta oficial;
+- fallback para acesso direto caso o provedor bloqueie a incorporação em `iframe`.
+
+A referência do dashboard fica centralizada em `lib/lagoon-level.ts`.
+
 ## Experiência mobile
 
 A interface para celulares segue uma linguagem próxima de aplicativo nativo:
@@ -148,11 +165,12 @@ A interface para celulares segue uma linguagem próxima de aplicativo nativo:
 - navegação preparada para instalação como PWA;
 - cartões compactos com hierarquia adaptada para toque;
 - carrosséis horizontais com scroll snap para previsão horária, histórico, câmeras e conteúdos relacionados;
+- painel da lagoa responsivo e carregado sob demanda;
 - suporte a `viewport-fit=cover` e `safe-area-inset`;
-- manifesto com atalhos para tempo atual, previsão semanal, chuva, câmeras, histórico e alertas;
+- manifesto com atalhos para tempo atual, previsão semanal, chuva, lagoa, câmeras, histórico e alertas;
 - estilos específicos para execução em modo `standalone`.
 
-Os principais ajustes estão em `app/mobile-app.css`, `app/cameras.css` e `components/site-header.tsx`.
+Os principais ajustes estão em `app/mobile-app.css`, `app/cameras.css`, `app/lagoon-level.css` e `components/site-header.tsx`.
 
 ## Gráficos meteorológicos
 
@@ -191,6 +209,7 @@ Características:
 - `/previsao-7-dias-pelotas` — tendência semanal completa;
 - `/chuva-em-pelotas` — probabilidade e acumulado de chuva;
 - `/vento-em-pelotas` — vento médio e rajadas;
+- `/nivel-da-lagoa-dos-patos-laranjal` — medidor da Estação Laranjal;
 - `/historico-climatico-pelotas` — comparação dos últimos 30 dias;
 - `/cameras-ao-vivo-pelotas` — pontos de observação visual da cidade;
 - `/alertas` — leitura automática de condições de atenção;
@@ -202,7 +221,7 @@ Características:
 
 - metadados por página;
 - URLs canônicas;
-- Schema.org, FAQPage, Dataset e ItemList;
+- Schema.org, FAQPage, Dataset, ItemList e WebPage;
 - sitemap dinâmico;
 - robots.txt;
 - navegação interna entre previsões;
@@ -211,12 +230,13 @@ Características:
 
 ## Alertas
 
-A página de alertas utiliza critérios internos para destacar chuva, rajadas e indicação de temporal. Essa leitura não representa um alerta oficial e não substitui a Defesa Civil, o INMET ou as autoridades locais.
+A página de alertas utiliza critérios internos para destacar chuva, rajadas e indicação de temporal. Essa leitura não representa um alerta oficial e não substitui a Defesa Civil, o INMET ou as autoridades locais. O medidor da lagoa é apresentado apenas como informação complementar.
 
 ## Próximas etapas
 
 - configurar um projeto Supabase exclusivo e iniciar o arquivo diário próprio;
 - integrar avisos oficiais do INMET e referências da Defesa Civil;
 - ativar as primeiras fontes públicas e estáveis de câmera;
+- avaliar integração estruturada do nível da lagoa quando houver API pública documentada;
 - ampliar a cobertura para mais cidades da Zona Sul;
 - revisar identidade visual e conteúdo com base no uso real.
