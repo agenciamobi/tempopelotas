@@ -9,9 +9,10 @@ Portal meteorológico local para Pelotas e a Zona Sul do Rio Grande do Sul.
 - TypeScript
 - Tailwind CSS 4
 - Open-Meteo como fonte meteorológica inicial
+- Supabase opcional para arquivo histórico próprio
 - MapLibre GL JS para visualização geográfica
 - OpenFreeMap como camada cartográfica
-- Vercel para validação de produção
+- Vercel para validação de produção e captura diária
 
 ## Desenvolvimento local
 
@@ -69,7 +70,31 @@ A página de histórico oferece:
 - Schema.org do tipo `Dataset`;
 - endpoint interno `/api/weather/history`.
 
-O histórico é revalidado a cada seis horas. Nesta etapa, os dados são recuperados da fonte histórica com cache; ainda não existe armazenamento próprio em banco de dados.
+O histórico é revalidado a cada seis horas. Quando o armazenamento próprio está configurado, os snapshots persistidos têm prioridade sobre o dado externo correspondente. Durante a formação do arquivo, o sistema combina os dias próprios com a série do Open-Meteo, sem deixar lacunas no painel.
+
+## Arquivo meteorológico próprio
+
+A persistência é opcional e utiliza a API REST do Supabase apenas no servidor, sem enviar a chave administrativa ao navegador.
+
+1. Aplique a migration:
+
+```text
+supabase/migrations/20260718233000_create_weather_daily_snapshots.sql
+```
+
+2. Configure no ambiente local e na Vercel:
+
+```env
+SUPABASE_URL=https://SEU-PROJETO.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=CHAVE_APENAS_DO_SERVIDOR
+CRON_SECRET=SEGREDO_ALEATORIO_COM_PELO_MENOS_16_CARACTERES
+```
+
+3. A rota protegida `/api/cron/weather-snapshot` busca o dia completo anterior e realiza `upsert` pela combinação `location_slug + observed_date`.
+
+4. O `vercel.json` agenda a execução diária às `06:15 UTC`, equivalente a `03:15` no horário de Pelotas. Em contas Hobby, a execução pode ocorrer em qualquer momento dentro dessa hora.
+
+Enquanto as variáveis não estiverem configuradas, a captura retorna como ignorada e o portal continua funcionando exclusivamente com o histórico externo e o fallback já existente.
 
 ## Experiência mobile
 
@@ -126,7 +151,8 @@ Características:
 - `/historico-climatico-pelotas` — comparação dos últimos 30 dias;
 - `/alertas` — leitura automática de condições de atenção;
 - `/api/weather` — endpoint interno com dados normalizados;
-- `/api/weather/history` — endpoint interno do histórico recente.
+- `/api/weather/history` — endpoint interno do histórico recente;
+- `/api/cron/weather-snapshot` — captura protegida do arquivo diário.
 
 ## SEO e distribuição
 
@@ -145,8 +171,8 @@ A página de alertas utiliza critérios internos para destacar chuva, rajadas e 
 
 ## Próximas etapas
 
+- configurar um projeto Supabase exclusivo e iniciar o arquivo diário próprio;
 - integrar alertas oficiais quando houver uma fonte adequada;
 - adicionar câmeras meteorológicas locais;
-- persistir snapshots diários em banco de dados para comparações próprias de longo prazo;
 - ampliar a cobertura para mais cidades da Zona Sul;
 - revisar identidade visual e conteúdo com base no uso real.
