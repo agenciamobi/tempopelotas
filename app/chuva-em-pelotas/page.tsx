@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ForecastPageShell } from "@/components/forecast-page-shell";
 import { WeatherIcon } from "@/components/weather-icon";
+import { WeatherTrendChart } from "@/components/weather-trend-chart";
 import { formatMillimeters } from "@/lib/weather-insights";
 import { getPelotasWeather } from "@/lib/weather-service";
 
@@ -63,6 +64,8 @@ export default async function ChuvaEmPelotasPage() {
           <small>{wettestDay?.weekday} · {wettestDay?.date}</small>
         </article>
       </section>
+
+      <WeatherTrendChart hourly={weather.hourly} initialMetric="precipitation" />
 
       <section className="topic-section" aria-labelledby="rain-hours-title">
         <div className="section-heading">
