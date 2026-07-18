@@ -7,24 +7,38 @@ import { getPelotasWeather } from "@/lib/weather-service";
 
 export const revalidate = 600;
 
-export const metadata: Metadata = {
-  title: "Câmeras ao vivo de Pelotas e Praia do Laranjal",
-  description:
-    "Acompanhe câmeras meteorológicas de Pelotas, Praia do Laranjal e Canal São Gonçalo para observar chuva, nuvens, vento e visibilidade.",
-  alternates: { canonical: "/cameras-ao-vivo-pelotas" },
-  openGraph: {
-    title: "Câmeras ao vivo de Pelotas",
-    description:
-      "Visualize pontos de Pelotas e acompanhe as condições meteorológicas locais por imagem.",
-    url: "/cameras-ao-vivo-pelotas",
-  },
-};
+export function generateMetadata(): Metadata {
+  const hasOnlineCamera = getWeatherCameras().some(
+    (camera) => camera.status === "online",
+  );
+
+  return {
+    title: hasOnlineCamera
+      ? "Câmeras ao vivo de Pelotas e Praia do Laranjal"
+      : "Câmeras meteorológicas de Pelotas",
+    description: hasOnlineCamera
+      ? "Acompanhe câmeras meteorológicas de Pelotas, Praia do Laranjal e Canal São Gonçalo para observar chuva, nuvens, vento e visibilidade."
+      : "Conheça os pontos preparados para observação visual do tempo em Pelotas, Praia do Laranjal e Canal São Gonçalo.",
+    alternates: { canonical: "/cameras-ao-vivo-pelotas" },
+    robots: {
+      index: hasOnlineCamera,
+      follow: true,
+    },
+    openGraph: {
+      title: hasOnlineCamera
+        ? "Câmeras ao vivo de Pelotas"
+        : "Câmeras meteorológicas de Pelotas",
+      description: hasOnlineCamera
+        ? "Visualize pontos de Pelotas e acompanhe as condições meteorológicas locais por imagem."
+        : "Rede de pontos preparada para observação visual das condições meteorológicas de Pelotas.",
+      url: "/cameras-ao-vivo-pelotas",
+    },
+  };
+}
 
 export default async function CamerasAoVivoPelotasPage() {
-  const [weather, cameras] = await Promise.all([
-    getPelotasWeather(),
-    Promise.resolve(getWeatherCameras()),
-  ]);
+  const weather = await getPelotasWeather();
+  const cameras = getWeatherCameras();
   const onlineCount = cameras.filter((camera) => camera.status === "online").length;
 
   const itemListSchema = {
@@ -46,8 +60,12 @@ export default async function CamerasAoVivoPelotasPage() {
     <ForecastPageShell
       weather={weather}
       eyebrow="Observação visual"
-      title="Câmeras ao vivo de Pelotas"
-      description="Acompanhe pontos estratégicos da cidade para complementar a leitura da previsão com imagens locais, sem substituir dados de estações ou alertas oficiais."
+      title={onlineCount ? "Câmeras ao vivo de Pelotas" : "Câmeras meteorológicas de Pelotas"}
+      description={
+        onlineCount
+          ? "Acompanhe pontos estratégicos da cidade para complementar a leitura da previsão com imagens locais, sem substituir dados de estações ou alertas oficiais."
+          : "A rede visual está estruturada para receber transmissões do Laranjal, Centro e Canal São Gonçalo assim que fontes públicas e estáveis forem ativadas."
+      }
       currentPath="/cameras-ao-vivo-pelotas"
     >
       <script
