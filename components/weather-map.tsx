@@ -105,7 +105,7 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
           zoom: 7.4,
           minZoom: 6,
           maxZoom: 13,
-          attributionControl: true,
+          cooperativeGestures: true,
         });
 
         mapRef.current = map;
