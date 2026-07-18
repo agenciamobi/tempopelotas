@@ -1,3 +1,4 @@
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WeatherDashboard } from "@/components/weather-dashboard";
 import { WeatherMap } from "@/components/weather-map";
@@ -44,22 +45,7 @@ export default async function Home() {
           <WeatherDashboard weather={weather} />
         </div>
 
-        <footer className="site-footer">
-          <div>
-            <strong>TEMPO Pelotas</strong>
-            <p>Informação meteorológica local, clara e acessível.</p>
-          </div>
-          <p>
-            Fonte meteorológica: {weather.source.url ? (
-              <a href={weather.source.url} target="_blank" rel="noreferrer">
-                {weather.source.name}
-              </a>
-            ) : weather.source.name}
-            {weather.source.isFallback
-              ? ". A integração externa está temporariamente indisponível e o sistema exibiu dados de contingência."
-              : ". Dados atualizados automaticamente a cada 10 minutos."}
-          </p>
-        </footer>
+        <SiteFooter source={weather.source} />
       </div>
     </>
   );
