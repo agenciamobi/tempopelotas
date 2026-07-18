@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ForecastPageShell } from "@/components/forecast-page-shell";
 import { WeatherIcon } from "@/components/weather-icon";
-import { absoluteUrl } from "@/lib/site";
+import { WeatherTrendChart } from "@/components/weather-trend-chart";
 import { formatMillimeters } from "@/lib/weather-insights";
 import { getPelotasWeather } from "@/lib/weather-service";
 
@@ -89,6 +89,8 @@ export default async function TempoHojePelotasPage() {
         <article><span>Rajadas</span><strong>{current.windGust} km/h</strong><small>Velocidade instantânea</small></article>
         <article><span>Chuva prevista</span><strong>{formatMillimeters(today?.precipitation ?? 0)} mm</strong><small>{today?.rainChance ?? 0}% de probabilidade</small></article>
       </section>
+
+      <WeatherTrendChart hourly={hourly} initialMetric="temperature" />
 
       <section className="topic-section" aria-labelledby="today-hours-title">
         <div className="section-heading">
