@@ -1,3 +1,4 @@
+import { LagoonLevelTeaser } from "@/components/lagoon-level-teaser";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WeatherDashboard } from "@/components/weather-dashboard";
@@ -45,6 +46,8 @@ export default async function Home() {
           <WeatherMap regionalWeather={weather.regional} />
           <WeatherDashboard weather={weather} />
         </div>
+
+        <LagoonLevelTeaser />
 
         <div className="home-weather-navigation">
           <WeatherNavigation />
