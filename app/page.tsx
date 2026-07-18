@@ -2,6 +2,9 @@ import { SiteHeader } from "@/components/site-header";
 import { WeatherDashboard } from "@/components/weather-dashboard";
 import { WeatherMap } from "@/components/weather-map";
 import { absoluteUrl } from "@/lib/site";
+import { getPelotasWeather } from "@/lib/weather-service";
+
+export const revalidate = 600;
 
 const websiteSchema = {
   "@context": "https://schema.org",
@@ -21,7 +24,9 @@ const websiteSchema = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
+  const weather = await getPelotasWeather();
+
   return (
     <>
       <script
@@ -35,8 +40,8 @@ export default function Home() {
         <SiteHeader />
 
         <div className="dashboard-layout">
-          <WeatherMap />
-          <WeatherDashboard />
+          <WeatherMap regionalWeather={weather.regional} />
+          <WeatherDashboard weather={weather} />
         </div>
 
         <footer className="site-footer">
@@ -45,7 +50,14 @@ export default function Home() {
             <p>Informação meteorológica local, clara e acessível.</p>
           </div>
           <p>
-            Front-end inicial com dados demonstrativos. A fonte oficial será identificada em cada previsão após a integração da API.
+            Fonte meteorológica: {weather.source.url ? (
+              <a href={weather.source.url} target="_blank" rel="noreferrer">
+                {weather.source.name}
+              </a>
+            ) : weather.source.name}
+            {weather.source.isFallback
+              ? ". A integração externa está temporariamente indisponível e o sistema exibiu dados de contingência."
+              : ". Dados atualizados automaticamente a cada 10 minutos."}
           </p>
         </footer>
       </div>
