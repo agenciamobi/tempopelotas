@@ -8,9 +8,10 @@ Portal meteorológico local para Pelotas e a Zona Sul do Rio Grande do Sul.
 - React 19
 - TypeScript
 - Tailwind CSS 4
-- Deploy previsto na Vercel
+- Open-Meteo como fonte meteorológica inicial
+- Vercel para validação de produção
 
-## Desenvolvimento
+## Desenvolvimento local
 
 ```bash
 npm install
@@ -19,6 +20,12 @@ npm run dev
 
 Acesse `http://localhost:3000`.
 
+Para definir a URL pública localmente, copie `.env.example` para `.env.local`:
+
+```env
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
 ## Validação
 
 ```bash
@@ -26,35 +33,54 @@ npm run typecheck
 npm run build
 ```
 
-O GitHub Actions executa as duas verificações automaticamente em cada atualização da `main`.
+O GitHub Actions e a Vercel validam as atualizações enviadas para a `main`.
 
-## Front-end implementado
+## Dados meteorológicos
 
-- condição meteorológica atual em destaque;
-- mapa ilustrativo de Pelotas e cidades próximas;
-- umidade, pressão, vento e visibilidade;
-- previsão horária com navegação horizontal no celular;
+A integração está centralizada em `lib/weather-service.ts` e normaliza os dados antes de entregá-los aos componentes.
+
+Informações disponíveis:
+
+- temperatura e sensação térmica;
+- umidade, pressão e visibilidade;
+- velocidade, direção e rajadas de vento;
+- previsão horária;
 - previsão para sete dias;
-- área preparada para alertas meteorológicos;
-- cabeçalho fixo e navegação mobile;
-- metadados, Schema.org, sitemap e robots.txt;
-- layout responsivo e suporte a redução de movimento.
+- probabilidade e acumulado estimado de chuva;
+- nascer e pôr do sol;
+- condições regionais de Pelotas, Rio Grande, Canguçu e São Lourenço do Sul.
 
-Os dados exibidos nesta etapa são demonstrativos e estão centralizados em `lib/weather-data.ts`.
+Os dados são revalidados a cada 10 minutos. Em caso de indisponibilidade da fonte externa, o sistema utiliza uma estrutura de contingência sem interromper a página.
 
-## Direção visual
+## Páginas
 
-A referência do ClicTempo foi usada somente como base de hierarquia da informação. O projeto adota identidade própria:
+- `/` — painel meteorológico principal;
+- `/tempo-hoje-pelotas` — condição atual e previsão horária;
+- `/previsao-7-dias-pelotas` — tendência semanal completa;
+- `/chuva-em-pelotas` — probabilidade e acumulado de chuva;
+- `/vento-em-pelotas` — vento médio e rajadas;
+- `/alertas` — leitura automática de condições de atenção;
+- `/api/weather` — endpoint interno com dados normalizados.
 
-- azul profundo para a condição atual;
-- superfícies claras e alto contraste;
-- ciano para informações meteorológicas;
-- amarelo solar para destaques;
-- azul para precipitação;
-- laranja reservado aos alertas.
+## SEO e distribuição
 
-No desktop, o mapa permanece lateral e o conteúdo meteorológico recebe maior área útil. No mobile, a condição atual, previsão horária, alertas e previsão semanal aparecem antes do mapa.
+- metadados por página;
+- URLs canônicas;
+- Schema.org e FAQPage;
+- sitemap dinâmico;
+- robots.txt;
+- navegação interna entre previsões;
+- manifesto instalável e ícone do aplicativo;
+- conteúdo renderizado no servidor.
 
-## Próxima etapa
+## Alertas
 
-Criar uma camada interna de normalização e cache para integrar fontes meteorológicas sem acoplar os componentes diretamente a uma API específica. A fonte utilizada deverá ser identificada claramente em cada previsão.
+A página de alertas utiliza critérios internos para destacar chuva, rajadas e indicação de temporal. Essa leitura não representa um alerta oficial e não substitui a Defesa Civil, o INMET ou as autoridades locais.
+
+## Próximas etapas
+
+- integrar alertas oficiais quando houver uma fonte adequada;
+- substituir o mapa ilustrativo por uma camada geográfica interativa;
+- adicionar câmeras meteorológicas locais;
+- criar histórico e gráficos de temperatura, chuva e vento;
+- revisar identidade visual e conteúdo com base no uso real.
