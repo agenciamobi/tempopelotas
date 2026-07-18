@@ -39,7 +39,7 @@ O GitHub Actions e a Vercel validam as atualizações enviadas para a `main`.
 
 ## Dados meteorológicos
 
-A integração está centralizada em `lib/weather-service.ts` e normaliza os dados antes de entregá-los aos componentes.
+A integração atual está centralizada em `lib/weather-service.ts` e normaliza os dados antes de entregá-los aos componentes.
 
 Informações disponíveis:
 
@@ -52,7 +52,24 @@ Informações disponíveis:
 - nascer e pôr do sol;
 - condições regionais de Pelotas, Rio Grande, Canguçu e São Lourenço do Sul.
 
-Os dados são revalidados a cada 10 minutos. Em caso de indisponibilidade da fonte externa, o sistema utiliza uma estrutura de contingência sem interromper a página.
+Os dados de previsão são revalidados a cada 10 minutos. Em caso de indisponibilidade da fonte externa, o sistema utiliza uma estrutura de contingência sem interromper a página.
+
+## Histórico meteorológico
+
+O serviço `lib/weather-history-service.ts` consulta os últimos 30 dias completos na API Historical Forecast do Open-Meteo e entrega uma série diária normalizada.
+
+A página de histórico oferece:
+
+- médias das temperaturas máximas e mínimas;
+- chuva acumulada no período;
+- maior rajada registrada pelo modelo;
+- identificação do dia mais quente, mais frio e mais chuvoso;
+- gráfico interativo para 7, 14 ou 30 dias;
+- alternância entre temperatura, chuva e rajadas;
+- Schema.org do tipo `Dataset`;
+- endpoint interno `/api/weather/history`.
+
+O histórico é revalidado a cada seis horas. Nesta etapa, os dados são recuperados da fonte histórica com cache; ainda não existe armazenamento próprio em banco de dados.
 
 ## Experiência mobile
 
@@ -64,7 +81,7 @@ A interface para celulares segue uma linguagem próxima de aplicativo nativo:
 - cartões compactos com hierarquia adaptada para toque;
 - carrosséis horizontais com scroll snap para previsão horária e conteúdos relacionados;
 - suporte a `viewport-fit=cover` e `safe-area-inset`;
-- manifesto com atalhos para tempo atual, previsão semanal, chuva e alertas;
+- manifesto com atalhos para tempo atual, previsão semanal, chuva, histórico e alertas;
 - estilos específicos para execução em modo `standalone`.
 
 Os principais ajustes estão em `app/mobile-app.css` e `components/site-header.tsx`.
@@ -82,6 +99,8 @@ Recursos:
 - carrossel com scroll snap no celular;
 - tema inicial contextual nas páginas de chuva e vento;
 - uso na página inicial e nas páginas específicas de previsão.
+
+O componente `components/weather-history-chart.tsx` aplica a mesma arquitetura ao histórico diário e permite alternar o período exibido.
 
 ## Mapa regional
 
@@ -104,14 +123,16 @@ Características:
 - `/previsao-7-dias-pelotas` — tendência semanal completa;
 - `/chuva-em-pelotas` — probabilidade e acumulado de chuva;
 - `/vento-em-pelotas` — vento médio e rajadas;
+- `/historico-climatico-pelotas` — comparação dos últimos 30 dias;
 - `/alertas` — leitura automática de condições de atenção;
-- `/api/weather` — endpoint interno com dados normalizados.
+- `/api/weather` — endpoint interno com dados normalizados;
+- `/api/weather/history` — endpoint interno do histórico recente.
 
 ## SEO e distribuição
 
 - metadados por página;
 - URLs canônicas;
-- Schema.org e FAQPage;
+- Schema.org, FAQPage e Dataset;
 - sitemap dinâmico;
 - robots.txt;
 - navegação interna entre previsões;
@@ -126,6 +147,6 @@ A página de alertas utiliza critérios internos para destacar chuva, rajadas e 
 
 - integrar alertas oficiais quando houver uma fonte adequada;
 - adicionar câmeras meteorológicas locais;
-- criar histórico diário persistente para comparação meteorológica;
+- persistir snapshots diários em banco de dados para comparações próprias de longo prazo;
 - ampliar a cobertura para mais cidades da Zona Sul;
 - revisar identidade visual e conteúdo com base no uso real.
