@@ -3,10 +3,11 @@
 import { useId, useMemo, useState } from "react";
 import type { HourlyForecast } from "@/lib/weather-data";
 
-type ChartMetric = "temperature" | "precipitation" | "windGust";
+export type ChartMetric = "temperature" | "precipitation" | "windGust";
 
 type WeatherTrendChartProps = {
   hourly: HourlyForecast[];
+  initialMetric?: ChartMetric;
 };
 
 const metrics: Record<
@@ -77,11 +78,16 @@ function createSmoothPath(points: Array<{ x: number; y: number }>) {
   }, "");
 }
 
-export function WeatherTrendChart({ hourly }: WeatherTrendChartProps) {
-  const [metric, setMetric] = useState<ChartMetric>("temperature");
+export function WeatherTrendChart({
+  hourly,
+  initialMetric = "temperature",
+}: WeatherTrendChartProps) {
+  const [metric, setMetric] = useState<ChartMetric>(initialMetric);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const reactId = useId();
-  const gradientId = `weather-chart-${reactId.replace(/:/g, "")}`;
+  const safeId = reactId.replace(/:/g, "");
+  const gradientId = `weather-chart-gradient-${safeId}`;
+  const headingId = `weather-chart-title-${safeId}`;
   const config = metrics[metric];
 
   const chart = useMemo(() => {
@@ -125,12 +131,12 @@ export function WeatherTrendChart({ hourly }: WeatherTrendChartProps) {
   return (
     <section
       className={`trend-chart trend-chart--${metric}`}
-      aria-labelledby="trend-chart-title"
+      aria-labelledby={headingId}
     >
       <div className="trend-chart-heading">
         <div>
           <span className="eyebrow">Evolução nas próximas horas</span>
-          <h2 id="trend-chart-title">Tendência meteorológica</h2>
+          <h2 id={headingId}>Tendência meteorológica</h2>
           <p>{config.description}</p>
         </div>
 
