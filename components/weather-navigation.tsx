@@ -27,6 +27,11 @@ const pages = [
     description: "Compare os últimos 30 dias na cidade.",
   },
   {
+    href: "/cameras-ao-vivo-pelotas",
+    title: "Câmeras de Pelotas",
+    description: "Observe Laranjal, Centro e São Gonçalo.",
+  },
+  {
     href: "/alertas",
     title: "Alertas e atenção",
     description: "Leitura automática e fontes oficiais.",
