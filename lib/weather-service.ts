@@ -27,6 +27,7 @@ type OpenMeteoCurrent = {
   pressure_msl: number;
   visibility?: number;
   wind_speed_10m: number;
+  wind_gusts_10m: number;
   wind_direction_10m: number;
   is_day: number;
 };
@@ -38,6 +39,8 @@ type OpenMeteoResponse = {
     time: string[];
     temperature_2m: number[];
     precipitation_probability: number[];
+    wind_speed_10m: number[];
+    wind_gusts_10m: number[];
     weather_code: number[];
     is_day: number[];
   };
@@ -47,6 +50,8 @@ type OpenMeteoResponse = {
     temperature_2m_max: number[];
     temperature_2m_min: number[];
     precipitation_probability_max: number[];
+    precipitation_sum: number[];
+    wind_gusts_10m_max: number[];
     sunrise: string[];
     sunset: string[];
   };
@@ -58,15 +63,24 @@ type RegionalOpenMeteoResponse = {
 
 function weatherCodeToPresentation(code: number, isDay = true) {
   if (code === 0) {
-    return { label: isDay ? "Céu limpo" : "Noite de céu limpo", icon: "sun" as WeatherIconName };
+    return {
+      label: isDay ? "Céu limpo" : "Noite de céu limpo",
+      icon: (isDay ? "sun" : "moon") as WeatherIconName,
+    };
   }
 
   if (code === 1 || code === 2) {
-    return { label: "Sol entre nuvens", icon: "partly-cloudy" as WeatherIconName };
+    return {
+      label: isDay ? "Sol entre nuvens" : "Noite parcialmente nublada",
+      icon: (isDay ? "partly-cloudy" : "partly-cloudy-night") as WeatherIconName,
+    };
   }
 
   if (code === 3 || code === 45 || code === 48) {
-    return { label: code >= 45 ? "Neblina" : "Céu nublado", icon: "cloud" as WeatherIconName };
+    return {
+      label: code >= 45 ? "Neblina" : "Céu nublado",
+      icon: "cloud" as WeatherIconName,
+    };
   }
 
   if ((code >= 51 && code <= 67) || (code >= 80 && code <= 86)) {
@@ -85,7 +99,25 @@ function weatherCodeToPresentation(code: number, isDay = true) {
 }
 
 function degreesToCompass(degrees: number) {
-  const directions = ["N", "NNE", "NE", "ENE", "L", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO"];
+  const directions = [
+    "N",
+    "NNE",
+    "NE",
+    "ENE",
+    "L",
+    "ESE",
+    "SE",
+    "SSE",
+    "S",
+    "SSO",
+    "SO",
+    "OSO",
+    "O",
+    "ONO",
+    "NO",
+    "NNO",
+  ];
+
   return directions[Math.round((((degrees % 360) + 360) % 360) / 22.5) % 16];
 }
 
@@ -121,25 +153,31 @@ function formatDate(date: string) {
 }
 
 function normalizeHourly(response: OpenMeteoResponse): HourlyForecast[] {
-  const currentIndex = Math.max(
-    0,
-    response.hourly.time.findIndex((time) => time >= response.current.time),
+  const foundIndex = response.hourly.time.findIndex(
+    (time) => time >= response.current.time,
   );
+  const currentIndex = foundIndex === -1 ? 0 : foundIndex;
 
-  return response.hourly.time.slice(currentIndex, currentIndex + 7).map((time, offset) => {
-    const index = currentIndex + offset;
-    const presentation = weatherCodeToPresentation(
-      response.hourly.weather_code[index],
-      response.hourly.is_day[index] === 1,
-    );
+  return response.hourly.time
+    .slice(currentIndex, currentIndex + 7)
+    .map((time, offset) => {
+      const index = currentIndex + offset;
+      const presentation = weatherCodeToPresentation(
+        response.hourly.weather_code[index],
+        response.hourly.is_day[index] === 1,
+      );
 
-    return {
-      time: offset === 0 ? "Agora" : `${formatClock(time).slice(0, 2)}h`,
-      temperature: Math.round(response.hourly.temperature_2m[index]),
-      precipitation: Math.round(response.hourly.precipitation_probability[index] ?? 0),
-      icon: presentation.icon,
-    };
-  });
+      return {
+        time: offset === 0 ? "Agora" : `${formatClock(time).slice(0, 2)}h`,
+        temperature: Math.round(response.hourly.temperature_2m[index]),
+        precipitation: Math.round(
+          response.hourly.precipitation_probability[index] ?? 0,
+        ),
+        windSpeed: Math.round(response.hourly.wind_speed_10m[index] ?? 0),
+        windGust: Math.round(response.hourly.wind_gusts_10m[index] ?? 0),
+        icon: presentation.icon,
+      };
+    });
 }
 
 function normalizeDaily(response: OpenMeteoResponse): DailyForecast[] {
@@ -148,8 +186,17 @@ function normalizeDaily(response: OpenMeteoResponse): DailyForecast[] {
     date: formatDate(date),
     min: Math.round(response.daily.temperature_2m_min[index]),
     max: Math.round(response.daily.temperature_2m_max[index]),
-    rainChance: Math.round(response.daily.precipitation_probability_max[index] ?? 0),
-    icon: weatherCodeToPresentation(response.daily.weather_code[index], true).icon,
+    rainChance: Math.round(
+      response.daily.precipitation_probability_max[index] ?? 0,
+    ),
+    precipitation: Number(
+      (response.daily.precipitation_sum[index] ?? 0).toFixed(1),
+    ),
+    windGust: Math.round(response.daily.wind_gusts_10m_max[index] ?? 0),
+    icon: weatherCodeToPresentation(
+      response.daily.weather_code[index],
+      true,
+    ).icon,
   }));
 }
 
@@ -168,12 +215,15 @@ async function fetchForecast() {
       "pressure_msl",
       "visibility",
       "wind_speed_10m",
+      "wind_gusts_10m",
       "wind_direction_10m",
       "is_day",
     ].join(","),
     hourly: [
       "temperature_2m",
       "precipitation_probability",
+      "wind_speed_10m",
+      "wind_gusts_10m",
       "weather_code",
       "is_day",
     ].join(","),
@@ -182,6 +232,8 @@ async function fetchForecast() {
       "temperature_2m_max",
       "temperature_2m_min",
       "precipitation_probability_max",
+      "precipitation_sum",
+      "wind_gusts_10m_max",
       "sunrise",
       "sunset",
     ].join(","),
@@ -256,8 +308,13 @@ export async function getPelotasWeather(): Promise<WeatherData> {
         humidity: Math.round(forecast.current.relative_humidity_2m),
         pressure: Math.round(forecast.current.pressure_msl),
         windSpeed: Math.round(forecast.current.wind_speed_10m),
-        windDirection: degreesToCompass(forecast.current.wind_direction_10m),
-        visibility: Math.round((forecast.current.visibility ?? 10000) / 1000),
+        windGust: Math.round(forecast.current.wind_gusts_10m),
+        windDirection: degreesToCompass(
+          forecast.current.wind_direction_10m,
+        ),
+        visibility: Math.round(
+          (forecast.current.visibility ?? 10000) / 1000,
+        ),
         sunrise: formatClock(forecast.daily.sunrise[0]),
         sunset: formatClock(forecast.daily.sunset[0]),
         updatedAt: formatUpdatedAt(forecast.current.time),
