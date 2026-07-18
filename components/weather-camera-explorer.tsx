@@ -22,6 +22,7 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
     () => cameras.find((camera) => camera.status === "online") ?? cameras[0],
     [cameras],
   );
+  const hasOnlineCamera = cameras.some((camera) => camera.status === "online");
   const [selectedId, setSelectedId] = useState(initialCamera?.id ?? "");
   const [playerOpen, setPlayerOpen] = useState(false);
   const selectedCamera =
@@ -39,10 +40,13 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
       <div className="camera-explorer-heading">
         <div>
           <span className="eyebrow">Visualização local</span>
-          <h2 id="camera-explorer-title">Observe Pelotas em tempo real</h2>
+          <h2 id="camera-explorer-title">
+            {hasOnlineCamera ? "Observe Pelotas em tempo real" : "Rede visual preparada para Pelotas"}
+          </h2>
           <p>
-            Escolha um ponto da cidade. A transmissão externa só é carregada depois do seu toque,
-            preservando desempenho e consumo de dados.
+            {hasOnlineCamera
+              ? "Escolha um ponto da cidade. A transmissão externa só é carregada depois do seu toque, preservando desempenho e consumo de dados."
+              : "Os pontos já estão organizados e serão habilitados individualmente quando transmissões públicas e estáveis estiverem disponíveis."}
           </p>
         </div>
         <div className="camera-live-summary" aria-live="polite">
@@ -158,6 +162,7 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
       <div className="camera-list" aria-label="Resumo dos pontos de câmera">
         {cameras.map((camera) => (
           <button
+            id={camera.id}
             type="button"
             className={camera.id === selectedCamera.id ? "is-active" : undefined}
             key={camera.id}
@@ -172,8 +177,11 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
             </span>
             <i
               className={`camera-list-state camera-list-state--${camera.status}`}
-              aria-label={camera.status === "online" ? "Disponível" : "Em preparação"}
+              aria-hidden="true"
             />
+            <span className="sr-only">
+              {camera.status === "online" ? "Disponível" : "Em preparação"}
+            </span>
           </button>
         ))}
       </div>
