@@ -21,12 +21,12 @@ npm install
 npm run dev
 ```
 
-Acesse `http://localhost:3000`.
+A aplicação inicia em `http://localhost:5175`.
 
 Para definir a URL pública localmente, copie `.env.example` para `.env.local`:
 
 ```env
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL=http://localhost:5175
 ```
 
 ## Validação
@@ -97,13 +97,47 @@ CRON_SECRET=SEGREDO_ALEATORIO_COM_PELO_MENOS_16_CARACTERES
 ```powershell
 Invoke-RestMethod `
   -Method Post `
-  -Uri "http://localhost:3000/api/cron/weather-snapshot" `
+  -Uri "http://localhost:5175/api/cron/weather-snapshot" `
   -Headers @{ Authorization = "Bearer $env:CRON_SECRET" }
 ```
 
 5. O `vercel.json` agenda a execução diária às `06:15 UTC`, equivalente a `03:15` no horário de Pelotas. Em contas Hobby, a execução pode ocorrer em qualquer momento dentro dessa hora.
 
 O backfill é interrompido quando a fonte externa está em contingência, evitando gravar a amostra demonstrativa como histórico real. Enquanto as variáveis não estiverem configuradas, a captura retorna como ignorada e o portal continua funcionando exclusivamente com o histórico externo e o fallback já existente.
+
+## Câmeras meteorológicas
+
+A página `app/cameras-ao-vivo-pelotas/page.tsx` está preparada para pontos de observação no Laranjal, Centro e Canal São Gonçalo.
+
+Características:
+
+- fontes configuradas exclusivamente por variáveis de ambiente;
+- URLs validadas e limitadas a HTTPS, com HTTP permitido apenas em ambiente local;
+- transmissão externa carregada somente após ação do usuário;
+- seletor de pontos com estados disponível e em preparação;
+- link opcional para a fonte original;
+- atribuição do provedor por câmera;
+- layout desktop e mobile com linguagem de aplicativo;
+- ItemList em Schema.org e URL incluída no sitemap;
+- atalho próprio no manifesto PWA.
+
+Exemplo de configuração:
+
+```env
+CAMERA_LARANJAL_EMBED_URL=https://URL-DE-INCORPORACAO
+CAMERA_LARANJAL_PUBLIC_URL=https://PAGINA-ORIGINAL
+CAMERA_LARANJAL_PROVIDER=Nome do provedor
+
+CAMERA_CENTRO_EMBED_URL=
+CAMERA_CENTRO_PUBLIC_URL=
+CAMERA_CENTRO_PROVIDER=
+
+CAMERA_SAO_GONCALO_EMBED_URL=
+CAMERA_SAO_GONCALO_PUBLIC_URL=
+CAMERA_SAO_GONCALO_PROVIDER=
+```
+
+Sem uma URL de incorporação válida, o ponto permanece identificado como `Em preparação`. O portal não exibe transmissões fictícias nem tenta acessar RTSP diretamente no navegador.
 
 ## Experiência mobile
 
@@ -113,12 +147,12 @@ A interface para celulares segue uma linguagem próxima de aplicativo nativo:
 - barra inferior com cinco abas, ícones e indicação da rota ativa;
 - navegação preparada para instalação como PWA;
 - cartões compactos com hierarquia adaptada para toque;
-- carrosséis horizontais com scroll snap para previsão horária e conteúdos relacionados;
+- carrosséis horizontais com scroll snap para previsão horária, histórico, câmeras e conteúdos relacionados;
 - suporte a `viewport-fit=cover` e `safe-area-inset`;
-- manifesto com atalhos para tempo atual, previsão semanal, chuva, histórico e alertas;
+- manifesto com atalhos para tempo atual, previsão semanal, chuva, câmeras, histórico e alertas;
 - estilos específicos para execução em modo `standalone`.
 
-Os principais ajustes estão em `app/mobile-app.css` e `components/site-header.tsx`.
+Os principais ajustes estão em `app/mobile-app.css`, `app/cameras.css` e `components/site-header.tsx`.
 
 ## Gráficos meteorológicos
 
@@ -158,6 +192,7 @@ Características:
 - `/chuva-em-pelotas` — probabilidade e acumulado de chuva;
 - `/vento-em-pelotas` — vento médio e rajadas;
 - `/historico-climatico-pelotas` — comparação dos últimos 30 dias;
+- `/cameras-ao-vivo-pelotas` — pontos de observação visual da cidade;
 - `/alertas` — leitura automática de condições de atenção;
 - `/api/weather` — endpoint interno com dados normalizados;
 - `/api/weather/history` — endpoint interno do histórico recente;
@@ -167,7 +202,7 @@ Características:
 
 - metadados por página;
 - URLs canônicas;
-- Schema.org, FAQPage e Dataset;
+- Schema.org, FAQPage, Dataset e ItemList;
 - sitemap dinâmico;
 - robots.txt;
 - navegação interna entre previsões;
@@ -181,7 +216,7 @@ A página de alertas utiliza critérios internos para destacar chuva, rajadas e 
 ## Próximas etapas
 
 - configurar um projeto Supabase exclusivo e iniciar o arquivo diário próprio;
-- integrar alertas oficiais quando houver uma fonte adequada;
-- adicionar câmeras meteorológicas locais;
+- integrar avisos oficiais do INMET e referências da Defesa Civil;
+- ativar as primeiras fontes públicas e estáveis de câmera;
 - ampliar a cobertura para mais cidades da Zona Sul;
 - revisar identidade visual e conteúdo com base no uso real.
