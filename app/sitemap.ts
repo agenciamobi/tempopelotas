@@ -8,6 +8,11 @@ const baseRoutes = [
   { path: "/previsao-7-dias-pelotas", priority: 0.9, changeFrequency: "hourly" },
   { path: "/chuva-em-pelotas", priority: 0.85, changeFrequency: "hourly" },
   { path: "/vento-em-pelotas", priority: 0.85, changeFrequency: "hourly" },
+  {
+    path: "/nivel-da-lagoa-dos-patos-laranjal",
+    priority: 0.9,
+    changeFrequency: "hourly",
+  },
   { path: "/historico-climatico-pelotas", priority: 0.82, changeFrequency: "daily" },
   { path: "/alertas", priority: 0.8, changeFrequency: "hourly" },
 ] as const;
