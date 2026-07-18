@@ -1,98 +1,60 @@
-Análise da referência ClicTempo
+# TEMPO Pelotas
 
-A estrutura visual é forte como conceito, mas tecnologicamente envelhecida.
+Portal meteorológico local para Pelotas e a Zona Sul do Rio Grande do Sul.
 
-Composição
+## Stack
 
-O desktop é dividido em três áreas:
+- Next.js 16 com App Router
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- Deploy previsto na Vercel
 
-Mapa lateral
-Ocupa aproximadamente 35% da tela.
-Mostra RS/SC com marcadores meteorológicos.
-Funciona como elemento visual e navegação geográfica.
-Conteúdo principal
-Temperatura em escala muito grande.
-Condição atual, sensação térmica, umidade, pressão e vento.
-Previsão ao longo do dia.
-Continuação vertical com previsão detalhada dos próximos dias.
-Barra semanal fixa
-Lista compacta com sete dias.
-Permite leitura rápida sem rolar a página.
+## Desenvolvimento
 
-A página efetivamente apresenta condição atual, umidade, pressão, vento, previsão horária e previsão semanal.
+```bash
+npm install
+npm run dev
+```
 
-O que devemos preservar
-Forte impacto visual da temperatura atual.
-Leitura meteorológica imediata.
-Mapa como elemento editorial.
-Previsão horária bem destacada.
-Navegação semanal sempre acessível.
-Poucos elementos de navegação tradicional.
-O que não devemos copiar
-Layout rigidamente desktop.
-Barra semanal estreita e desconfortável.
-Contraste baixo entre fundo azul e textos secundários.
-Excesso de espaço ocupado pelo mapa.
-Publicidade interferindo na leitura.
-Botões sociais obsoletos.
-Ícones e tipografia datados.
-Dependência visual de blocos com largura fixa.
+Acesse `http://localhost:3000`.
 
-Há ainda problemas estruturais: os títulos de previsão aparecem duplicados no conteúdo e a página informa “Climatempo Meteorologia” nos blocos, enquanto o rodapé também atribui previsão ao yr.no, deixando a origem dos dados pouco clara.
+## Validação
 
-Direção recomendada para o TEMPO Pelotas
-Stack
-Next.js
-TypeScript
-Tailwind CSS
-Server Components
-API Route para normalizar os dados meteorológicos
-Cache e revalidação periódica
-Deploy na Vercel
+```bash
+npm run typecheck
+npm run build
+```
 
-Next.js é preferível ao Vite neste projeto por SEO, conteúdo indexável, metadados dinâmicos e geração estruturada das previsões.
+O GitHub Actions executa as duas verificações automaticamente em cada atualização da `main`.
 
-Primeira dobra
+## Front-end implementado
 
-No desktop:
+- condição meteorológica atual em destaque;
+- mapa ilustrativo de Pelotas e cidades próximas;
+- umidade, pressão, vento e visibilidade;
+- previsão horária com navegação horizontal no celular;
+- previsão para sete dias;
+- área preparada para alertas meteorológicos;
+- cabeçalho fixo e navegação mobile;
+- metadados, Schema.org, sitemap e robots.txt;
+- layout responsivo e suporte a redução de movimento.
 
-28%: mapa da região de Pelotas e Zona Sul
-54%: condição meteorológica atual
-18%: previsão dos próximos dias
+Os dados exibidos nesta etapa são demonstrativos e estão centralizados em `lib/weather-data.ts`.
 
-No mobile:
+## Direção visual
 
-Cabeçalho compacto
-Condição atual
-Alertas meteorológicos
-Previsão horária horizontal
-Previsão de sete dias
-Mapa abaixo do conteúdo principal
-Identidade
+A referência do ClicTempo foi usada somente como base de hierarquia da informação. O projeto adota identidade própria:
 
-Não recomendo reproduzir o azul acinzentado da referência. O TEMPO Pelotas deve ter personalidade própria:
+- azul profundo para a condição atual;
+- superfícies claras e alto contraste;
+- ciano para informações meteorológicas;
+- amarelo solar para destaques;
+- azul para precipitação;
+- laranja reservado aos alertas.
 
-Fundo azul profundo e superfícies claras
-Ciano para informações meteorológicas
-Amarelo solar para destaques
-Azul de chuva para precipitação
-Vermelho somente para alertas
-Visual limpo, local e confiável
-Conteúdo e SEO
+No desktop, o mapa permanece lateral e o conteúdo meteorológico recebe maior área útil. No mobile, a condição atual, previsão horária, alertas e previsão semanal aparecem antes do mapa.
 
-Estrutura inicial:
+## Próxima etapa
 
-/ — Tempo em Pelotas
-/previsao-do-tempo-pelotas
-/tempo-hoje-pelotas
-/previsao-7-dias-pelotas
-/chuva-em-pelotas
-/vento-em-pelotas
-/clima-de-pelotas
-/alertas
-/cameras-ao-vivo
-/blog
-
-O projeto já tinha como base a integração CPTEC/INPE para previsão de quatro dias. Devemos manter essa possibilidade, mas criar uma camada interna de normalização para não acoplar a interface diretamente ao XML do provedor.
-
-A direção correta é usar a referência como modelo de hierarquia meteorológica, não como modelo visual literal. O novo site deve ser mais responsivo, mais editorial, mais local e preparado para SEO de Pelotas e região.
+Criar uma camada interna de normalização e cache para integrar fontes meteorológicas sem acoplar os componentes diretamente a uma API específica. A fonte utilizada deverá ser identificada claramente em cada previsão.
