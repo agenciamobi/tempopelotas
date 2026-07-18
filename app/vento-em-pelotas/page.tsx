@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ForecastPageShell } from "@/components/forecast-page-shell";
 import { WeatherIcon } from "@/components/weather-icon";
+import { WeatherTrendChart } from "@/components/weather-trend-chart";
 import { getPelotasWeather } from "@/lib/weather-service";
 
 export const revalidate = 600;
@@ -77,6 +78,8 @@ export default async function VentoEmPelotasPage() {
           <small>{peakDay?.weekday} · {peakDay?.date}</small>
         </article>
       </section>
+
+      <WeatherTrendChart hourly={weather.hourly} initialMetric="windGust" />
 
       <section className="topic-section" aria-labelledby="wind-hours-title">
         <div className="section-heading">
