@@ -1,12 +1,13 @@
 import { SiteHeader } from "@/components/site-header";
 import { WeatherDashboard } from "@/components/weather-dashboard";
 import { WeatherMap } from "@/components/weather-map";
+import { absoluteUrl } from "@/lib/site";
 
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "TEMPO Pelotas",
-  url: "https://tempopelotas.com.br/",
+  url: absoluteUrl("/"),
   description:
     "Portal meteorológico local com previsão do tempo para Pelotas e a Zona Sul do Rio Grande do Sul.",
   inLanguage: "pt-BR",
