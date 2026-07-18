@@ -48,3 +48,4 @@ for each row
 execute function public.set_weather_daily_snapshots_updated_at();
 
 revoke all on public.weather_daily_snapshots from anon, authenticated;
+grant select, insert, update on public.weather_daily_snapshots to service_role;
