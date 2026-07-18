@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://tempopelotas.com.br"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "TEMPO Pelotas | Previsão do tempo em Pelotas, RS",
     template: "%s | TEMPO Pelotas",
