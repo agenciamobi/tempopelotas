@@ -90,11 +90,20 @@ SUPABASE_SERVICE_ROLE_KEY=CHAVE_APENAS_DO_SERVIDOR
 CRON_SECRET=SEGREDO_ALEATORIO_COM_PELO_MENOS_16_CARACTERES
 ```
 
-3. A rota protegida `/api/cron/weather-snapshot` busca o dia completo anterior e realiza `upsert` pela combinação `location_slug + observed_date`.
+3. A chamada `GET /api/cron/weather-snapshot` busca o dia completo anterior e realiza `upsert` pela combinação `location_slug + observed_date`.
 
-4. O `vercel.json` agenda a execução diária às `06:15 UTC`, equivalente a `03:15` no horário de Pelotas. Em contas Hobby, a execução pode ocorrer em qualquer momento dentro dessa hora.
+4. A chamada protegida `POST /api/cron/weather-snapshot` preenche imediatamente os últimos 30 dias disponíveis. Em desenvolvimento local com PowerShell:
 
-Enquanto as variáveis não estiverem configuradas, a captura retorna como ignorada e o portal continua funcionando exclusivamente com o histórico externo e o fallback já existente.
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:3000/api/cron/weather-snapshot" `
+  -Headers @{ Authorization = "Bearer $env:CRON_SECRET" }
+```
+
+5. O `vercel.json` agenda a execução diária às `06:15 UTC`, equivalente a `03:15` no horário de Pelotas. Em contas Hobby, a execução pode ocorrer em qualquer momento dentro dessa hora.
+
+O backfill é interrompido quando a fonte externa está em contingência, evitando gravar a amostra demonstrativa como histórico real. Enquanto as variáveis não estiverem configuradas, a captura retorna como ignorada e o portal continua funcionando exclusivamente com o histórico externo e o fallback já existente.
 
 ## Experiência mobile
 
@@ -152,7 +161,7 @@ Características:
 - `/alertas` — leitura automática de condições de atenção;
 - `/api/weather` — endpoint interno com dados normalizados;
 - `/api/weather/history` — endpoint interno do histórico recente;
-- `/api/cron/weather-snapshot` — captura protegida do arquivo diário.
+- `/api/cron/weather-snapshot` — captura e backfill protegidos do arquivo diário.
 
 ## SEO e distribuição
 
