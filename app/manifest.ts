@@ -35,6 +35,12 @@ export default function manifest(): MetadataRoute.Manifest {
         url: "/chuva-em-pelotas",
       },
       {
+        name: "Histórico de Pelotas",
+        short_name: "Histórico",
+        description: "Comparar temperatura, chuva e vento dos últimos 30 dias.",
+        url: "/historico-climatico-pelotas",
+      },
+      {
         name: "Alertas meteorológicos",
         short_name: "Alertas",
         description: "Abrir a análise de condições de atenção.",
