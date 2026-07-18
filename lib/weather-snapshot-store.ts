@@ -44,14 +44,17 @@ export function getWeatherSnapshotStorageStatus(): WeatherSnapshotStorageStatus 
   };
 }
 
-function requestHeaders(serviceRoleKey: string, prefer?: string) {
-  return {
+function requestHeaders(serviceRoleKey: string, prefer?: string): Record<string, string> {
+  const headers: Record<string, string> = {
     apikey: serviceRoleKey,
     Authorization: `Bearer ${serviceRoleKey}`,
     Accept: "application/json",
     "Content-Type": "application/json",
-    ...(prefer ? { Prefer: prefer } : {}),
   };
+
+  if (prefer) headers.Prefer = prefer;
+
+  return headers;
 }
 
 function formatStoredDay(date: string) {
