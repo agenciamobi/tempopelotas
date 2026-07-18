@@ -1,9 +1,5 @@
 import { WeatherIcon } from "@/components/weather-icon";
-import {
-  currentWeather,
-  dailyForecast,
-  hourlyForecast,
-} from "@/lib/weather-data";
+import type { WeatherData } from "@/lib/weather-data";
 
 function MetricIcon({ type }: { type: "humidity" | "pressure" | "wind" | "visibility" }) {
   const paths = {
@@ -22,7 +18,13 @@ function MetricIcon({ type }: { type: "humidity" | "pressure" | "wind" | "visibi
   );
 }
 
-export function WeatherDashboard() {
+type WeatherDashboardProps = {
+  weather: WeatherData;
+};
+
+export function WeatherDashboard({ weather }: WeatherDashboardProps) {
+  const { current, hourly, daily } = weather;
+
   return (
     <main className="weather-content">
       <section className="current-weather" id="agora" aria-labelledby="current-title">
@@ -30,42 +32,42 @@ export function WeatherDashboard() {
           <div>
             <span className="eyebrow">Agora em Pelotas</span>
             <h1 id="current-title">
-              {currentWeather.city}, <span>{currentWeather.state}</span>
+              {current.city}, <span>{current.state}</span>
             </h1>
           </div>
-          <span className="demo-badge">{currentWeather.updatedAt}</span>
+          <span className="demo-badge">{current.updatedAt}</span>
         </div>
 
         <div className="current-main">
           <div className="temperature-block">
-            <span className="temperature-value">{currentWeather.temperature}°</span>
+            <span className="temperature-value">{current.temperature}°</span>
             <div>
-              <strong>{currentWeather.condition}</strong>
-              <span>Sensação de {currentWeather.feelsLike}°</span>
+              <strong>{current.condition}</strong>
+              <span>Sensação de {current.feelsLike}°</span>
             </div>
           </div>
 
           <div className="hero-weather-icon">
-            <WeatherIcon name={currentWeather.icon} title={currentWeather.condition} />
+            <WeatherIcon name={current.icon} title={current.condition} />
           </div>
         </div>
 
         <div className="metrics-grid" aria-label="Condições meteorológicas atuais">
           <article>
             <MetricIcon type="humidity" />
-            <div><span>Umidade</span><strong>{currentWeather.humidity}%</strong></div>
+            <div><span>Umidade</span><strong>{current.humidity}%</strong></div>
           </article>
           <article>
             <MetricIcon type="pressure" />
-            <div><span>Pressão</span><strong>{currentWeather.pressure} hPa</strong></div>
+            <div><span>Pressão</span><strong>{current.pressure} hPa</strong></div>
           </article>
           <article>
             <MetricIcon type="wind" />
-            <div><span>Vento</span><strong>{currentWeather.windSpeed} km/h {currentWeather.windDirection}</strong></div>
+            <div><span>Vento</span><strong>{current.windSpeed} km/h {current.windDirection}</strong></div>
           </article>
           <article>
             <MetricIcon type="visibility" />
-            <div><span>Visibilidade</span><strong>{currentWeather.visibility} km</strong></div>
+            <div><span>Visibilidade</span><strong>{current.visibility} km</strong></div>
           </article>
         </div>
       </section>
@@ -77,14 +79,14 @@ export function WeatherDashboard() {
             <h2 id="hourly-title">Como fica o tempo hoje</h2>
           </div>
           <div className="sun-times" aria-label="Horários do nascer e pôr do sol">
-            <span>Nascer <strong>{currentWeather.sunrise}</strong></span>
-            <span>Pôr do sol <strong>{currentWeather.sunset}</strong></span>
+            <span>Nascer <strong>{current.sunrise}</strong></span>
+            <span>Pôr do sol <strong>{current.sunset}</strong></span>
           </div>
         </div>
 
         <div className="hourly-list">
-          {hourlyForecast.map((hour, index) => (
-            <article className={index === 0 ? "is-current" : ""} key={hour.time}>
+          {hourly.map((hour, index) => (
+            <article className={index === 0 ? "is-current" : ""} key={`${hour.time}-${index}`}>
               <span>{hour.time}</span>
               <WeatherIcon name={hour.icon} title={`Condição às ${hour.time}`} />
               <strong>{hour.temperature}°</strong>
@@ -99,9 +101,9 @@ export function WeatherDashboard() {
           <svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3Zm0 6v5m0 3v.01" /></svg>
         </div>
         <div>
-          <span className="eyebrow">Monitoramento local</span>
-          <h2 id="alert-title">Sem alertas severos ativos</h2>
-          <p>Área preparada para avisos da Defesa Civil, chuva intensa, vento forte, granizo e risco de alagamentos.</p>
+          <span className="eyebrow">Próxima integração</span>
+          <h2 id="alert-title">Alertas meteorológicos locais</h2>
+          <p>Esta área receberá avisos oficiais de chuva intensa, vento forte, granizo e risco de alagamentos.</p>
         </div>
         <a href="#semana">Ver previsão completa</a>
       </section>
@@ -116,7 +118,7 @@ export function WeatherDashboard() {
         </div>
 
         <div className="daily-list">
-          {dailyForecast.map((day, index) => (
+          {daily.map((day, index) => (
             <article className={index === 0 ? "is-today" : ""} key={`${day.weekday}-${day.date}`}>
               <div className="daily-day"><strong>{day.weekday}</strong><span>{day.date}</span></div>
               <WeatherIcon name={day.icon} title={`Previsão para ${day.weekday}`} />
