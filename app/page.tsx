@@ -2,6 +2,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WeatherDashboard } from "@/components/weather-dashboard";
 import { WeatherMap } from "@/components/weather-map";
+import { WeatherNavigation } from "@/components/weather-navigation";
 import { absoluteUrl } from "@/lib/site";
 import { getPelotasWeather } from "@/lib/weather-service";
 
@@ -43,6 +44,10 @@ export default async function Home() {
         <div className="dashboard-layout">
           <WeatherMap regionalWeather={weather.regional} />
           <WeatherDashboard weather={weather} />
+        </div>
+
+        <div className="home-weather-navigation">
+          <WeatherNavigation />
         </div>
 
         <SiteFooter source={weather.source} />
