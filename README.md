@@ -9,6 +9,8 @@ Portal meteorológico local para Pelotas e a Zona Sul do Rio Grande do Sul.
 - TypeScript
 - Tailwind CSS 4
 - Open-Meteo como fonte meteorológica inicial
+- MapLibre GL JS para visualização geográfica
+- OpenFreeMap como camada cartográfica
 - Vercel para validação de produção
 
 ## Desenvolvimento local
@@ -52,6 +54,20 @@ Informações disponíveis:
 
 Os dados são revalidados a cada 10 minutos. Em caso de indisponibilidade da fonte externa, o sistema utiliza uma estrutura de contingência sem interromper a página.
 
+## Mapa regional
+
+O mapa da página inicial utiliza coordenadas geográficas reais e apresenta marcadores meteorológicos para as cidades monitoradas.
+
+Características:
+
+- carregamento progressivo somente quando o mapa se aproxima da área visível;
+- navegação, zoom e centralização em Pelotas;
+- marcadores acessíveis com temperatura e condição atual;
+- popup com detalhes por cidade;
+- gestos cooperativos para não bloquear a rolagem da página;
+- atribuição cartográfica automática;
+- fallback visual quando a camada externa não puder ser carregada.
+
 ## Páginas
 
 - `/` — painel meteorológico principal;
@@ -80,7 +96,7 @@ A página de alertas utiliza critérios internos para destacar chuva, rajadas e 
 ## Próximas etapas
 
 - integrar alertas oficiais quando houver uma fonte adequada;
-- substituir o mapa ilustrativo por uma camada geográfica interativa;
 - adicionar câmeras meteorológicas locais;
 - criar histórico e gráficos de temperatura, chuva e vento;
+- ampliar a cobertura para mais cidades da Zona Sul;
 - revisar identidade visual e conteúdo com base no uso real.
