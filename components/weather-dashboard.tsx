@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { WeatherIcon } from "@/components/weather-icon";
+import { WeatherTrendChart } from "@/components/weather-trend-chart";
 import type { WeatherData } from "@/lib/weather-data";
 import { getWeatherAdvisory } from "@/lib/weather-insights";
 
@@ -98,6 +99,8 @@ export function WeatherDashboard({ weather }: WeatherDashboardProps) {
           ))}
         </div>
       </section>
+
+      <WeatherTrendChart hourly={hourly} />
 
       <section className={`alert-card alert-card--${advisory.level}`} id="alertas" aria-labelledby="alert-title">
         <div className="alert-icon" aria-hidden="true">
