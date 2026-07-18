@@ -24,6 +24,12 @@ export default function manifest(): MetadataRoute.Manifest {
       description: "Consultar probabilidade e acumulado de chuva.",
       url: "/chuva-em-pelotas",
     },
+    {
+      name: "Nível da Lagoa dos Patos",
+      short_name: "Lagoa",
+      description: "Abrir o medidor da Estação Laranjal.",
+      url: "/nivel-da-lagoa-dos-patos-laranjal",
+    },
     ...(hasOnlineCamera
       ? [
           {
