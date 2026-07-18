@@ -14,6 +14,11 @@ export const metadata: Metadata = {
   description:
     "Previsão do tempo em Pelotas, RS, com condições atuais, chuva, vento, alertas e tendência para os próximos dias.",
   applicationName: "TEMPO Pelotas",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+  },
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
