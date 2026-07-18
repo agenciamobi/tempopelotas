@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { WeatherIcon } from "@/components/weather-icon";
 import type { WeatherData } from "@/lib/weather-data";
+import { getWeatherAdvisory } from "@/lib/weather-insights";
 
 function MetricIcon({ type }: { type: "humidity" | "pressure" | "wind" | "visibility" }) {
   const paths = {
@@ -24,6 +26,7 @@ type WeatherDashboardProps = {
 
 export function WeatherDashboard({ weather }: WeatherDashboardProps) {
   const { current, hourly, daily } = weather;
+  const advisory = getWeatherAdvisory(weather);
 
   return (
     <main className="weather-content">
@@ -63,7 +66,7 @@ export function WeatherDashboard({ weather }: WeatherDashboardProps) {
           </article>
           <article>
             <MetricIcon type="wind" />
-            <div><span>Vento</span><strong>{current.windSpeed} km/h {current.windDirection}</strong></div>
+            <div><span>Rajadas de {current.windGust} km/h</span><strong>{current.windSpeed} km/h {current.windDirection}</strong></div>
           </article>
           <article>
             <MetricIcon type="visibility" />
@@ -96,16 +99,16 @@ export function WeatherDashboard({ weather }: WeatherDashboardProps) {
         </div>
       </section>
 
-      <section className="alert-card" id="alertas" aria-labelledby="alert-title">
+      <section className={`alert-card alert-card--${advisory.level}`} id="alertas" aria-labelledby="alert-title">
         <div className="alert-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3Zm0 6v5m0 3v.01" /></svg>
         </div>
         <div>
-          <span className="eyebrow">Próxima integração</span>
-          <h2 id="alert-title">Alertas meteorológicos locais</h2>
-          <p>Esta área receberá avisos oficiais de chuva intensa, vento forte, granizo e risco de alagamentos.</p>
+          <span className="eyebrow">{advisory.eyebrow}</span>
+          <h2 id="alert-title">{advisory.title}</h2>
+          <p>{advisory.reasons[0] ?? advisory.description}</p>
         </div>
-        <a href="#semana">Ver previsão completa</a>
+        <Link href="/alertas">Ver análise</Link>
       </section>
 
       <section className="weekly-section" id="semana" aria-labelledby="weekly-title">
