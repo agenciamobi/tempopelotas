@@ -22,6 +22,11 @@ const pages = [
     description: "Velocidade, direção e rajadas.",
   },
   {
+    href: "/nivel-da-lagoa-dos-patos-laranjal",
+    title: "Nível da Lagoa dos Patos",
+    description: "Medidor da Estação Laranjal.",
+  },
+  {
     href: "/historico-climatico-pelotas",
     title: "Histórico climático",
     description: "Compare os últimos 30 dias na cidade.",
