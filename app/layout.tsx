@@ -10,6 +10,7 @@ import "./mobile-app.css";
 import "./mobile-app-fixes.css";
 import "./charts.css";
 import "./history.css";
+import "./cameras.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
