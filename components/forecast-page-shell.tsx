@@ -32,8 +32,8 @@ export function ForecastPageShell({
             <h1>{title}</h1>
             <p>{description}</p>
           </div>
-          <div className="topic-hero-status">
-            <span>{weather.current.updatedAt}</span>
+          <div className="topic-hero-status" aria-label="Tempo agora em Pelotas">
+            <span>Atualizado em {weather.current.updatedAt}</span>
             <strong>{weather.current.temperature}°</strong>
             <small>{weather.current.condition}</small>
           </div>
