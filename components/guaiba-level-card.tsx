@@ -16,13 +16,11 @@ function formatLevel(value: number | null, digits = 2) {
 function formatSigned(value: number | null, digits = 1) {
   if (value === null) return "—";
 
-  const formatted = new Intl.NumberFormat("pt-BR", {
+  return new Intl.NumberFormat("pt-BR", {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
     signDisplay: "exceptZero",
   }).format(value);
-
-  return formatted;
 }
 
 function formatUpdatedAt(value: string | null) {
@@ -41,10 +39,19 @@ function formatUpdatedAt(value: string | null) {
 function getTrend(data: GuaibaObservationData) {
   const rate = data.trendCmPerHour;
 
-  if (rate === null || Math.abs(rate) < 0.1) {
+  if (rate === null) {
+    return {
+      label: "Tendência indisponível",
+      detail: "série insuficiente",
+      direction: "unavailable" as const,
+      symbol: "·",
+    };
+  }
+
+  if (Math.abs(rate) < 0.1) {
     return {
       label: "Estável",
-      detail: "variação inferior a 0,1 cm/h",
+      detail: "média das últimas 6h",
       direction: "stable" as const,
       symbol: "→",
     };
@@ -53,7 +60,7 @@ function getTrend(data: GuaibaObservationData) {
   if (rate > 0) {
     return {
       label: "Subindo",
-      detail: `${formatSigned(rate)} cm/h`,
+      detail: `${formatSigned(rate)} cm/h · média 6h`,
       direction: "rising" as const,
       symbol: "↑",
     };
@@ -61,7 +68,7 @@ function getTrend(data: GuaibaObservationData) {
 
   return {
     label: "Descendo",
-    detail: `${formatSigned(Math.abs(rate))} cm/h`,
+    detail: `${formatSigned(Math.abs(rate))} cm/h · média 6h`,
     direction: "falling" as const,
     symbol: "↓",
   };
