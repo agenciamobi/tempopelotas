@@ -39,14 +39,14 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
     <section className="camera-explorer" aria-labelledby="camera-explorer-title">
       <div className="camera-explorer-heading">
         <div>
-          <span className="eyebrow">Visualização local</span>
+          <span className="eyebrow">Veja diferentes pontos da cidade</span>
           <h2 id="camera-explorer-title">
-            {hasOnlineCamera ? "Observe Pelotas em tempo real" : "Rede visual preparada para Pelotas"}
+            {hasOnlineCamera ? "Acompanhe Pelotas pelas câmeras" : "Câmeras de Pelotas"}
           </h2>
           <p>
             {hasOnlineCamera
-              ? "Escolha um ponto da cidade. A transmissão externa só é carregada depois do seu toque, preservando desempenho e consumo de dados."
-              : "Os pontos já estão organizados e serão habilitados individualmente quando transmissões públicas e estáveis estiverem disponíveis."}
+              ? "Escolha um local para observar o céu, a visibilidade e a presença de chuva. A câmera será aberta quando você tocar no botão."
+              : "As câmeras ainda não estão disponíveis. Os locais previstos são Laranjal, Centro e Canal São Gonçalo."}
           </p>
         </div>
         <div className="camera-live-summary" aria-live="polite">
@@ -54,14 +54,14 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
             className={`camera-status camera-status--${selectedCamera.status}`}
           >
             <i aria-hidden="true" />
-            {selectedCamera.status === "online" ? "Disponível" : "Em preparação"}
+            {selectedCamera.status === "online" ? "Disponível" : "Ainda não disponível"}
           </span>
           <strong>{selectedCamera.shortName}</strong>
           <small>{selectedCamera.observation}</small>
         </div>
       </div>
 
-      <div className="camera-selector" role="tablist" aria-label="Pontos de câmera">
+      <div className="camera-selector" role="tablist" aria-label="Escolha uma câmera">
         {cameras.map((camera) => {
           const isSelected = camera.id === selectedCamera.id;
 
@@ -75,7 +75,7 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
               onClick={() => selectCamera(camera)}
             >
               <span>{camera.shortName}</span>
-              <small>{camera.status === "online" ? "Ao vivo" : "Em preparação"}</small>
+              <small>{camera.status === "online" ? "Ao vivo" : "Em breve"}</small>
             </button>
           );
         })}
@@ -104,7 +104,7 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
                   <CameraIcon />
                 </span>
                 <strong>Abrir câmera</strong>
-                <small>A transmissão será carregada agora</small>
+                <small>Toque para começar a assistir</small>
               </button>
             )
           ) : (
@@ -112,10 +112,9 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
               <span className="camera-placeholder-icon">
                 <CameraIcon />
               </span>
-              <strong>Transmissão em preparação</strong>
+              <strong>Câmera ainda não disponível</strong>
               <p>
-                A estrutura deste ponto está pronta. A câmera será ativada quando uma fonte pública
-                e estável for configurada.
+                Este local será exibido quando houver uma câmera pública com imagem estável.
               </p>
             </div>
           )}
@@ -125,8 +124,8 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
           </div>
         </div>
 
-        <aside className="camera-details" aria-label="Informações da câmera selecionada">
-          <span className="eyebrow">Ponto selecionado</span>
+        <aside className="camera-details" aria-label="Informações da câmera escolhida">
+          <span className="eyebrow">Local escolhido</span>
           <h3>{selectedCamera.name}</h3>
           <p>{selectedCamera.description}</p>
           <dl>
@@ -135,14 +134,14 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
               <dd>{selectedCamera.area}</dd>
             </div>
             <div>
-              <dt>Coordenadas</dt>
+              <dt>Posição</dt>
               <dd>
                 {selectedCamera.latitude.toFixed(4)}, {selectedCamera.longitude.toFixed(4)}
               </dd>
             </div>
             <div>
-              <dt>Status</dt>
-              <dd>{selectedCamera.status === "online" ? "Câmera disponível" : "Aguardando fonte"}</dd>
+              <dt>Disponibilidade</dt>
+              <dd>{selectedCamera.status === "online" ? "Câmera disponível" : "Câmera em breve"}</dd>
             </div>
           </dl>
           {selectedCamera.publicUrl ? (
@@ -152,17 +151,17 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
               target="_blank"
               rel="noreferrer"
             >
-              Abrir na fonte original
+              Abrir página da câmera
               <span aria-hidden="true">↗</span>
             </a>
           ) : null}
         </aside>
       </div>
 
-      <div className="camera-list" aria-label="Resumo dos pontos de câmera">
+      <div className="camera-list" aria-label="Outras câmeras">
         {cameras.map((camera) => {
           const statusLabel =
-            camera.status === "online" ? "Disponível" : "Em preparação";
+            camera.status === "online" ? "Disponível" : "Em breve";
 
           return (
             <button
