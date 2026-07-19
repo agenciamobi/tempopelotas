@@ -25,6 +25,8 @@ export type PushConfigurationStatus = {
   missing: string[];
 };
 
+type LibraryPushSubscription = Parameters<typeof webpush.sendNotification>[0];
+
 function getVapidConfig() {
   return {
     publicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim(),
@@ -52,10 +54,11 @@ export function getPushConfigurationStatus(): PushConfigurationStatus {
   };
 }
 
-function toWebPushSubscription(subscription: StoredPushSubscription): webpush.PushSubscription {
+function toWebPushSubscription(
+  subscription: StoredPushSubscription,
+): LibraryPushSubscription {
   return {
     endpoint: subscription.endpoint,
-    expirationTime: subscription.expirationTime,
     keys: subscription.keys,
   };
 }
@@ -90,7 +93,9 @@ export async function broadcastPushNotification(payload: PushPayload) {
           },
           TTL: 60 * 60 * 6,
           urgency: payload.urgency || "normal",
-          topic: (payload.tag || "tempo-pelotas").replace(/[^A-Za-z0-9_-]/g, "-").slice(0, 32),
+          topic: (payload.tag || "tempo-pelotas")
+            .replace(/[^A-Za-z0-9_-]/g, "-")
+            .slice(0, 32),
           timeout: 12_000,
         });
         sent += 1;
