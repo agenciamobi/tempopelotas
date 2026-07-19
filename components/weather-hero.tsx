@@ -2,21 +2,114 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { WeatherIcon } from "@/components/weather-icon";
 import type { WeatherData } from "@/lib/weather-data";
-import { getWeatherAdvisory } from "@/lib/weather-insights";
+import {
+  getWeatherAdvisory,
+  type AdvisoryLevel,
+  type WeatherAdvisory,
+} from "@/lib/weather-insights";
 
 type WeatherHeroProps = {
   weather: WeatherData;
 };
 
-type HeroMetricIcon = "humidity" | "wind" | "gust" | "visibility";
+type HeroMetricIconName = "humidity" | "wind" | "gust" | "visibility";
 
-function HeroMetricIcon({ name }: { name: HeroMetricIcon }) {
+type HeroPresentation = {
+  badge: string;
+  kicker: string;
+  title: string;
+  highlightedTitle: string;
+  description: string;
+  primaryAction: {
+    href: string;
+    label: string;
+  };
+  secondaryAction: {
+    href: string;
+    label: string;
+  };
+  photoHref: string;
+  photoCredit: string;
+};
+
+const heroPresentationByLevel = {
+  normal: {
+    badge: "Condições monitoradas",
+    kicker: "Tempo agora em Pelotas",
+    title: "O tempo de Pelotas.",
+    highlightedTitle: "Clareza para se preparar.",
+    description:
+      "Previsão, chuva, vento e situação das águas em uma leitura local, objetiva e atualizada para Pelotas e a Zona Sul.",
+    primaryAction: {
+      href: "/tempo-hoje-pelotas",
+      label: "Ver previsão completa",
+    },
+    secondaryAction: {
+      href: "/alertas",
+      label: "Consultar monitoramento",
+    },
+    photoHref:
+      "https://commons.wikimedia.org/wiki/File:Amanhecer_na_Praia_do_Laranjal.jpg",
+    photoCredit: "Foto: Sebastian2112 / CC BY-SA 4.0",
+  },
+  attention: {
+    badge: "Atenção nas próximas horas",
+    kicker: "Condições de atenção em Pelotas",
+    title: "Chuva e vento.",
+    highlightedTitle: "Acompanhe as próximas horas.",
+    description:
+      "A previsão indica condições que merecem acompanhamento. Verifique a evolução da chuva, das rajadas e das informações oficiais.",
+    primaryAction: {
+      href: "/alertas",
+      label: "Ver condições de atenção",
+    },
+    secondaryAction: {
+      href: "/tempo-hoje-pelotas",
+      label: "Abrir previsão completa",
+    },
+    photoHref:
+      "https://commons.wikimedia.org/wiki/File:Sunset_over_Calm_Lake.jpg",
+    photoCredit: "Foto: Kane Morley / CC BY-SA 4.0",
+  },
+  warning: {
+    badge: "Atenção redobrada",
+    kicker: "Condições relevantes em Pelotas",
+    title: "Atenção ao tempo.",
+    highlightedTitle: "Condições exigem cuidado.",
+    description:
+      "Há possibilidade de temporal, chuva volumosa ou vento forte. Acompanhe a previsão e consulte os avisos da Defesa Civil e do INMET.",
+    primaryAction: {
+      href: "/alertas",
+      label: "Ver alerta e orientações",
+    },
+    secondaryAction: {
+      href: "/tempo-hoje-pelotas",
+      label: "Abrir previsão detalhada",
+    },
+    photoHref: "https://commons.wikimedia.org/wiki/File:Heavy_Rain.jpg",
+    photoCredit: "Foto: Pridatko Oleksandr / domínio público",
+  },
+} satisfies Record<AdvisoryLevel, HeroPresentation>;
+
+function getHeroPresentation(advisory: WeatherAdvisory): HeroPresentation {
+  const presentation = heroPresentationByLevel[advisory.level];
+
+  if (advisory.level === "normal") return presentation;
+
+  return {
+    ...presentation,
+    badge: advisory.eyebrow,
+    description: advisory.description,
+  };
+}
+
+function HeroMetricIcon({ name }: { name: HeroMetricIconName }) {
   const paths = {
     humidity: <path d="M12 3.2S6.8 9.3 6.8 13.7a5.2 5.2 0 0 0 10.4 0C17.2 9.3 12 3.2 12 3.2Z" />,
     wind: <path d="M3 8h10.5c3.8 0 3.8-5.5.2-5.5-1.9 0-2.9 1-2.9 2.8M3 13h15.5c3.8 0 3.8 6.5.2 6.5-1.9 0-2.9-1-2.9-2.8M3 18h7.5" />,
     gust: <path d="M4 7.5h10.8M4 12h16M4 16.5h12.5M17.5 5.2l2.5 2.3-2.5 2.3" />,
     visibility: <path d="M2.5 12s3.4-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.4 5.5-9.5 5.5S2.5 12 2.5 12Zm9.5-2.8a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z" />,
-  } satisfies Record<HeroMetricIcon, ReactNode>;
+  } satisfies Record<HeroMetricIconName, ReactNode>;
 
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -32,7 +125,7 @@ function HeroMetric({
   label,
   value,
 }: {
-  icon: HeroMetricIcon;
+  icon: HeroMetricIconName;
   label: string;
   value: string;
 }) {
@@ -50,9 +143,14 @@ function HeroMetric({
 export function WeatherHero({ weather }: WeatherHeroProps) {
   const { current } = weather;
   const advisory = getWeatherAdvisory(weather);
+  const presentation = getHeroPresentation(advisory);
+  const reasons = advisory.level === "normal" ? [] : advisory.reasons.slice(0, 2);
 
   return (
-    <section className="weather-hero" aria-labelledby="weather-hero-title">
+    <section
+      className={`weather-hero weather-hero--${advisory.level}`}
+      aria-labelledby="weather-hero-title"
+    >
       <div className="weather-hero-photo" aria-hidden="true" />
       <div className="weather-hero-overlay" aria-hidden="true" />
       <div className="weather-hero-orbit weather-hero-orbit--one" aria-hidden="true" />
@@ -62,25 +160,30 @@ export function WeatherHero({ weather }: WeatherHeroProps) {
         <div className="weather-hero-copy">
           <span className={`weather-hero-status weather-hero-status--${advisory.level}`}>
             <i aria-hidden="true" />
-            {advisory.level === "normal" ? "Condições monitoradas" : advisory.eyebrow}
+            {presentation.badge}
           </span>
 
-          <p className="weather-hero-kicker">Tempo agora em Pelotas</p>
+          <p className="weather-hero-kicker">{presentation.kicker}</p>
           <h1 id="weather-hero-title">
-            O tempo de Pelotas. <span>Clareza para se preparar.</span>
+            {presentation.title} <span>{presentation.highlightedTitle}</span>
           </h1>
-          <p className="weather-hero-description">
-            Previsão, chuva, vento e situação das águas em uma leitura local,
-            objetiva e atualizada para Pelotas e a Zona Sul.
-          </p>
+          <p className="weather-hero-description">{presentation.description}</p>
+
+          {reasons.length > 0 ? (
+            <div className="weather-hero-reasons" aria-label="Motivos para atenção">
+              {reasons.map((reason) => (
+                <span key={reason}>{reason}</span>
+              ))}
+            </div>
+          ) : null}
 
           <div className="weather-hero-actions">
-            <Link className="weather-hero-primary" href="/tempo-hoje-pelotas">
-              Ver previsão completa
+            <Link className="weather-hero-primary" href={presentation.primaryAction.href}>
+              {presentation.primaryAction.label}
               <span aria-hidden="true">→</span>
             </Link>
-            <Link className="weather-hero-secondary" href="/alertas">
-              Consultar alertas
+            <Link className="weather-hero-secondary" href={presentation.secondaryAction.href}>
+              {presentation.secondaryAction.label}
             </Link>
           </div>
         </div>
@@ -124,11 +227,11 @@ export function WeatherHero({ weather }: WeatherHeroProps) {
 
       <a
         className="weather-hero-credit"
-        href="https://commons.wikimedia.org/wiki/File:Amanhecer_na_Praia_do_Laranjal.jpg"
+        href={presentation.photoHref}
         target="_blank"
         rel="noreferrer"
       >
-        Foto: Sebastian2112 / CC BY-SA 4.0
+        {presentation.photoCredit}
       </a>
     </section>
   );
