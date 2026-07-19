@@ -17,6 +17,7 @@ import "./lagoon-level.css";
 import "./lagoon-layout-refinement.css";
 import "./home-lagoon-card.css";
 import "./hydrology.css";
+import "./hydrology-monitor-grid.css";
 import "./guaiba-card.css";
 import "./guaiba-card-refinement.css";
 import "./laranjal-level-card.css";
@@ -25,6 +26,7 @@ import "./footer.css";
 import "./footer-resources.css";
 import "./interface-fixes.css";
 import "./pwa.css";
+import "./mobile-width-guard.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
