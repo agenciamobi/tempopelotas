@@ -117,12 +117,16 @@ function decodeEntities(value: string) {
   return value.replace(/&(#x[\da-f]+|#\d+|[a-z]+);/gi, (match, entity: string) => {
     if (entity.startsWith("#x")) {
       const codePoint = Number.parseInt(entity.slice(2), 16);
-      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+      return Number.isFinite(codePoint) && codePoint <= 0x10ffff
+        ? String.fromCodePoint(codePoint)
+        : match;
     }
 
     if (entity.startsWith("#")) {
       const codePoint = Number.parseInt(entity.slice(1), 10);
-      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+      return Number.isFinite(codePoint) && codePoint <= 0x10ffff
+        ? String.fromCodePoint(codePoint)
+        : match;
     }
 
     return named[entity.toLowerCase()] ?? match;
@@ -146,14 +150,20 @@ function htmlToSearchableText(html: string) {
   return decodeEntities(decodeEscapedText(html))
     .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
     .replace(/<[^>]+>/g, " ")
-    .replace(/[{}[\]"|]/g, " ")
+    .replace(/[{}\[\]"|]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
 
 function parseNumber(value: string | undefined) {
   if (!value) return null;
-  const parsed = Number(value.replace(".", "").replace(",", "."));
+
+  const compact = value.trim().replace(/\s/g, "");
+  const normalized = compact.includes(",")
+    ? compact.replace(/\./g, "").replace(",", ".")
+    : compact;
+  const parsed = Number(normalized);
+
   return Number.isFinite(parsed) && parsed > -500 && parsed < 5_000
     ? parsed
     : null;
@@ -171,7 +181,9 @@ function parseUpdatedAt(segment: string) {
     return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
   }
 
-  const iso = segment.match(/(20\d{2}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2}))/i);
+  const iso = segment.match(
+    /(20\d{2}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2}))/i,
+  );
   if (!iso) return null;
 
   const parsed = new Date(iso[1]);
@@ -207,7 +219,9 @@ function parseStation(
     return stationUnavailable(station, "A estação não foi encontrada na página da fonte.");
   }
 
-  const next = nextStationName ? text.indexOf(nextStationName, start + station.name.length) : -1;
+  const next = nextStationName
+    ? text.indexOf(nextStationName, start + station.name.length)
+    : -1;
   const segment = text.slice(start, next > start ? next : start + 2_500);
   const currentLevel = parseNumber(
     segment.match(/Cota Atual\s*([+-]?\d+(?:[.,]\d+)?)\s*cm/i)?.[1],
@@ -269,11 +283,12 @@ function buildNetwork(
   const live = availableObservations.filter(
     (observation) => observation.status === "live",
   ).length;
-  const latestUpdatedAt = availableObservations
-    .map((observation) => observation.updatedAt)
-    .filter((value): value is string => Boolean(value))
-    .sort()
-    .at(-1) ?? null;
+  const latestUpdatedAt =
+    availableObservations
+      .map((observation) => observation.updatedAt)
+      .filter((value): value is string => Boolean(value))
+      .sort()
+      .at(-1) ?? null;
 
   let status: LagoonMonitoringNetworkData["status"] = "unavailable";
   if (live === observations.length) status = "live";
