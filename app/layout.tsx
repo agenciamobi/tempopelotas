@@ -43,6 +43,7 @@ import "./home-first-fold-refinement.css";
 import "./home-flow-footer-refinement.css";
 import "./theme-polish.css";
 import "./topic-theme-polish.css";
+import "./footer-theme-v2.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
