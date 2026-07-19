@@ -19,10 +19,10 @@ export default function manifest(): MetadataRoute.Manifest {
       url: "/previsao-7-dias-pelotas",
     },
     {
-      name: "Chuva em Pelotas",
-      short_name: "Chuva",
-      description: "Consultar probabilidade e acumulado de chuva.",
-      url: "/chuva-em-pelotas",
+      name: "Situação das águas",
+      short_name: "Águas",
+      description: "Acompanhar Guaíba, Lagoa dos Patos e contexto de Pelotas.",
+      url: "/situacao-hidrologica-pelotas",
     },
     {
       name: "Nível da Lagoa dos Patos",
@@ -41,12 +41,6 @@ export default function manifest(): MetadataRoute.Manifest {
         ]
       : []),
     {
-      name: "Histórico de Pelotas",
-      short_name: "Histórico",
-      description: "Comparar temperatura, chuva e vento dos últimos 30 dias.",
-      url: "/historico-climatico-pelotas",
-    },
-    {
       name: "Alertas meteorológicos",
       short_name: "Alertas",
       description: "Abrir a análise de condições de atenção.",
@@ -59,7 +53,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "TEMPO Pelotas",
     short_name: "Tempo Pelotas",
     description:
-      "Previsão do tempo, chuva, vento e condições meteorológicas em Pelotas, RS.",
+      "Previsão do tempo e situação hidrológica para preparação comunitária em Pelotas, RS.",
     start_url: "/",
     scope: "/",
     display: "standalone",
@@ -67,7 +61,7 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#071e2f",
     lang: "pt-BR",
     orientation: "portrait-primary",
-    categories: ["weather", "utilities", "local"],
+    categories: ["weather", "utilities", "local", "news"],
     shortcuts,
     icons: [
       {
