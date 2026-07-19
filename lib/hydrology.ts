@@ -33,6 +33,8 @@ export const SGB_SACE_URL = "https://www.sgb.gov.br/sace/";
 export const CEMADEN_URL = "https://www.gov.br/cemaden/pt-br";
 export const NOAA_STAR_URL = "https://www.star.nesdis.noaa.gov/star/index.php";
 export const OPEN_METEO_URL = "https://open-meteo.com/";
+export const EMBRAPA_AGROMET_URL =
+  "https://agromet.cpact.embrapa.br/online/Current_Monitor.htm";
 export const GLOFAS_URL = "https://global-flood.emergency.copernicus.eu/";
 
 export const HYDROLOGY_FLOW = [
@@ -141,6 +143,17 @@ export const HYDROLOGY_DATA_SOURCES: HydrologyDataSource[] = [
     status: "active",
     statusLabel: "Em uso",
     url: OPEN_METEO_URL,
+  },
+  {
+    id: "embrapa-agromet",
+    name: "Posto Meteorológico da Sede",
+    organization: "Embrapa Clima Temperado",
+    category: "Observação meteorológica local",
+    description:
+      "Leituras automáticas de temperatura, umidade, pressão, vento, chuva, extremos do dia e evapotranspiração em um ponto físico de Pelotas.",
+    status: "active",
+    statusLabel: "Em uso",
+    url: EMBRAPA_AGROMET_URL,
   },
   {
     id: "cemaden",
