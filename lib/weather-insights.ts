@@ -48,18 +48,18 @@ export function getWeatherAdvisory(weather: WeatherData): WeatherAdvisory {
   const precipitation = today?.precipitation ?? 0;
   const reasons: string[] = [];
 
-  if (hasStormSignal) reasons.push("há indicação de temporal na previsão");
-  if (maxHourlyGust >= 50) reasons.push(`rajadas podem chegar a ${maxHourlyGust} km/h`);
-  if (maxHourlyRainChance >= 70) reasons.push(`probabilidade de chuva chega a ${maxHourlyRainChance}%`);
-  if (precipitation >= 25) reasons.push(`acumulado estimado de ${formatMillimeters(precipitation)} mm hoje`);
+  if (hasStormSignal) reasons.push("a previsão mostra possibilidade de temporal");
+  if (maxHourlyGust >= 50) reasons.push(`as rajadas podem chegar a ${maxHourlyGust} km/h`);
+  if (maxHourlyRainChance >= 70) reasons.push(`a chance de chuva chega a ${maxHourlyRainChance}%`);
+  if (precipitation >= 25) reasons.push(`o volume de chuva previsto para hoje é de ${formatMillimeters(precipitation)} mm`);
 
   if (hasStormSignal || maxHourlyGust >= 75 || precipitation >= 50) {
     return {
       level: "warning",
-      eyebrow: "Atenção meteorológica",
-      title: "Há indicativos automáticos de tempo severo",
+      eyebrow: "Atenção redobrada",
+      title: "A previsão mostra condições que merecem cuidado",
       description:
-        "A previsão aponta condições que exigem acompanhamento. Consulte também os avisos oficiais da Defesa Civil e do INMET.",
+        "Há possibilidade de temporal, chuva volumosa ou vento forte. Consulte também os avisos da Defesa Civil e do INMET.",
       reasons,
     };
   }
@@ -67,20 +67,20 @@ export function getWeatherAdvisory(weather: WeatherData): WeatherAdvisory {
   if (maxHourlyGust >= 50 || maxHourlyRainChance >= 70 || precipitation >= 25) {
     return {
       level: "attention",
-      eyebrow: "Condições sob monitoramento",
-      title: "A previsão recomenda atenção nas próximas horas",
+      eyebrow: "Atenção nas próximas horas",
+      title: "Acompanhe a chuva e o vento",
       description:
-        "Os dados automáticos mostram chuva ou vento em níveis que merecem acompanhamento, embora isso não represente um alerta oficial.",
+        "A previsão mostra chuva ou rajadas que merecem acompanhamento. Esta informação não substitui os avisos oficiais.",
       reasons,
     };
   }
 
   return {
     level: "normal",
-    eyebrow: "Leitura automática da previsão",
-    title: "Sem indicativos automáticos de tempo severo",
+    eyebrow: "Sem sinal importante no momento",
+    title: "A previsão não mostra chuva ou vento fortes",
     description:
-      "A previsão disponível não atingiu os limites internos de atenção para chuva, rajadas ou temporal. Avisos oficiais podem mudar a qualquer momento.",
+      "As condições podem mudar. Continue acompanhando e consulte os canais oficiais quando o tempo estiver instável.",
     reasons: [],
   };
 }
