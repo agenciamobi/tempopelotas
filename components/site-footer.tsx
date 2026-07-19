@@ -22,12 +22,11 @@ function MobiMark() {
 export function SiteFooter({ source: _source }: SiteFooterProps) {
   return (
     <footer className="site-footer">
-      <nav className="footer-resource-links" aria-label="Transparência e recursos públicos">
-        <Link href="/estacao-embrapa-pelotas">Estação Embrapa</Link>
+      <nav className="footer-resource-links" aria-label="Informações do portal">
+        <Link href="/estacao-embrapa-pelotas">Medições da Embrapa</Link>
         <Link href="/situacao-hidrologica-pelotas">Situação das águas</Link>
-        <Link href="/metodologia">Metodologia e fontes</Link>
-        <a href="/pelotas.json">Dados JSON</a>
-        <a href="/feed">Feed público</a>
+        <Link href="/nivel-da-lagoa-dos-patos-laranjal">Nível no Laranjal</Link>
+        <Link href="/metodologia">De onde vêm as informações</Link>
       </nav>
 
       <a
@@ -47,7 +46,7 @@ export function SiteFooter({ source: _source }: SiteFooterProps) {
 
         <span className="mobi-ad-message">
           <strong>Desenvolvimento de Sites Inteligentes</strong>
-          <small>Estratégia, SEO, performance e tecnologia para gerar resultados.</small>
+          <small>Estratégia, presença no Google e tecnologia para gerar resultados.</small>
         </span>
 
         <span className="mobi-ad-action">
