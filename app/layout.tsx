@@ -18,6 +18,7 @@ import "./home-lagoon-card.css";
 import "./hydrology.css";
 import "./guaiba-card.css";
 import "./guaiba-card-refinement.css";
+import "./laranjal-level-card.css";
 import "./embrapa-observation.css";
 import "./footer.css";
 import "./footer-resources.css";
