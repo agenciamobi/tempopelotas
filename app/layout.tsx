@@ -48,6 +48,7 @@ import "./footer-shell-v2.css";
 import "./brand-palette-theme.css";
 import "./guaiba-city-directory.css";
 import "./lagoon-monitoring-network.css";
+import "./lagoon-monitoring-api.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
