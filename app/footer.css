@@ -12,7 +12,7 @@
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(180px, 0.9fr) minmax(250px, 1.25fr) auto;
+  grid-template-columns: minmax(170px, 0.85fr) minmax(240px, 1.25fr) auto;
   align-items: center;
   gap: 20px;
   width: min(100%, 728px);
@@ -81,57 +81,12 @@
 .mobi-ad-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: flex-start;
 }
 
-.mobi-ad-brand > span:last-child,
 .mobi-ad-message {
   display: grid;
   gap: 3px;
-}
-
-.mobi-ad-mark {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  font-size: 1.35rem;
-  font-weight: 950;
-  letter-spacing: -0.09em;
-}
-
-.mobi-ad-mark span:nth-child(1) {
-  color: #18bdcd;
-}
-
-.mobi-ad-mark span:nth-child(2) {
-  color: #7a55f4;
-}
-
-.mobi-ad-mark span:nth-child(3) {
-  color: #ef3b9d;
-}
-
-.mobi-ad-mark span:nth-child(4) {
-  color: #f58a55;
-}
-
-.mobi-ad-brand small,
-.mobi-ad-message small {
-  color: rgba(255, 255, 255, 0.62);
-  line-height: 1.35;
-}
-
-.mobi-ad-brand small {
-  font-size: 0.56rem;
-  font-weight: 760;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.mobi-ad-brand strong {
-  max-width: 170px;
-  font-size: 0.78rem;
-  line-height: 1.15;
 }
 
 .mobi-ad-message strong {
@@ -146,7 +101,9 @@
 
 .mobi-ad-message small {
   overflow: hidden;
+  color: rgba(255, 255, 255, 0.62);
   font-size: 0.64rem;
+  line-height: 1.35;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -205,7 +162,7 @@
 
 @media (max-width: 720px) {
   .mobi-sites-banner {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 12px 14px;
     min-height: 118px;
     padding: 16px;
@@ -257,20 +214,18 @@
 
   .mobi-ad-brand {
     grid-row: 1;
+    justify-content: center;
   }
 
   .mobi-ad-message {
     grid-row: 2;
+    text-align: center;
   }
 
   .mobi-ad-action {
     grid-row: 3;
     width: 100%;
     margin-top: 2px;
-  }
-
-  .mobi-ad-brand strong {
-    max-width: none;
   }
 
   .site-footer > p {
