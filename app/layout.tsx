@@ -17,6 +17,7 @@ import "./lagoon-layout-refinement.css";
 import "./home-lagoon-card.css";
 import "./hydrology.css";
 import "./footer.css";
+import "./footer-resources.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
