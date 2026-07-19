@@ -112,15 +112,14 @@ export function SiteHeader({ advisoryLevel = "normal" }: SiteHeaderProps) {
     <>
       <header className="site-header">
         <Link className="brand" href="/" aria-label="TEMPO Pelotas — página inicial">
-          <span className="brand-symbol" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </span>
-          <span className="brand-copy">
-            <strong>TEMPO</strong>
-            <small>Pelotas, RS</small>
-          </span>
+          <img
+            className="brand-logo"
+            src="/brand/tempo-pelotas-header"
+            alt=""
+            width={11349}
+            height={1552}
+            draggable={false}
+          />
         </Link>
 
         <nav className="main-nav" aria-label="Navegação principal">
