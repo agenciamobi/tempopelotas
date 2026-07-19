@@ -1,4 +1,4 @@
-const fallbackUrl = "http://localhost:3000";
+const fallbackUrl = "http://localhost:5175";
 const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
   : undefined;
