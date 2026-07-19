@@ -1,20 +1,20 @@
 const CACHE_VERSION = "tempo-pelotas-v1";
 const APP_SHELL_CACHE = `${CACHE_VERSION}-app-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
-const APP_SHELL_URLS = [
-  "/",
-  "/offline",
-  "/manifest.webmanifest",
-  "/icon.svg",
-  "/alertas",
-  "/nivel-da-lagoa-dos-patos-laranjal",
-];
+const APP_SHELL_URLS = ["/", "/offline", "/manifest.webmanifest", "/icon.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(APP_SHELL_CACHE)
-      .then((cache) => cache.addAll(APP_SHELL_URLS))
+      .then(async (cache) => {
+        await Promise.allSettled(
+          APP_SHELL_URLS.map(async (url) => {
+            const response = await fetch(url, { cache: "reload" });
+            if (response.ok) await cache.put(url, response);
+          }),
+        );
+      })
       .then(() => self.skipWaiting()),
   );
 });
@@ -46,7 +46,7 @@ async function networkFirst(request) {
     return response;
   } catch {
     const cached = await caches.match(request);
-    return cached || caches.match("/offline");
+    return cached || (await caches.match("/offline")) || Response.error();
   }
 }
 
@@ -60,7 +60,12 @@ async function staleWhileRevalidate(request) {
     })
     .catch(() => null);
 
-  return cached || networkPromise || Response.error();
+  if (cached) {
+    void networkPromise;
+    return cached;
+  }
+
+  return (await networkPromise) || Response.error();
 }
 
 self.addEventListener("fetch", (event) => {
