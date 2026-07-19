@@ -23,58 +23,61 @@ function MetricIcon({ type }: { type: "humidity" | "pressure" | "wind" | "visibi
 
 type WeatherDashboardProps = {
   weather: WeatherData;
+  showCurrent?: boolean;
 };
 
-export function WeatherDashboard({ weather }: WeatherDashboardProps) {
+export function WeatherDashboard({ weather, showCurrent = true }: WeatherDashboardProps) {
   const { current, hourly, daily } = weather;
   const advisory = getWeatherAdvisory(weather);
 
   return (
     <main className="weather-content">
-      <section className="current-weather" id="agora" aria-labelledby="current-title">
-        <div className="current-topline">
-          <div>
-            <span className="eyebrow">Tempo agora</span>
-            <h1 id="current-title">
-              {current.city}, <span>{current.state}</span>
-            </h1>
-          </div>
-          <span className="demo-badge">Atualizado em {current.updatedAt}</span>
-        </div>
-
-        <div className="current-main">
-          <div className="temperature-block">
-            <span className="temperature-value">{current.temperature}°</span>
+      {showCurrent ? (
+        <section className="current-weather" id="agora" aria-labelledby="current-title">
+          <div className="current-topline">
             <div>
-              <strong>{current.condition}</strong>
-              <span>Sensação de {current.feelsLike}°</span>
+              <span className="eyebrow">Tempo agora</span>
+              <h1 id="current-title">
+                {current.city}, <span>{current.state}</span>
+              </h1>
+            </div>
+            <span className="demo-badge">Atualizado em {current.updatedAt}</span>
+          </div>
+
+          <div className="current-main">
+            <div className="temperature-block">
+              <span className="temperature-value">{current.temperature}°</span>
+              <div>
+                <strong>{current.condition}</strong>
+                <span>Sensação de {current.feelsLike}°</span>
+              </div>
+            </div>
+
+            <div className="hero-weather-icon">
+              <WeatherIcon name={current.icon} title={current.condition} />
             </div>
           </div>
 
-          <div className="hero-weather-icon">
-            <WeatherIcon name={current.icon} title={current.condition} />
+          <div className="metrics-grid" aria-label="Tempo agora em Pelotas">
+            <article>
+              <MetricIcon type="humidity" />
+              <div><span>Umidade do ar</span><strong>{current.humidity}%</strong></div>
+            </article>
+            <article>
+              <MetricIcon type="pressure" />
+              <div><span>Pressão do ar</span><strong>{current.pressure} hPa</strong></div>
+            </article>
+            <article>
+              <MetricIcon type="wind" />
+              <div><span>Rajadas de {current.windGust} km/h</span><strong>{current.windSpeed} km/h {current.windDirection}</strong></div>
+            </article>
+            <article>
+              <MetricIcon type="visibility" />
+              <div><span>Até onde é possível enxergar</span><strong>{current.visibility} km</strong></div>
+            </article>
           </div>
-        </div>
-
-        <div className="metrics-grid" aria-label="Tempo agora em Pelotas">
-          <article>
-            <MetricIcon type="humidity" />
-            <div><span>Umidade do ar</span><strong>{current.humidity}%</strong></div>
-          </article>
-          <article>
-            <MetricIcon type="pressure" />
-            <div><span>Pressão do ar</span><strong>{current.pressure} hPa</strong></div>
-          </article>
-          <article>
-            <MetricIcon type="wind" />
-            <div><span>Rajadas de {current.windGust} km/h</span><strong>{current.windSpeed} km/h {current.windDirection}</strong></div>
-          </article>
-          <article>
-            <MetricIcon type="visibility" />
-            <div><span>Até onde é possível enxergar</span><strong>{current.visibility} km</strong></div>
-          </article>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <section className="hourly-section" id="horas" aria-labelledby="hourly-title">
         <div className="section-heading">
