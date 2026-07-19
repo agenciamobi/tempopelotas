@@ -75,7 +75,7 @@ const heroPresentationByLevel = {
     badge: "Atenção redobrada",
     kicker: "Condições relevantes em Pelotas",
     title: "Atenção ao tempo.",
-    highlightedTitle: "Condições exigem cuidado.",
+    highlightedTitle: "Redobre os cuidados.",
     description:
       "Há possibilidade de temporal, chuva volumosa ou vento forte. Acompanhe a previsão e consulte os avisos da Defesa Civil e do INMET.",
     primaryAction: {
@@ -101,6 +101,22 @@ function getHeroPresentation(advisory: WeatherAdvisory): HeroPresentation {
     badge: advisory.eyebrow,
     description: advisory.description,
   };
+}
+
+function capitalizeSentence(value: string) {
+  return value.replace(/^./, (character) => character.toUpperCase());
+}
+
+function getCurrentSourceMeta(current: WeatherData["current"]) {
+  if (current.source.kind === "observation") {
+    const observationTime = current.source.observedAt
+      ? `Observado às ${current.source.observedAt}`
+      : "Medição observada";
+
+    return `${observationTime} · ${current.source.name}`;
+  }
+
+  return `${current.updatedAt} · ${current.source.name}`;
 }
 
 function HeroMetricIcon({ name }: { name: HeroMetricIconName }) {
@@ -145,6 +161,7 @@ export function WeatherHero({ weather }: WeatherHeroProps) {
   const advisory = getWeatherAdvisory(weather);
   const presentation = getHeroPresentation(advisory);
   const reasons = advisory.level === "normal" ? [] : advisory.reasons.slice(0, 2);
+  const currentSourceMeta = getCurrentSourceMeta(current);
 
   return (
     <section
@@ -172,7 +189,7 @@ export function WeatherHero({ weather }: WeatherHeroProps) {
           {reasons.length > 0 ? (
             <div className="weather-hero-reasons" aria-label="Motivos para atenção">
               {reasons.map((reason) => (
-                <span key={reason}>{reason}</span>
+                <span key={reason}>{capitalizeSentence(reason)}</span>
               ))}
             </div>
           ) : null}
@@ -192,7 +209,7 @@ export function WeatherHero({ weather }: WeatherHeroProps) {
           <div className="weather-hero-now-heading">
             <div>
               <span>Pelotas, RS</span>
-              <small>{current.updatedAt} · {current.source.name}</small>
+              <small>{currentSourceMeta}</small>
             </div>
             <span className="weather-hero-live"><i aria-hidden="true" /> Agora</span>
           </div>
