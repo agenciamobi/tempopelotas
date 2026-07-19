@@ -6,6 +6,7 @@ import "./globals.css";
 import "./topic-pages.css";
 import "./home.css";
 import "./map.css";
+import "./radar-map.css";
 import "./mobile-app.css";
 import "./mobile-app-fixes.css";
 import "./charts.css";
