@@ -40,23 +40,23 @@ export function HydrologyOverview({ weather, guaiba }: HydrologyOverviewProps) {
     >
       <div className="hydrology-home-intro">
         <div>
-          <span className="hydrology-stage-label">Segunda etapa da homepage</span>
-          <span className="eyebrow">Monitoramento para prevenção</span>
+          <span className="hydrology-stage-label">Águas que podem afetar Pelotas</span>
+          <span className="eyebrow">Acompanhamento para prevenção</span>
           <h2 id="hydrology-home-title">Situação das águas no Rio Grande do Sul e em Pelotas</h2>
           <p>
-            O Guaíba é uma contribuição importante para a Lagoa dos Patos, mas não explica sozinho o
-            nível observado em Pelotas. A lagoa recebe água de várias bacias, rios e arroios; sua
-            resposta também depende do vento, da chuva local, do Canal São Gonçalo e da capacidade de
-            escoamento pelo canal da Barra, entre Rio Grande e São José do Norte.
+            Veja como estão o Guaíba e a Lagoa dos Patos e acompanhe as condições que podem influenciar
+            o Laranjal e as áreas baixas de Pelotas. O cenário local depende de várias bacias, rios e
+            arroios, além do vento, da chuva, do Canal São Gonçalo e da saída de água pela Barra de Rio
+            Grande.
           </p>
         </div>
         <div className="hydrology-home-actions">
           <Link className="hydrology-primary-action" href="/situacao-hidrologica-pelotas">
-            Abrir situação hidrológica
+            Ver panorama completo
             <span aria-hidden="true">→</span>
           </Link>
           <Link className="hydrology-secondary-action" href="/metodologia">
-            Fontes e metodologia
+            Entender os dados
           </Link>
         </div>
       </div>
@@ -85,7 +85,7 @@ export function HydrologyOverview({ weather, guaiba }: HydrologyOverviewProps) {
           <GuaibaLevelCard data={guaiba} />
 
           <article className="hydrology-context-card hydrology-context-card--local">
-            <span className="eyebrow">Referência local</span>
+            <span className="eyebrow">Medição próxima de Pelotas</span>
             <h3>Estação Laranjal</h3>
             <p>{laranjalStation.role}</p>
             <dl>
@@ -99,7 +99,7 @@ export function HydrologyOverview({ weather, guaiba }: HydrologyOverviewProps) {
               </div>
             </dl>
             <Link href="/nivel-da-lagoa-dos-patos-laranjal">
-              Ver medidor e orientações
+              Acompanhar nível e orientações
               <span aria-hidden="true">→</span>
             </Link>
           </article>
@@ -113,7 +113,7 @@ export function HydrologyOverview({ weather, guaiba }: HydrologyOverviewProps) {
             <article>
               <span>Maior rajada próxima</span>
               <strong>{strongestUpcomingGust} km/h</strong>
-              <small>Agora e próximas horas</small>
+              <small>Previsão para as próximas horas</small>
             </article>
             <article>
               <span>Chuva prevista hoje</span>
@@ -125,7 +125,7 @@ export function HydrologyOverview({ weather, guaiba }: HydrologyOverviewProps) {
           <a className="hydrology-sgb-link" href={SGB_SACE_URL} target="_blank" rel="noreferrer">
             <span>
               <small>Serviço Geológico do Brasil</small>
-              <strong>Consultar monitoramento e boletins do SACE</strong>
+              <strong>Consultar níveis, boletins e avisos do SACE</strong>
             </span>
             <b aria-hidden="true">↗</b>
           </a>
@@ -133,11 +133,10 @@ export function HydrologyOverview({ weather, guaiba }: HydrologyOverviewProps) {
       </div>
 
       <div className="hydrology-community-note">
-        <strong>Informação para preparação comunitária</strong>
+        <strong>Acompanhe e prepare-se</strong>
         <p>
-          Este painel reúne contexto e fontes públicas para facilitar o acompanhamento. Ele não
-          substitui alertas, ordens de evacuação ou orientações da Defesa Civil, Prefeitura, Sanep,
-          ANA, SGB e demais autoridades competentes.
+          Observe a evolução dos níveis e mantenha atenção aos comunicados oficiais. Em situações de
+          risco, siga as orientações da Defesa Civil, Prefeitura, Sanep, ANA, SGB e demais autoridades.
         </p>
       </div>
     </section>
