@@ -23,7 +23,7 @@ export async function GET() {
     language: "pt-BR",
     items: [
       {
-        id: `${absoluteUrl("/tempo-hoje-pelotas")}#${generatedAt}`,
+        id: absoluteUrl("/tempo-hoje-pelotas"),
         url: absoluteUrl("/tempo-hoje-pelotas"),
         title: `Tempo em Pelotas: ${weather.current.temperature}°C e ${weather.current.condition}`,
         content_text: `Sensação de ${weather.current.feelsLike}°C, vento de ${weather.current.windSpeed} km/h ${weather.current.windDirection}, rajadas de ${weather.current.windGust} km/h e ${today?.rainChance ?? 0}% de probabilidade de chuva hoje.`,
@@ -31,7 +31,7 @@ export async function GET() {
         tags: ["tempo", "Pelotas", "previsão", "chuva", "vento"],
       },
       {
-        id: `${absoluteUrl("/situacao-hidrologica-pelotas")}#${generatedAt}`,
+        id: absoluteUrl("/situacao-hidrologica-pelotas"),
         url: absoluteUrl("/situacao-hidrologica-pelotas"),
         title: "Situação hidrológica de Pelotas e da Lagoa dos Patos",
         content_text: `Acompanhe a Estação Laranjal${laranjalStation ? `, código ANA ${laranjalStation.code}` : ""}, o contexto do Guaíba, vento e chuva. O nível local é consultado no painel público ${LAGOON_LEVEL_SOURCE.name}.`,
