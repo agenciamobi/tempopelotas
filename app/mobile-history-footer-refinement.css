@@ -75,19 +75,15 @@
   .history-summary strong,
   .history-records strong,
   .history-note h2,
-  .history-note p {
+  .history-note p,
+  .mobi-ad-message strong,
+  .mobi-ad-message small,
+  .site-footer > p {
     overflow-wrap: anywhere;
   }
 
   .mobi-sites-banner {
     width: 100%;
-  }
-
-  .mobi-ad-brand strong,
-  .mobi-ad-message strong,
-  .mobi-ad-message small,
-  .site-footer > p {
-    overflow-wrap: anywhere;
   }
 
   .site-footer > p {
@@ -181,10 +177,6 @@
   }
 
   .mobi-ad-brand {
-    align-items: flex-start;
-  }
-
-  .mobi-ad-mark {
-    font-size: 1.18rem;
+    align-items: center;
   }
 }
