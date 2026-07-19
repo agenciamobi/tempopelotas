@@ -115,6 +115,10 @@ export function SiteHeader({
 
   return (
     <>
+      <a className="skip-link" href="#conteudo-principal">
+        Pular para o conteúdo principal
+      </a>
+
       <header className={headerClassName} data-advisory-level={advisoryLevel}>
         <Link className="brand" href="/" aria-label="TEMPO Pelotas — página inicial">
           <img
