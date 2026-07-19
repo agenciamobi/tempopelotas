@@ -68,19 +68,19 @@ export function EmbrapaObservationOverview({
     >
       <div className="embrapa-observation-intro">
         <div>
-          <span className="embrapa-stage-label">Observação meteorológica local</span>
-          <span className="eyebrow">Estação física em Pelotas</span>
+          <span className="embrapa-stage-label">Medições feitas em Pelotas</span>
+          <span className="eyebrow">Estação Embrapa Clima Temperado</span>
           <h2 id="embrapa-observation-title">
-            Dados medidos pela Embrapa Clima Temperado
+            Veja o que a estação registrou agora
           </h2>
           <p>
-            Leituras da estação automática instalada no Posto Meteorológico da Sede da Embrapa.
-            Elas mostram o que foi observado naquele ponto e complementam a previsão dos modelos.
+            Estes valores foram medidos em um ponto da Embrapa, em Pelotas. Eles mostram o tempo
+            observado naquele local e ajudam a comparar com a previsão da cidade.
           </p>
         </div>
         <div className="embrapa-observation-actions">
           <Link className="embrapa-primary-action" href="/estacao-embrapa-pelotas">
-            Ver estação completa
+            Ver todas as medições
             <span aria-hidden="true">→</span>
           </Link>
           <a
@@ -89,7 +89,7 @@ export function EmbrapaObservationOverview({
             target="_blank"
             rel="noreferrer"
           >
-            Abrir fonte original
+            Consultar na Embrapa
             <span aria-hidden="true">↗</span>
           </a>
         </div>
@@ -101,17 +101,17 @@ export function EmbrapaObservationOverview({
             <div className="embrapa-current-topline">
               <span className="embrapa-live-status">
                 <i aria-hidden="true" />
-                {observation.status === "live" ? "Leitura reconhecida" : "Leitura parcial"}
+                {observation.status === "live" ? "Medição disponível" : "Alguns valores indisponíveis"}
               </span>
               <small>
-                Consulta {formatFetchedAt(observation.source.fetchedAt)}
+                Consultado em {formatFetchedAt(observation.source.fetchedAt)}
               </small>
             </div>
 
             <div className="embrapa-temperature-reading">
               <span>{formatNumber(observation.current.temperature)}°</span>
               <div>
-                <strong>Temperatura observada</strong>
+                <strong>Temperatura medida</strong>
                 <small>
                   Sensação de {formatNumber(observation.current.feelsLike)} °C
                 </small>
@@ -120,15 +120,15 @@ export function EmbrapaObservationOverview({
 
             <div className="embrapa-primary-metrics">
               <div>
-                <span>Umidade</span>
+                <span>Umidade do ar</span>
                 <strong>{formatNumber(observation.current.humidity, 0)}%</strong>
               </div>
               <div>
-                <span>Ponto de orvalho</span>
+                <span>Possibilidade de orvalho ou neblina</span>
                 <strong>{formatNumber(observation.current.dewPoint)} °C</strong>
               </div>
               <div>
-                <span>Pressão</span>
+                <span>Pressão do ar</span>
                 <strong>{formatNumber(observation.current.pressure)} hPa</strong>
                 {observation.current.pressureTrend ? (
                   <small>{observation.current.pressureTrend}</small>
@@ -143,7 +143,7 @@ export function EmbrapaObservationOverview({
                 <ObservationIcon type="wind" />
               </span>
               <div>
-                <small>Vento observado</small>
+                <small>Vento medido</small>
                 <strong>{formatNumber(observation.current.windSpeed)} km/h</strong>
                 <span>{observation.current.windDirection ?? "Direção indisponível"}</span>
               </div>
@@ -163,7 +163,7 @@ export function EmbrapaObservationOverview({
                 <ObservationIcon type="temperature" />
               </span>
               <div>
-                <small>Extremos de hoje</small>
+                <small>Menor e maior temperatura de hoje</small>
                 <strong>
                   {formatNumber(observation.extremes.temperatureMin.value)}° /{" "}
                   {formatNumber(observation.extremes.temperatureMax.value)}°
@@ -179,7 +179,7 @@ export function EmbrapaObservationOverview({
                 <ObservationIcon type="humidity" />
               </span>
               <div>
-                <small>Evapotranspiração</small>
+                <small>Água que voltou para o ar hoje</small>
                 <strong>
                   {formatNumber(observation.accumulated.evapotranspirationDaily, 2)} mm
                 </strong>
@@ -191,11 +191,11 @@ export function EmbrapaObservationOverview({
           </div>
 
           <aside className="embrapa-station-context">
-            <span className="eyebrow">Local da medição</span>
-            <h3>Posto Meteorológico da Sede</h3>
+            <span className="eyebrow">Onde fica a estação</span>
+            <h3>Sede da Embrapa Clima Temperado</h3>
             <p>
-              Latitude 31°42′S, longitude 52°24′W e altitude de 57 m. A leitura representa esse
-              ponto físico e pode diferir do Centro, Laranjal e demais bairros.
+              A leitura representa esse local específico. O tempo pode ser diferente no Centro,
+              Laranjal, bairros mais distantes e áreas rurais.
             </p>
             <dl>
               <div>
@@ -207,19 +207,19 @@ export function EmbrapaObservationOverview({
                 <dd>{observation.current.sunset ?? "—"}</dd>
               </div>
               <div>
-                <dt>Chuva anual</dt>
+                <dt>Chuva no ano</dt>
                 <dd>{formatNumber(observation.accumulated.rainAnnual)} mm</dd>
               </div>
             </dl>
             <p className="embrapa-source-note">
-              Fonte: Embrapa Clima Temperado. Dados coletados automaticamente e sujeitos a atraso,
-              manutenção ou indisponibilidade da estação.
+              Fonte: Embrapa Clima Temperado. A atualização pode atrasar durante manutenção ou falha
+              da estação.
             </p>
           </aside>
         </div>
       ) : (
         <div className="embrapa-unavailable-card" role="status">
-          <strong>Estação temporariamente indisponível</strong>
+          <strong>Medições temporariamente indisponíveis</strong>
           <p>{observation.error}</p>
           <a href={observation.source.url} target="_blank" rel="noreferrer">
             Consultar diretamente na Embrapa
