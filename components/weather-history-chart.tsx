@@ -43,7 +43,7 @@ function getMetricValues(days: HistoricalWeatherDay[], metric: HistoryMetric) {
       primary: days.map((day) => day.precipitation),
       secondary: [] as number[],
       unit: " mm",
-      label: "Chuva acumulada",
+      label: "Chuva",
     };
   }
 
@@ -51,7 +51,7 @@ function getMetricValues(days: HistoricalWeatherDay[], metric: HistoryMetric) {
     primary: days.map((day) => day.windGust),
     secondary: [] as number[],
     unit: " km/h",
-    label: "Rajada máxima",
+    label: "Rajada mais forte",
   };
 }
 
@@ -120,9 +120,9 @@ export function WeatherHistoryChart({ days }: WeatherHistoryChartProps) {
     <section className={`history-chart history-chart--${metric}`} aria-labelledby="history-chart-title">
       <div className="history-chart-heading">
         <div>
-          <span className="eyebrow">Comparação diária</span>
-          <h2 id="history-chart-title">Histórico recente em Pelotas</h2>
-          <p>Selecione o indicador e toque em uma data para consultar o valor registrado pelo modelo.</p>
+          <span className="eyebrow">Veja dia por dia</span>
+          <h2 id="history-chart-title">Como esteve o tempo em Pelotas</h2>
+          <p>Escolha o que deseja comparar e toque em uma data para ver o valor daquele dia.</p>
         </div>
         <div className="history-chart-reading" aria-live="polite">
           <span>{selectedDay.weekday}, {selectedDay.label}</span>
@@ -134,14 +134,14 @@ export function WeatherHistoryChart({ days }: WeatherHistoryChartProps) {
       </div>
 
       <div className="history-chart-controls">
-        <div className="history-chart-tabs" role="tablist" aria-label="Indicador histórico">
+        <div className="history-chart-tabs" role="tablist" aria-label="Escolha o que deseja comparar">
           <button type="button" role="tab" aria-selected={metric === "temperature"} className={metric === "temperature" ? "is-active" : undefined} onClick={() => updateMetric("temperature")}>Temperatura</button>
           <button type="button" role="tab" aria-selected={metric === "precipitation"} className={metric === "precipitation" ? "is-active" : undefined} onClick={() => updateMetric("precipitation")}>Chuva</button>
           <button type="button" role="tab" aria-selected={metric === "wind"} className={metric === "wind" ? "is-active" : undefined} onClick={() => updateMetric("wind")}>Rajadas</button>
         </div>
-        <div className="history-period" aria-label="Período do histórico">
+        <div className="history-period" aria-label="Escolha quantos dias deseja ver">
           {([7, 14, 30] as HistoryPeriod[]).map((item) => (
-            <button type="button" className={period === item ? "is-active" : undefined} aria-pressed={period === item} key={item} onClick={() => updatePeriod(item)}>{item}d</button>
+            <button type="button" className={period === item ? "is-active" : undefined} aria-pressed={period === item} key={item} onClick={() => updatePeriod(item)}>{item} dias</button>
           ))}
         </div>
       </div>
@@ -178,7 +178,7 @@ export function WeatherHistoryChart({ days }: WeatherHistoryChartProps) {
         </svg>
       </div>
 
-      <div className="history-days" aria-label="Selecionar dia do histórico">
+      <div className="history-days" aria-label="Escolha um dia">
         {visibleDays.map((day, index) => {
           const isSelected = index === selectedIndex;
           return (
