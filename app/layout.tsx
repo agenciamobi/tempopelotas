@@ -44,6 +44,7 @@ import "./home-flow-footer-refinement.css";
 import "./theme-polish.css";
 import "./topic-theme-polish.css";
 import "./footer-theme-v2.css";
+import "./footer-shell-v2.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
