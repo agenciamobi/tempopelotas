@@ -1,4 +1,5 @@
 const RADAR_STEP_SECONDS = 10 * 60;
+const RADAR_PROCESSING_DELAY_SECONDS = 5 * 60;
 const HISTORY_STEPS = 6;
 const FORECAST_STEPS = 12;
 const TIMEZONE = "America/Sao_Paulo";
@@ -35,6 +36,11 @@ export function roundToRadarStep(timestampSeconds: number) {
   return Math.floor(timestampSeconds / RADAR_STEP_SECONDS) * RADAR_STEP_SECONDS;
 }
 
+function getLatestCompleteRadarTimestamp(now = Date.now()) {
+  const delayedTimestamp = Math.floor(now / 1000) - RADAR_PROCESSING_DELAY_SECONDS;
+  return roundToRadarStep(delayedTimestamp);
+}
+
 function formatFrameTime(timestamp: number) {
   return new Intl.DateTimeFormat("pt-BR", {
     timeZone: TIMEZONE,
@@ -45,7 +51,7 @@ function formatFrameTime(timestamp: number) {
 }
 
 export function buildRadarFrames(now = Date.now()) {
-  const currentTimestamp = roundToRadarStep(Math.floor(now / 1000));
+  const currentTimestamp = getLatestCompleteRadarTimestamp(now);
   const frames: RadarFrame[] = [];
 
   for (let offset = -HISTORY_STEPS; offset <= FORECAST_STEPS; offset += 1) {
@@ -79,7 +85,7 @@ export function isAllowedRadarTileRequest(
   if (!Number.isInteger(x) || !Number.isInteger(y)) return false;
   if (x < 0 || y < 0 || x >= maxCoordinate || y >= maxCoordinate) return false;
 
-  const currentTimestamp = roundToRadarStep(Math.floor(now / 1000));
+  const currentTimestamp = getLatestCompleteRadarTimestamp(now);
   const minimumTimestamp = currentTimestamp - HISTORY_STEPS * RADAR_STEP_SECONDS;
   const maximumTimestamp = currentTimestamp + FORECAST_STEPS * RADAR_STEP_SECONDS;
 
