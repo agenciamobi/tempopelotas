@@ -23,6 +23,7 @@ export function SiteFooter({ source: _source }: SiteFooterProps) {
   return (
     <footer className="site-footer">
       <nav className="footer-resource-links" aria-label="Transparência e recursos públicos">
+        <Link href="/estacao-embrapa-pelotas">Estação Embrapa</Link>
         <Link href="/situacao-hidrologica-pelotas">Situação das águas</Link>
         <Link href="/metodologia">Metodologia e fontes</Link>
         <a href="/pelotas.json">Dados JSON</a>
