@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { ForecastPageShell } from "@/components/forecast-page-shell";
-import { LagoonLevelDashboard } from "@/components/lagoon-level-dashboard";
+import { LaranjalLevelCard } from "@/components/laranjal-level-card";
+import { getLaranjalLevelData } from "@/lib/laranjal-level";
 import { absoluteUrl } from "@/lib/site";
 import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
 import { getPelotasWeather } from "@/lib/weather-service";
 
-export const revalidate = 600;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Nível da Lagoa dos Patos no Laranjal em tempo real",
@@ -21,7 +22,10 @@ export const metadata: Metadata = {
 };
 
 export default async function NivelDaLagoaPage() {
-  const weather = await getPelotasWeather();
+  const [weather, laranjalLevel] = await Promise.all([
+    getPelotasWeather(),
+    getLaranjalLevelData(),
+  ]);
   const today = weather.daily[0];
   const maxHourlyGust = Math.max(
     weather.current.windGust,
@@ -62,13 +66,14 @@ export default async function NivelDaLagoaPage() {
         }}
       />
 
-      <LagoonLevelDashboard
-        windSpeed={weather.current.windSpeed}
-        windDirection={weather.current.windDirection}
-        windGust={maxHourlyGust}
-        precipitation={today?.precipitation ?? 0}
-        condition={weather.current.condition}
-        updatedAt={weather.current.updatedAt}
+      <LaranjalLevelCard
+        initialData={laranjalLevel}
+        weather={{
+          windSpeed: weather.current.windSpeed,
+          windDirection: weather.current.windDirection,
+          windGust: maxHourlyGust,
+          precipitation: today?.precipitation ?? 0,
+        }}
       />
 
       <section className="topic-section lagoon-explanation" aria-labelledby="lagoon-explanation-title">
