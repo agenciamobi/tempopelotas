@@ -1,6 +1,10 @@
 import Link from "next/link";
 import type { EmbrapaObservationData } from "@/lib/embrapa-observation";
 
+const EMBRAPA_MAP_URL = "https://maps.app.goo.gl/JjMT1vyqhzw6dqG17";
+const EMBRAPA_MAP_EMBED_URL =
+  "https://www.google.com/maps?q=Embrapa+Clima+Temperado+Pelotas+RS&z=14&output=embed";
+
 type EmbrapaObservationOverviewProps = {
   observation: EmbrapaObservationData;
 };
@@ -51,6 +55,15 @@ function ObservationIcon({ type }: { type: "temperature" | "humidity" | "wind" |
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       {paths[type]}
+    </svg>
+  );
+}
+
+function LocationIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 21s6-5.4 6-11a6 6 0 1 0-12 0c0 5.6 6 11 6 11Z" />
+      <circle cx="12" cy="10" r="2.2" />
     </svg>
   );
 }
@@ -197,6 +210,24 @@ export function EmbrapaObservationOverview({
               A leitura representa esse local específico. O tempo pode ser diferente no Centro,
               Laranjal, bairros mais distantes e áreas rurais.
             </p>
+
+            <div className="embrapa-station-map">
+              <iframe
+                src={EMBRAPA_MAP_EMBED_URL}
+                title="Localização da sede da Embrapa Clima Temperado em Pelotas"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+              <a href={EMBRAPA_MAP_URL} target="_blank" rel="noreferrer">
+                <LocationIcon />
+                <span>
+                  <strong>Ver localização</strong>
+                  <small>Abrir no Google Maps</small>
+                </span>
+                <b aria-hidden="true">↗</b>
+              </a>
+            </div>
+
             <dl>
               <div>
                 <dt>Nascer do sol</dt>
