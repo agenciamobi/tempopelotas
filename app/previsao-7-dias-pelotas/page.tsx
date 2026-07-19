@@ -9,12 +9,12 @@ export const revalidate = 600;
 export const metadata: Metadata = {
   title: "Previsão do tempo para 7 dias em Pelotas",
   description:
-    "Confira a previsão de 7 dias para Pelotas, RS, com máximas, mínimas, chuva prevista e rajadas de vento.",
+    "Confira a previsão de 7 dias para Pelotas, RS, com máximas, mínimas, chuva e rajadas de vento.",
   alternates: { canonical: "/previsao-7-dias-pelotas" },
   openGraph: {
     title: "Previsão de 7 dias em Pelotas",
     description:
-      "Tendência semanal de temperatura, chuva e vento para Pelotas, RS.",
+      "Veja o que esperar de temperatura, chuva e vento durante a semana em Pelotas.",
     url: "/previsao-7-dias-pelotas",
   },
 };
@@ -36,9 +36,9 @@ export default async function PrevisaoSeteDiasPage() {
   return (
     <ForecastPageShell
       weather={weather}
-      eyebrow="Tendência semanal"
+      eyebrow="Planeje os próximos dias"
       title="Previsão do tempo para 7 dias em Pelotas"
-      description="Planeje a semana com máximas, mínimas, acumulado estimado de chuva e rajadas previstas para cada dia."
+      description="Confira as temperaturas, a chuva e o vento previstos para organizar sua semana."
       currentPath="/previsao-7-dias-pelotas"
     >
       <script
@@ -60,12 +60,12 @@ export default async function PrevisaoSeteDiasPage() {
           <small>{highlights.coldest?.weekday} · {highlights.coldest?.date}</small>
         </article>
         <article>
-          <span>Maior chuva</span>
+          <span>Maior volume de chuva</span>
           <strong>{formatMillimeters(highlights.wettest?.precipitation ?? 0)} mm</strong>
           <small>{highlights.wettest?.weekday} · {highlights.wettest?.rainChance ?? 0}% de chance</small>
         </article>
         <article>
-          <span>Maior rajada</span>
+          <span>Vento mais forte</span>
           <strong>{highlights.windiest?.windGust ?? 0} km/h</strong>
           <small>{highlights.windiest?.weekday} · {highlights.windiest?.date}</small>
         </article>
@@ -75,9 +75,9 @@ export default async function PrevisaoSeteDiasPage() {
         <div className="section-heading">
           <div>
             <span className="eyebrow">Dia a dia</span>
-            <h2 id="week-list-title">Previsão completa da semana</h2>
+            <h2 id="week-list-title">Veja a previsão de cada dia</h2>
           </div>
-          <p>Os valores são atualizados automaticamente conforme novas rodadas dos modelos meteorológicos.</p>
+          <p>A previsão é atualizada ao longo do dia e pode mudar, principalmente para as datas mais distantes.</p>
         </div>
 
         <div className="week-forecast-grid">
@@ -93,8 +93,8 @@ export default async function PrevisaoSeteDiasPage() {
                 <span>{day.min}°</span>
               </div>
               <dl>
-                <div><dt>Chuva</dt><dd>{day.rainChance}%</dd></div>
-                <div><dt>Acumulado</dt><dd>{formatMillimeters(day.precipitation)} mm</dd></div>
+                <div><dt>Chance de chuva</dt><dd>{day.rainChance}%</dd></div>
+                <div><dt>Volume previsto</dt><dd>{formatMillimeters(day.precipitation)} mm</dd></div>
                 <div><dt>Rajadas</dt><dd>{day.windGust} km/h</dd></div>
               </dl>
             </article>
@@ -105,18 +105,18 @@ export default async function PrevisaoSeteDiasPage() {
       <section className="topic-section topic-copy" aria-labelledby="week-reading-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Como interpretar</span>
-            <h2 id="week-reading-title">O que observar na previsão de 7 dias</h2>
+            <span className="eyebrow">Leia a previsão com atenção</span>
+            <h2 id="week-reading-title">O que observar antes de planejar</h2>
           </div>
         </div>
         <div className="copy-columns">
           <div>
-            <h3>Previsões próximas são mais precisas</h3>
-            <p>Os primeiros dias da previsão costumam ter maior confiabilidade. A tendência para o fim da semana pode mudar conforme novas informações atmosféricas entram no modelo.</p>
+            <h3>Os próximos dias costumam ser mais confiáveis</h3>
+            <p>A previsão para hoje e amanhã tende a mudar menos. Para o fim da semana, confira novamente antes de sair ou marcar uma atividade.</p>
           </div>
           <div>
-            <h3>Probabilidade e volume são diferentes</h3>
-            <p>A chance de chuva indica a possibilidade de ocorrência. O acumulado em milímetros estima o volume total previsto para o período.</p>
+            <h3>Chance e volume de chuva são informações diferentes</h3>
+            <p>A porcentagem mostra a possibilidade de chover. Os milímetros mostram quanto pode chover durante o dia.</p>
           </div>
         </div>
       </section>
