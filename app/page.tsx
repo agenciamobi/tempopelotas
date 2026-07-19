@@ -72,9 +72,10 @@ export default async function Home() {
           <nav className="home-reading-order-v2" aria-label="Principais informações da homepage">
             <div className="home-reading-order-v2__intro">
               <span className="eyebrow">Leitura rápida</span>
-              <strong>Comece pelo tempo de hoje e avance até a situação das águas</strong>
+              <strong>Previsão, medição local e águas em uma sequência clara</strong>
               <p>
-                A homepage agora separa previsão, mapa, observação local e hidrologia para facilitar a leitura.
+                Consulte a previsão e o mapa, compare com a estação da Embrapa e acompanhe a situação das
+                águas antes de acessar os conteúdos especializados.
               </p>
             </div>
 
@@ -82,33 +83,33 @@ export default async function Home() {
               <a href="#previsao-hoje" className={`is-${advisory.level}`}>
                 <span>01</span>
                 <div>
-                  <small>Previsão e atenção</small>
+                  <small>Previsão e mapa</small>
                   <strong>{weather.current.temperature}° · {weather.current.condition}</strong>
                   <p>{advisory.title}</p>
                 </div>
               </a>
-              <a href="#regiao">
+              <a href="#observacao-embrapa">
                 <span>02</span>
                 <div>
-                  <small>Mapa regional</small>
-                  <strong>Pelotas e Zona Sul</strong>
-                  <p>Mapa, satélite e chuva.</p>
-                </div>
-              </a>
-              <a href="#observacao-embrapa">
-                <span>03</span>
-                <div>
-                  <small>Observação local</small>
-                  <strong>Estação Embrapa</strong>
+                  <small>Medição local</small>
+                  <strong>Embrapa Clima Temperado</strong>
                   <p>{embrapaStatus}</p>
                 </div>
               </a>
               <a href="#situacao-das-aguas">
+                <span>03</span>
+                <div>
+                  <small>Situação das águas</small>
+                  <strong>Laranjal e Lagoa dos Patos</strong>
+                  <p>Guaíba como contexto regional.</p>
+                </div>
+              </a>
+              <a href="#explorar-portal">
                 <span>04</span>
                 <div>
-                  <small>Situação hidrológica</small>
-                  <strong>Laranjal, Lagoa e Guaíba</strong>
-                  <p>Acompanhamento local e regional.</p>
+                  <small>Conteúdos especializados</small>
+                  <strong>Chuva, vento, histórico e câmeras</strong>
+                  <p>Acesse diretamente o assunto procurado.</p>
                 </div>
               </a>
             </div>
@@ -196,7 +197,7 @@ export default async function Home() {
               <span>04</span>
               <div>
                 <small>Explore o portal</small>
-                <strong>Acesse páginas específicas sem repetir toda a leitura da homepage</strong>
+                <strong>Acesse diretamente previsão, chuva, vento, histórico, águas e câmeras</strong>
               </div>
             </div>
             <div className="home-weather-navigation">
