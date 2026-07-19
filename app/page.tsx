@@ -6,6 +6,7 @@ import { WeatherDashboard } from "@/components/weather-dashboard";
 import { WeatherMap } from "@/components/weather-map";
 import { WeatherNavigation } from "@/components/weather-navigation";
 import { getEmbrapaObservation } from "@/lib/embrapa-observation";
+import { getGuaibaObservation } from "@/lib/guaiba-monitor";
 import { absoluteUrl } from "@/lib/site";
 import { getPelotasWeather } from "@/lib/weather-service";
 
@@ -30,9 +31,10 @@ const websiteSchema = {
 };
 
 export default async function Home() {
-  const [weather, embrapaObservation] = await Promise.all([
+  const [weather, embrapaObservation, guaibaObservation] = await Promise.all([
     getPelotasWeather(),
     getEmbrapaObservation(),
+    getGuaibaObservation(),
   ]);
 
   return (
@@ -54,7 +56,7 @@ export default async function Home() {
 
         <EmbrapaObservationOverview observation={embrapaObservation} />
 
-        <HydrologyOverview weather={weather} />
+        <HydrologyOverview weather={weather} guaiba={guaibaObservation} />
 
         <div className="home-weather-navigation">
           <WeatherNavigation />
