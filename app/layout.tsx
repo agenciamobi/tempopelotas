@@ -27,6 +27,7 @@ import "./footer-resources.css";
 import "./interface-fixes.css";
 import "./pwa.css";
 import "./mobile-width-guard.css";
+import "./mobile-structure-refinement.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
