@@ -1,7 +1,13 @@
-const CACHE_VERSION = "tempo-pelotas-v1";
+const CACHE_VERSION = "tempo-pelotas-v2";
 const APP_SHELL_CACHE = `${CACHE_VERSION}-app-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
-const APP_SHELL_URLS = ["/", "/offline", "/manifest.webmanifest", "/icon.svg"];
+const APP_SHELL_URLS = [
+  "/",
+  "/offline",
+  "/manifest.webmanifest",
+  "/icon.svg",
+  "/pwa-icons/192",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -83,6 +89,7 @@ self.addEventListener("fetch", (event) => {
 
   const isStaticAsset =
     url.pathname.startsWith("/_next/static/") ||
+    url.pathname.startsWith("/pwa-icons/") ||
     url.pathname.endsWith(".css") ||
     url.pathname.endsWith(".js") ||
     url.pathname.endsWith(".svg") ||
@@ -107,8 +114,8 @@ self.addEventListener("push", (event) => {
   const title = data.title || "TEMPO Pelotas";
   const options = {
     body: data.body || "Há uma nova informação para Pelotas.",
-    icon: data.icon || "/icon.svg",
-    badge: data.badge || "/icon.svg",
+    icon: data.icon || "/pwa-icons/192",
+    badge: data.badge || "/pwa-icons/192",
     tag: data.tag || "tempo-pelotas",
     renotify: Boolean(data.renotify),
     requireInteraction: Boolean(data.requireInteraction),
