@@ -6,21 +6,28 @@ import {
   HYDROLOGY_STATIONS,
 } from "@/lib/hydrology";
 import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
+import { getNivelGuaibaRegionalObservations } from "@/lib/nivel-guaiba-regional";
 import { absoluteUrl } from "@/lib/site";
 import { getPelotasWeather } from "@/lib/weather-service";
 
 export const revalidate = 300;
 
 export async function GET() {
-  const [weather, embrapaObservation, guaibaObservation] = await Promise.all([
+  const [
+    weather,
+    embrapaObservation,
+    guaibaObservation,
+    guaibaRegional,
+  ] = await Promise.all([
     getPelotasWeather(),
     getEmbrapaObservation(),
     getGuaibaObservation(),
+    getNivelGuaibaRegionalObservations(),
   ]);
 
   return NextResponse.json(
     {
-      schema_version: "1.2",
+      schema_version: "1.3",
       generated_at: new Date().toISOString(),
       location: {
         city: "Pelotas",
@@ -49,6 +56,12 @@ export async function GET() {
           interpretation:
             "Indicador regional a montante. Não representa previsão isolada do nível futuro em Pelotas.",
         },
+        upstream_network: {
+          source: "Nível Guaíba",
+          observations: guaibaRegional,
+          interpretation:
+            "Cada cidade utiliza uma régua e uma referência próprias. Compare a tendência de cada ponto, não os níveis absolutos entre cidades.",
+        },
         local_level: null,
         local_level_note:
           "O nível local é exibido no painel externo do LabHidroSens / UFPel. A integração numérica oficial com ANA/SGB ainda depende de credenciais e validação da API.",
@@ -69,6 +82,7 @@ export async function GET() {
         embrapa_api: absoluteUrl("/api/weather/embrapa"),
         hydrology: absoluteUrl("/situacao-hidrologica-pelotas"),
         guaiba_api: absoluteUrl("/api/hydrology/guaiba"),
+        guaiba_cities_api: absoluteUrl("/api/hydrology/guaiba/cities"),
         methodology: absoluteUrl("/metodologia"),
         feed: absoluteUrl("/feed"),
       },
