@@ -75,8 +75,8 @@ export function SiteFooter({ source }: SiteFooterProps) {
   ).slice(0, 3);
 
   return (
-    <footer className="site-footer">
-      <div className="portal-footer portal-footer--theme">
+    <footer className="site-footer-v2">
+      <div className="portal-footer--theme">
         <div className="portal-footer-atmosphere" aria-hidden="true">
           <span />
           <span />
