@@ -31,6 +31,7 @@ import "./mobile-structure-refinement.css";
 import "./mobile-special-sections.css";
 import "./pwa-fullscreen-refinement.css";
 import "./mobile-history-footer-refinement.css";
+import "./brand-assets.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -52,10 +53,17 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
+      {
+        url: "/brand/tempo-pelotas-icon",
+        sizes: "any",
+        type: "image/svg+xml",
+      },
       { url: "/pwa-icons/192", sizes: "192x192", type: "image/png" },
     ],
-    shortcut: "/icon.svg",
+    shortcut: {
+      url: "/brand/tempo-pelotas-icon",
+      type: "image/svg+xml",
+    },
     apple: [
       { url: "/pwa-icons/192", sizes: "192x192", type: "image/png" },
     ],
