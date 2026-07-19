@@ -3,6 +3,7 @@ import { HydrologyOverview } from "@/components/hydrology-overview";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WeatherDashboard } from "@/components/weather-dashboard";
+import { WeatherHero } from "@/components/weather-hero";
 import { WeatherMap } from "@/components/weather-map";
 import { WeatherNavigation } from "@/components/weather-navigation";
 import { getEmbrapaObservation } from "@/lib/embrapa-observation";
@@ -50,10 +51,11 @@ export default async function Home() {
 
       <div className="site-shell">
         <SiteHeader advisoryLevel={advisoryLevel} />
+        <WeatherHero weather={weather} />
 
-        <div className="dashboard-layout">
+        <div className="dashboard-layout dashboard-layout--after-hero">
           <WeatherMap regionalWeather={weather.regional} />
-          <WeatherDashboard weather={weather} />
+          <WeatherDashboard weather={weather} showCurrent={false} />
         </div>
 
         <EmbrapaObservationOverview observation={embrapaObservation} />
