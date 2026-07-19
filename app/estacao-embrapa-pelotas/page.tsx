@@ -14,12 +14,12 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "Estação meteorológica da Embrapa em Pelotas",
   description:
-    "Consulte temperatura, umidade, vento, pressão, chuva observada e extremos diários medidos pela Embrapa Clima Temperado em Pelotas.",
+    "Consulte temperatura, umidade, vento, pressão e chuva medidos pela Embrapa Clima Temperado em Pelotas.",
   alternates: { canonical: "/estacao-embrapa-pelotas" },
   openGraph: {
-    title: "Dados meteorológicos da Embrapa em Pelotas",
+    title: "Medições da Embrapa em Pelotas",
     description:
-      "Observações da estação automática da Embrapa Clima Temperado para complementar a previsão do tempo em Pelotas.",
+      "Veja o que a estação da Embrapa Clima Temperado registrou em Pelotas.",
     url: "/estacao-embrapa-pelotas",
   },
 };
@@ -56,12 +56,12 @@ function ExtremeCard({
     <article>
       <span>{label}</span>
       <div>
-        <small>Mínima</small>
+        <small>Menor valor</small>
         <strong>{formatNumber(minimum.value)}{unit}</strong>
         <em>{minimum.time ?? "Horário indisponível"}</em>
       </div>
       <div>
-        <small>Máxima</small>
+        <small>Maior valor</small>
         <strong>{formatNumber(maximum.value)}{unit}</strong>
         <em>{maximum.time ?? "Horário indisponível"}</em>
       </div>
@@ -81,7 +81,7 @@ export default async function EstacaoEmbrapaPelotasPage() {
     "@type": "Dataset",
     name: "Observações meteorológicas da Embrapa Clima Temperado em Pelotas",
     description:
-      "Temperatura, umidade, vento, pressão, chuva e evapotranspiração observados no Posto Meteorológico da Sede da Embrapa Clima Temperado.",
+      "Temperatura, umidade, vento, pressão e chuva observados na Sede da Embrapa Clima Temperado.",
     url: absoluteUrl("/estacao-embrapa-pelotas"),
     sameAs: EMBRAPA_MONITOR_URL,
     spatialCoverage: "Pelotas, Rio Grande do Sul, Brasil",
@@ -97,9 +97,9 @@ export default async function EstacaoEmbrapaPelotasPage() {
   return (
     <ForecastPageShell
       weather={weather}
-      eyebrow="Observação meteorológica local"
+      eyebrow="Medições feitas em Pelotas"
       title="Estação Embrapa Clima Temperado"
-      description="Dados medidos por uma estação automática em Pelotas para comparar o tempo observado com a previsão dos modelos meteorológicos."
+      description="Veja a temperatura, a chuva, o vento e outras condições medidas pela estação da Embrapa em Pelotas."
       currentPath="/estacao-embrapa-pelotas"
     >
       <script
@@ -115,31 +115,31 @@ export default async function EstacaoEmbrapaPelotasPage() {
             <div className="embrapa-page-reading">
               <span className="embrapa-live-status">
                 <i aria-hidden="true" />
-                {observation.status === "live" ? "Leitura reconhecida" : "Leitura parcial"}
+                {observation.status === "live" ? "Medição disponível" : "Alguns valores indisponíveis"}
               </span>
-              <span className="eyebrow">Temperatura observada</span>
+              <span className="eyebrow">Temperatura medida</span>
               <h2 id="embrapa-current-title">
                 {formatNumber(observation.current.temperature)}°C
               </h2>
               <p>
-                Sensação térmica de {formatNumber(observation.current.feelsLike)} °C e ponto de
-                orvalho em {formatNumber(observation.current.dewPoint)} °C.
+                Sensação térmica de {formatNumber(observation.current.feelsLike)} °C. A temperatura em que
+                pode haver formação de orvalho ou neblina está em {formatNumber(observation.current.dewPoint)} °C.
               </p>
-              <small>Consulta ao painel em {formatFetchedAt(observation.source.fetchedAt)}</small>
+              <small>Consultado na Embrapa em {formatFetchedAt(observation.source.fetchedAt)}</small>
             </div>
 
             <div className="embrapa-page-current-grid">
               <article>
-                <span>Umidade relativa</span>
+                <span>Umidade do ar</span>
                 <strong>{formatNumber(observation.current.humidity, 0)}%</strong>
               </article>
               <article>
-                <span>Pressão atmosférica</span>
+                <span>Pressão do ar</span>
                 <strong>{formatNumber(observation.current.pressure)} hPa</strong>
-                <small>{observation.current.pressureTrend ?? "Tendência indisponível"}</small>
+                <small>{observation.current.pressureTrend ?? "Sem comparação disponível"}</small>
               </article>
               <article>
-                <span>Vento observado</span>
+                <span>Vento medido</span>
                 <strong>{formatNumber(observation.current.windSpeed)} km/h</strong>
                 <small>{observation.current.windDirection ?? "Direção indisponível"}</small>
               </article>
@@ -155,12 +155,12 @@ export default async function EstacaoEmbrapaPelotasPage() {
           <section className="topic-section" aria-labelledby="embrapa-rain-title">
             <div className="section-heading">
               <div>
-                <span className="eyebrow">Precipitação observada</span>
+                <span className="eyebrow">Chuva medida</span>
                 <h2 id="embrapa-rain-title">Quanto choveu na estação</h2>
               </div>
               <p>
-                Estes valores são medições acumuladas no ponto da Embrapa, não estimativas dos
-                modelos e não representam necessariamente todos os bairros de Pelotas.
+                Estes valores foram medidos no local da Embrapa. A chuva pode ser diferente no Centro,
+                Laranjal e em outros bairros de Pelotas.
               </p>
             </div>
 
@@ -170,11 +170,11 @@ export default async function EstacaoEmbrapaPelotasPage() {
                 <strong>{formatNumber(observation.accumulated.rainDaily)} mm</strong>
               </article>
               <article>
-                <span>No mês</span>
+                <span>Neste mês</span>
                 <strong>{formatNumber(observation.accumulated.rainMonthly)} mm</strong>
               </article>
               <article>
-                <span>No ano</span>
+                <span>Neste ano</span>
                 <strong>{formatNumber(observation.accumulated.rainAnnual)} mm</strong>
               </article>
             </div>
@@ -183,12 +183,10 @@ export default async function EstacaoEmbrapaPelotasPage() {
           <section className="topic-section" aria-labelledby="embrapa-extremes-title">
             <div className="section-heading">
               <div>
-                <span className="eyebrow">Mínimas e máximas do dia</span>
-                <h2 id="embrapa-extremes-title">Extremos registrados</h2>
+                <span className="eyebrow">Menores e maiores valores de hoje</span>
+                <h2 id="embrapa-extremes-title">O que a estação registrou</h2>
               </div>
-              <p>
-                Os horários indicam quando cada extremo foi registrado pela estação automática.
-              </p>
+              <p>Veja o menor e o maior valor do dia e o horário em que cada um foi registrado.</p>
             </div>
 
             <div className="embrapa-extremes-grid">
@@ -199,21 +197,21 @@ export default async function EstacaoEmbrapaPelotasPage() {
                 unit=" °C"
               />
               <ExtremeCard
-                label="Umidade relativa"
+                label="Umidade do ar"
                 minimum={observation.extremes.humidityMin}
                 maximum={observation.extremes.humidityMax}
                 unit="%"
               />
               <ExtremeCard
-                label="Ponto de orvalho"
+                label="Temperatura para formação de orvalho"
                 minimum={observation.extremes.dewPointMin}
                 maximum={observation.extremes.dewPointMax}
                 unit=" °C"
               />
               <article>
-                <span>Maior velocidade do vento</span>
+                <span>Vento mais forte do dia</span>
                 <div>
-                  <small>Máxima</small>
+                  <small>Maior valor</small>
                   <strong>
                     {formatNumber(observation.extremes.windSpeedMax.value)} km/h
                   </strong>
@@ -228,12 +226,12 @@ export default async function EstacaoEmbrapaPelotasPage() {
           <section className="topic-section" aria-labelledby="embrapa-agro-title">
             <div className="section-heading">
               <div>
-                <span className="eyebrow">Agrometeorologia</span>
-                <h2 id="embrapa-agro-title">Evapotranspiração acumulada</h2>
+                <span className="eyebrow">Água que voltou para o ar</span>
+                <h2 id="embrapa-agro-title">Perda de água do solo e das plantas</h2>
               </div>
               <p>
-                Indicador técnico relacionado à perda de água para a atmosfera, útil para irrigação,
-                agricultura, hortas, estiagem e acompanhamento da disponibilidade hídrica.
+                Esta informação ajuda agricultores, hortas e jardins a entender quanto de água pode ter
+                voltado para o ar pela ação do calor, do vento, do solo e das plantas.
               </p>
             </div>
 
@@ -245,13 +243,13 @@ export default async function EstacaoEmbrapaPelotasPage() {
                 </strong>
               </article>
               <article>
-                <span>No mês</span>
+                <span>Neste mês</span>
                 <strong>
                   {formatNumber(observation.accumulated.evapotranspirationMonthly, 2)} mm
                 </strong>
               </article>
               <article>
-                <span>No ano</span>
+                <span>Neste ano</span>
                 <strong>
                   {formatNumber(observation.accumulated.evapotranspirationAnnual, 2)} mm
                 </strong>
@@ -261,11 +259,11 @@ export default async function EstacaoEmbrapaPelotasPage() {
         </>
       ) : (
         <section className="topic-section embrapa-page-unavailable" role="status">
-          <span className="eyebrow">Fonte temporariamente indisponível</span>
-          <h2>Não foi possível reconhecer as leituras da estação</h2>
+          <span className="eyebrow">Medições temporariamente indisponíveis</span>
+          <h2>Não foi possível mostrar os valores da estação</h2>
           <p>{observation.error}</p>
           <a href={EMBRAPA_MONITOR_URL} target="_blank" rel="noreferrer">
-            Abrir monitor original da Embrapa
+            Consultar diretamente na Embrapa
             <span aria-hidden="true">↗</span>
           </a>
         </section>
@@ -274,53 +272,49 @@ export default async function EstacaoEmbrapaPelotasPage() {
       <section className="topic-section" aria-labelledby="embrapa-location-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Referência geográfica</span>
-            <h2 id="embrapa-location-title">O que esta estação representa</h2>
+            <span className="eyebrow">Onde a medição é feita</span>
+            <h2 id="embrapa-location-title">O que estes valores representam</h2>
           </div>
           <p>
-            A estação fica na Sede da Embrapa Clima Temperado, em aproximadamente 31°42′S,
-            52°24′W e 57 m de altitude.
+            A estação fica na Sede da Embrapa Clima Temperado, em Pelotas, a 57 metros de altura em relação ao mar.
           </p>
         </div>
 
         <div className="methodology-rules-grid">
           <article>
-            <h3>Medição pontual</h3>
+            <h3>O tempo muda entre os bairros</h3>
             <p>
-              Temperatura, chuva e vento podem variar entre a estação, o Centro, o Laranjal e áreas
-              rurais. O local da leitura deve permanecer visível.
+              Temperatura, chuva e vento podem ser diferentes no local da estação, no Centro, no
+              Laranjal e nas áreas rurais.
             </p>
           </article>
           <article>
-            <h3>Observação, não previsão</h3>
+            <h3>A estação mostra o que aconteceu</h3>
             <p>
-              A estação informa o que foi medido. A previsão continua sendo calculada por modelos
-              numéricos e pode apresentar valores diferentes.
+              Estes valores foram medidos. A previsão mostra o que pode acontecer nas próximas horas e pode apresentar números diferentes.
             </p>
           </article>
           <article>
-            <h3>Fonte externa</h3>
+            <h3>A atualização pode parar</h3>
             <p>
-              O TEMPO Pelotas interpreta a estrutura pública da página sem alterar os valores. Mudanças
-              ou indisponibilidade no sistema original podem interromper a atualização.
+              Se a página da Embrapa ficar fora do ar ou mudar, as medições podem deixar de aparecer temporariamente no portal.
             </p>
           </article>
           <article>
-            <h3>Uso comunitário</h3>
+            <h3>Use junto dos avisos oficiais</h3>
             <p>
-              Os dados ajudam na compreensão local, mas não substituem alertas meteorológicos,
-              orientações da Defesa Civil ou decisões técnicas da Embrapa.
+              As medições ajudam a entender o tempo local, mas não substituem os avisos da Defesa Civil, do INMET ou da própria Embrapa.
             </p>
           </article>
         </div>
 
         <div className="hydrology-home-actions">
           <a className="hydrology-primary-action" href={EMBRAPA_MONITOR_URL} target="_blank" rel="noreferrer">
-            Abrir dados originais
+            Consultar diretamente na Embrapa
             <span aria-hidden="true">↗</span>
           </a>
           <Link className="hydrology-secondary-action" href="/metodologia">
-            Consultar metodologia
+            Ver de onde vêm as informações
           </Link>
         </div>
       </section>
