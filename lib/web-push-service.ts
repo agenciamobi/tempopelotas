@@ -75,8 +75,8 @@ export async function broadcastPushNotification(payload: PushPayload) {
   const body = JSON.stringify({
     ...payload,
     url: payload.url || "/",
-    icon: payload.icon || "/icon.svg",
-    badge: payload.badge || "/icon.svg",
+    icon: payload.icon || "/pwa-icons/192",
+    badge: payload.badge || "/pwa-icons/192",
   });
   let sent = 0;
   let failed = 0;
