@@ -242,63 +242,65 @@ export function GuaibaLevelCard({ data, regional = [] }: GuaibaLevelCardProps) {
         </p>
       </div>
 
-      <nav className="guaiba-city-directory" aria-label="Níveis regionais monitorados pelo Nível Guaíba">
-        <div className="guaiba-city-directory-heading">
-          <div>
-            <span className="eyebrow">Monitoramento regional dinâmico</span>
-            <strong>Níveis em outros pontos do Rio Grande do Sul</strong>
+      {regional.length > 0 ? (
+        <nav className="guaiba-city-directory" aria-label="Níveis regionais monitorados pelo Nível Guaíba">
+          <div className="guaiba-city-directory-heading">
+            <div>
+              <span className="eyebrow">Monitoramento regional dinâmico</span>
+              <strong>Níveis em outros pontos do Rio Grande do Sul</strong>
+            </div>
+            <small>Atualização automática a cada 5 minutos</small>
           </div>
-          <small>Atualização automática a cada 5 minutos</small>
-        </div>
-        <p className="guaiba-city-directory-note">
-          Cada cidade utiliza uma régua e uma referência próprias. Compare a tendência de cada ponto, não os números absolutos entre cidades.
-        </p>
-        <div className="guaiba-city-links">
-          {NIVEL_GUAIBA_CITIES.map((city) => {
-            const observation = regionalBySlug.get(city.slug);
-            const cityAvailable = Boolean(
-              observation &&
-              observation.status !== "unavailable" &&
-              observation.currentLevel !== null,
-            );
-            const cityTrend = getTrend(observation?.trendCmPerHour ?? null);
-            const status = observation?.status ?? "unavailable";
+          <p className="guaiba-city-directory-note">
+            Cada cidade utiliza uma régua e uma referência próprias. Compare a tendência de cada ponto, não os números absolutos entre cidades.
+          </p>
+          <div className="guaiba-city-links">
+            {NIVEL_GUAIBA_CITIES.map((city) => {
+              const observation = regionalBySlug.get(city.slug);
+              const cityAvailable = Boolean(
+                observation &&
+                observation.status !== "unavailable" &&
+                observation.currentLevel !== null,
+              );
+              const cityTrend = getTrend(observation?.trendCmPerHour ?? null);
+              const status = observation?.status ?? "unavailable";
 
-            return (
-              <a
-                aria-label={
-                  cityAvailable
-                    ? `${city.name}: ${formatLevel(observation!.currentLevel)} metros, ${cityTrend.label}`
-                    : `${city.name}: leitura indisponível`
-                }
-                className={`${city.isPrimary ? "is-primary " : ""}is-${status}`.trim()}
-                href={city.url}
-                key={city.slug}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span className="guaiba-city-link-head">
-                  <strong>{city.name}</strong>
-                  <i aria-hidden="true">↗</i>
-                </span>
-                {cityAvailable ? (
-                  <span className="guaiba-city-level">
-                    {formatLevel(observation!.currentLevel)} <small>m</small>
+              return (
+                <a
+                  aria-label={
+                    cityAvailable
+                      ? `${city.name}: ${formatLevel(observation!.currentLevel)} metros, ${cityTrend.label}`
+                      : `${city.name}: leitura indisponível`
+                  }
+                  className={`${city.isPrimary ? "is-primary " : ""}is-${status}`.trim()}
+                  href={city.url}
+                  key={city.slug}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <span className="guaiba-city-link-head">
+                    <strong>{city.name}</strong>
+                    <i aria-hidden="true">↗</i>
                   </span>
-                ) : (
-                  <span className="guaiba-city-level guaiba-city-level--unavailable">Indisponível</span>
-                )}
-                <span className={`guaiba-city-meta is-${cityTrend.direction}`}>
-                  <b aria-hidden="true">{cityTrend.symbol}</b>
-                  {cityAvailable
-                    ? `${cityTrend.label} · ${formatCompactUpdatedAt(observation!.updatedAt)}`
-                    : "Abrir página da cidade"}
-                </span>
-              </a>
-            );
-          })}
-        </div>
-      </nav>
+                  {cityAvailable ? (
+                    <span className="guaiba-city-level">
+                      {formatLevel(observation!.currentLevel)} <small>m</small>
+                    </span>
+                  ) : (
+                    <span className="guaiba-city-level guaiba-city-level--unavailable">Indisponível</span>
+                  )}
+                  <span className={`guaiba-city-meta is-${cityTrend.direction}`}>
+                    <b aria-hidden="true">{cityTrend.symbol}</b>
+                    {cityAvailable
+                      ? `${cityTrend.label} · ${formatCompactUpdatedAt(observation!.updatedAt)}`
+                      : "Abrir página da cidade"}
+                  </span>
+                </a>
+              );
+            })}
+          </div>
+        </nav>
+      ) : null}
 
       <div className="guaiba-source-links">
         <a href={data.source.url} target="_blank" rel="noreferrer">
