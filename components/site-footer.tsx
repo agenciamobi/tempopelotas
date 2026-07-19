@@ -8,17 +8,6 @@ type SiteFooterProps = {
   source: WeatherData["source"];
 };
 
-function MobiMark() {
-  return (
-    <span className="mobi-ad-mark" aria-hidden="true">
-      <span>M</span>
-      <span>O</span>
-      <span>B</span>
-      <span>I</span>
-    </span>
-  );
-}
-
 export function SiteFooter({ source: _source }: SiteFooterProps) {
   return (
     <footer className="site-footer">
@@ -37,11 +26,15 @@ export function SiteFooter({ source: _source }: SiteFooterProps) {
         aria-label="Conheça o serviço de desenvolvimento de sites inteligentes da Agência MOBI"
       >
         <span className="mobi-ad-brand">
-          <MobiMark />
-          <span>
-            <small>Marketing Inteligente</small>
-            <strong>Sites que trabalham pelo seu negócio.</strong>
-          </span>
+          <img
+            className="mobi-ad-logo"
+            src="/brand/mobi-tempo-pelotas-footer"
+            alt=""
+            width={7418}
+            height={2934}
+            loading="lazy"
+            draggable={false}
+          />
         </span>
 
         <span className="mobi-ad-message">
