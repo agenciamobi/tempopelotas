@@ -7,6 +7,7 @@ import { WeatherHero } from "@/components/weather-hero";
 import { WeatherMap } from "@/components/weather-map";
 import { WeatherNavigation } from "@/components/weather-navigation";
 import { getGuaibaObservation } from "@/lib/guaiba-monitor";
+import { getLaranjalLevelData } from "@/lib/laranjal-level";
 import { absoluteUrl } from "@/lib/site";
 import { getWeatherAdvisory } from "@/lib/weather-insights";
 import { getPelotasWeatherWithObservation } from "@/lib/weather-service";
@@ -32,11 +33,15 @@ const websiteSchema = {
 };
 
 export default async function Home() {
-  const [{ weather, observation: embrapaObservation }, guaibaObservation] =
-    await Promise.all([
-      getPelotasWeatherWithObservation(),
-      getGuaibaObservation(),
-    ]);
+  const [
+    { weather, observation: embrapaObservation },
+    guaibaObservation,
+    laranjalObservation,
+  ] = await Promise.all([
+    getPelotasWeatherWithObservation(),
+    getGuaibaObservation(),
+    getLaranjalLevelData(),
+  ]);
   const advisoryLevel = getWeatherAdvisory(weather).level;
 
   return (
@@ -59,7 +64,11 @@ export default async function Home() {
 
         <EmbrapaObservationOverview observation={embrapaObservation} />
 
-        <HydrologyOverview weather={weather} guaiba={guaibaObservation} />
+        <HydrologyOverview
+          weather={weather}
+          guaiba={guaibaObservation}
+          laranjal={laranjalObservation}
+        />
 
         <div className="home-weather-navigation">
           <WeatherNavigation />
