@@ -4,11 +4,13 @@ import { PelotasHydrologyWidget } from "@/components/pelotas-hydrology-widget";
 import { HYDROLOGY_FLOW, SGB_SACE_URL } from "@/lib/hydrology";
 import type { GuaibaObservationData } from "@/lib/guaiba-monitor";
 import type { LaranjalLevelData } from "@/lib/laranjal-level";
+import type { NivelGuaibaCityObservation } from "@/lib/nivel-guaiba-regional";
 import type { WeatherData } from "@/lib/weather-data";
 
 type HydrologyOverviewProps = {
   weather: WeatherData;
   guaiba: GuaibaObservationData;
+  guaibaRegional: NivelGuaibaCityObservation[];
   laranjal: LaranjalLevelData;
 };
 
@@ -20,7 +22,12 @@ function FlowArrow() {
   );
 }
 
-export function HydrologyOverview({ weather, guaiba, laranjal }: HydrologyOverviewProps) {
+export function HydrologyOverview({
+  weather,
+  guaiba,
+  guaibaRegional,
+  laranjal,
+}: HydrologyOverviewProps) {
   const today = weather.daily[0];
   const strongestUpcomingGust = Math.max(
     weather.current.windGust,
@@ -86,7 +93,7 @@ export function HydrologyOverview({ weather, guaiba, laranjal }: HydrologyOvervi
         />
 
         <aside className="hydrology-context-column" aria-label="Informações sobre o Guaíba e o Laranjal">
-          <GuaibaLevelCard data={guaiba} />
+          <GuaibaLevelCard data={guaiba} regional={guaibaRegional} />
 
           <a className="hydrology-sgb-link" href={SGB_SACE_URL} target="_blank" rel="noreferrer">
             <span>
