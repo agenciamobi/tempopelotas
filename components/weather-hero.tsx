@@ -192,7 +192,7 @@ export function WeatherHero({ weather }: WeatherHeroProps) {
           <div className="weather-hero-now-heading">
             <div>
               <span>Pelotas, RS</span>
-              <small>Atualizado em {current.updatedAt}</small>
+              <small>{current.updatedAt} · {current.source.name}</small>
             </div>
             <span className="weather-hero-live"><i aria-hidden="true" /> Agora</span>
           </div>
