@@ -12,6 +12,7 @@ import "./charts.css";
 import "./history.css";
 import "./cameras.css";
 import "./lagoon-level.css";
+import "./footer.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
