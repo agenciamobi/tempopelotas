@@ -1,10 +1,177 @@
 .site-footer {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0;
+  gap: 18px;
   padding: 30px 16px 20px;
   text-align: center;
+}
+
+.mobi-sites-banner {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(180px, 0.9fr) minmax(250px, 1.25fr) auto;
+  align-items: center;
+  gap: 20px;
+  width: min(100%, 728px);
+  min-height: 90px;
+  overflow: hidden;
+  padding: 14px 16px 14px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 8% 15%, rgba(24, 189, 205, 0.46), transparent 31%),
+    radial-gradient(circle at 78% 120%, rgba(231, 11, 133, 0.34), transparent 42%),
+    linear-gradient(118deg, #071e2f 0%, #102943 52%, #20153c 100%);
+  color: white;
+  box-shadow: 0 18px 55px rgba(7, 30, 47, 0.2);
+  text-align: left;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.mobi-sites-banner::before,
+.mobi-sites-banner::after {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+}
+
+.mobi-sites-banner::before {
+  top: -58px;
+  right: 104px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 42px;
+  transform: rotate(32deg);
+}
+
+.mobi-sites-banner::after {
+  right: -34px;
+  bottom: -72px;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(242, 112, 53, 0.36), rgba(94, 44, 237, 0.12));
+  filter: blur(4px);
+}
+
+.mobi-sites-banner:hover,
+.mobi-sites-banner:focus-visible {
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 22px 65px rgba(7, 30, 47, 0.28);
+  transform: translateY(-2px);
+}
+
+.mobi-sites-banner:focus-visible {
+  outline: 3px solid rgba(24, 189, 205, 0.7);
+  outline-offset: 4px;
+}
+
+.mobi-ad-brand,
+.mobi-ad-message {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.mobi-ad-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobi-ad-brand > span:last-child,
+.mobi-ad-message {
+  display: grid;
+  gap: 3px;
+}
+
+.mobi-ad-mark {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  font-size: 1.35rem;
+  font-weight: 950;
+  letter-spacing: -0.09em;
+}
+
+.mobi-ad-mark span:nth-child(1) {
+  color: #18bdcd;
+}
+
+.mobi-ad-mark span:nth-child(2) {
+  color: #7a55f4;
+}
+
+.mobi-ad-mark span:nth-child(3) {
+  color: #ef3b9d;
+}
+
+.mobi-ad-mark span:nth-child(4) {
+  color: #f58a55;
+}
+
+.mobi-ad-brand small,
+.mobi-ad-message small {
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.35;
+}
+
+.mobi-ad-brand small {
+  font-size: 0.56rem;
+  font-weight: 760;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mobi-ad-brand strong {
+  max-width: 170px;
+  font-size: 0.78rem;
+  line-height: 1.15;
+}
+
+.mobi-ad-message strong {
+  overflow: hidden;
+  font-size: 0.95rem;
+  font-weight: 880;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobi-ad-message small {
+  overflow: hidden;
+  font-size: 0.64rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobi-ad-action {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.11);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 850;
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+}
+
+.mobi-ad-action span {
+  font-size: 0.92rem;
 }
 
 .site-footer > p {
@@ -19,21 +186,50 @@
   white-space: nowrap;
 }
 
-.site-footer a {
+.site-footer > p a {
   color: var(--ink);
   font-weight: 850;
   transition: color 160ms ease;
 }
 
-.site-footer a:hover,
-.site-footer a:focus-visible {
+.site-footer > p a:hover,
+.site-footer > p a:focus-visible {
   color: var(--sky-deep);
 }
 
-.site-footer a:focus-visible {
+.site-footer > p a:focus-visible {
   border-radius: 4px;
   outline: 2px solid var(--sky-deep);
   outline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+  .mobi-sites-banner {
+    grid-template-columns: 1fr auto;
+    gap: 12px 14px;
+    min-height: 118px;
+    padding: 16px;
+    border-radius: 24px;
+  }
+
+  .mobi-ad-brand {
+    grid-column: 1 / 2;
+  }
+
+  .mobi-ad-message {
+    grid-column: 1 / 3;
+    grid-row: 2;
+  }
+
+  .mobi-ad-action {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .mobi-ad-message strong,
+  .mobi-ad-message small {
+    white-space: normal;
+  }
 }
 
 @media (max-width: 900px) {
@@ -42,9 +238,56 @@
   }
 }
 
+@media (max-width: 470px) {
+  .site-footer {
+    gap: 14px;
+  }
+
+  .mobi-sites-banner {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    padding: 17px;
+  }
+
+  .mobi-ad-brand,
+  .mobi-ad-message,
+  .mobi-ad-action {
+    grid-column: 1;
+  }
+
+  .mobi-ad-brand {
+    grid-row: 1;
+  }
+
+  .mobi-ad-message {
+    grid-row: 2;
+  }
+
+  .mobi-ad-action {
+    grid-row: 3;
+    width: 100%;
+    margin-top: 2px;
+  }
+
+  .mobi-ad-brand strong {
+    max-width: none;
+  }
+
+  .site-footer > p {
+    font-size: 0.56rem;
+    letter-spacing: -0.012em;
+  }
+}
+
 @media (max-width: 360px) {
   .site-footer > p {
-    font-size: 0.54rem;
-    letter-spacing: -0.015em;
+    font-size: 0.52rem;
+    letter-spacing: -0.018em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobi-sites-banner {
+    transition: none;
   }
 }
