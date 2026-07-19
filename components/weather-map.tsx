@@ -4,14 +4,29 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   Map as MapLibreMap,
   Marker as MapLibreMarker,
+  RasterTileSource,
 } from "maplibre-gl";
 import type {
   RegionalWeather,
   WeatherIconName,
 } from "@/lib/weather-data";
+import {
+  RADAR_ATTRIBUTION,
+  RADAR_MAX_ZOOM,
+  RADAR_MIN_ZOOM,
+  SATELLITE_ATTRIBUTION,
+  SATELLITE_TILE_URL,
+  type RadarStatus,
+} from "@/lib/weather-radar";
 
 const MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 const PELOTAS_CENTER: [number, number] = [-52.3376, -31.7654];
+const SATELLITE_SOURCE_ID = "regional-satellite-source";
+const SATELLITE_LAYER_ID = "regional-satellite-layer";
+const RADAR_SOURCE_ID = "regional-radar-source";
+const RADAR_LAYER_ID = "regional-radar-layer";
+
+type MapMode = "map" | "satellite" | "radar";
 
 const conditionLabels: Record<WeatherIconName, string> = {
   sun: "Céu limpo",
@@ -66,13 +81,36 @@ function createPopupContent(item: RegionalWeather) {
   return content;
 }
 
+function radarTileTemplate(timestamp: number) {
+  return `/api/weather/radar/tiles/${timestamp}/{z}/{x}/{y}`;
+}
+
+function PlayIcon({ playing }: { playing: boolean }) {
+  return playing ? (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M8 6v12M16 6v12" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m8 5 11 7-11 7V5Z" />
+    </svg>
+  );
+}
+
 export function WeatherMap({ regionalWeather }: WeatherMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef<MapLibreMarker[]>([]);
   const initializingRef = useRef(false);
+  const baseLayerVisibilityRef = useRef<Record<string, "visible" | "none">>({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [mode, setMode] = useState<MapMode>("map");
+  const [radarStatus, setRadarStatus] = useState<RadarStatus | null>(null);
+  const [radarStatusLoading, setRadarStatusLoading] = useState(false);
+  const [selectedFrameIndex, setSelectedFrameIndex] = useState(0);
+  const [radarPlaying, setRadarPlaying] = useState(false);
+  const [radarOpacity, setRadarOpacity] = useState(76);
 
   const temperatureRange = useMemo(() => {
     const temperatures = regionalWeather.map((item) => item.temperature);
@@ -82,6 +120,8 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
       max: temperatures.length ? Math.max(...temperatures) : 0,
     };
   }, [regionalWeather]);
+
+  const selectedRadarFrame = radarStatus?.frames[selectedFrameIndex];
 
   useEffect(() => {
     const container = mapContainerRef.current;
@@ -142,6 +182,38 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
         map.once("load", () => {
           if (cancelled) return;
 
+          const styleLayers = map.getStyle().layers ?? [];
+          baseLayerVisibilityRef.current = Object.fromEntries(
+            styleLayers.map((layer) => [
+              layer.id,
+              map.getLayoutProperty(layer.id, "visibility") === "none"
+                ? "none"
+                : "visible",
+            ]),
+          );
+
+          map.addSource(SATELLITE_SOURCE_ID, {
+            type: "raster",
+            tiles: [SATELLITE_TILE_URL],
+            tileSize: 256,
+            minzoom: 0,
+            maxzoom: 19,
+            attribution: SATELLITE_ATTRIBUTION,
+          });
+          map.addLayer(
+            {
+              id: SATELLITE_LAYER_ID,
+              type: "raster",
+              source: SATELLITE_SOURCE_ID,
+              layout: { visibility: "none" },
+              paint: {
+                "raster-opacity": 1,
+                "raster-fade-duration": 120,
+              },
+            },
+            styleLayers[0]?.id,
+          );
+
           if (!bounds.isEmpty()) {
             map.fitBounds(bounds, {
               padding: { top: 125, right: 70, bottom: 100, left: 70 },
@@ -185,6 +257,144 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
     };
   }, [regionalWeather]);
 
+  useEffect(() => {
+    if (!isLoaded || radarStatus || radarStatusLoading) return;
+
+    let cancelled = false;
+    setRadarStatusLoading(true);
+
+    fetch("/api/weather/radar/status", {
+      headers: { Accept: "application/json" },
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`Radar respondeu com status ${response.status}`);
+        return (await response.json()) as RadarStatus;
+      })
+      .then((status) => {
+        if (cancelled) return;
+        setRadarStatus(status);
+        setSelectedFrameIndex(status.currentIndex);
+      })
+      .catch((error) => {
+        console.error("Falha ao consultar disponibilidade do radar:", error);
+        if (!cancelled) {
+          setRadarStatus({
+            configured: false,
+            available: false,
+            provider: "OpenWeather",
+            product: "Global Precipitation Map Forecast",
+            frames: [],
+            currentIndex: 0,
+            updatedAt: new Date().toISOString(),
+            error: "Não foi possível consultar o radar neste momento.",
+          });
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setRadarStatusLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, radarStatus, radarStatusLoading]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !isLoaded) return;
+
+    const showSatellite = mode === "satellite";
+
+    for (const [layerId, originalVisibility] of Object.entries(
+      baseLayerVisibilityRef.current,
+    )) {
+      if (!map.getLayer(layerId)) continue;
+      map.setLayoutProperty(
+        layerId,
+        "visibility",
+        showSatellite ? "none" : originalVisibility,
+      );
+    }
+
+    if (map.getLayer(SATELLITE_LAYER_ID)) {
+      map.setLayoutProperty(
+        SATELLITE_LAYER_ID,
+        "visibility",
+        showSatellite ? "visible" : "none",
+      );
+    }
+
+    const shouldShowRadar =
+      mode === "radar" &&
+      Boolean(radarStatus?.available) &&
+      Boolean(selectedRadarFrame);
+
+    if (shouldShowRadar && selectedRadarFrame) {
+      if (!map.getSource(RADAR_SOURCE_ID)) {
+        map.addSource(RADAR_SOURCE_ID, {
+          type: "raster",
+          tiles: [radarTileTemplate(selectedRadarFrame.timestamp)],
+          tileSize: 256,
+          minzoom: RADAR_MIN_ZOOM,
+          maxzoom: RADAR_MAX_ZOOM,
+          attribution: RADAR_ATTRIBUTION,
+        });
+      }
+
+      if (!map.getLayer(RADAR_LAYER_ID)) {
+        const labelLayerId = (map.getStyle().layers ?? []).find(
+          (layer) =>
+            layer.type === "symbol" &&
+            Object.prototype.hasOwnProperty.call(
+              baseLayerVisibilityRef.current,
+              layer.id,
+            ),
+        )?.id;
+
+        map.addLayer(
+          {
+            id: RADAR_LAYER_ID,
+            type: "raster",
+            source: RADAR_SOURCE_ID,
+            paint: {
+              "raster-opacity": radarOpacity / 100,
+              "raster-fade-duration": 0,
+            },
+          },
+          labelLayerId,
+        );
+      }
+
+      const radarSource = map.getSource(RADAR_SOURCE_ID) as
+        | RasterTileSource
+        | undefined;
+      radarSource?.setTiles([radarTileTemplate(selectedRadarFrame.timestamp)]);
+      map.setLayoutProperty(RADAR_LAYER_ID, "visibility", "visible");
+      map.setPaintProperty(RADAR_LAYER_ID, "raster-opacity", radarOpacity / 100);
+    } else if (map.getLayer(RADAR_LAYER_ID)) {
+      map.setLayoutProperty(RADAR_LAYER_ID, "visibility", "none");
+    }
+  }, [isLoaded, mode, radarOpacity, radarStatus, selectedRadarFrame]);
+
+  useEffect(() => {
+    if (
+      !radarPlaying ||
+      mode !== "radar" ||
+      !radarStatus?.available ||
+      radarStatus.frames.length < 2
+    ) {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setSelectedFrameIndex((current) =>
+        current >= radarStatus.frames.length - 1 ? 0 : current + 1,
+      );
+    }, 900);
+
+    return () => window.clearInterval(interval);
+  }, [mode, radarPlaying, radarStatus]);
+
   const centerOnPelotas = () => {
     mapRef.current?.easeTo({
       center: PELOTAS_CENTER,
@@ -192,6 +402,21 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
       duration: 700,
     });
   };
+
+  const selectMode = (nextMode: MapMode) => {
+    if (nextMode === "radar" && !radarStatus?.available) return;
+    setMode(nextMode);
+
+    if (nextMode !== "radar") {
+      setRadarPlaying(false);
+    } else if (radarStatus) {
+      setSelectedFrameIndex(radarStatus.currentIndex);
+    }
+  };
+
+  const radarButtonTitle = radarStatusLoading
+    ? "Verificando disponibilidade do radar"
+    : radarStatus?.error ?? "Mostrar radar animado de precipitação";
 
   return (
     <section className="map-panel" id="regiao" aria-labelledby="map-title">
@@ -214,10 +439,48 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
       </div>
 
       <div
-        className="map-canvas map-canvas--interactive"
+        className={`map-canvas map-canvas--interactive map-canvas--${mode}`}
         aria-label="Mapa interativo com condições meteorológicas de Pelotas e cidades da Zona Sul"
       >
         <div ref={mapContainerRef} className="regional-map-engine" />
+
+        <div className="map-layer-switcher" aria-label="Camadas do mapa">
+          <button
+            type="button"
+            className={mode === "map" ? "is-active" : undefined}
+            aria-pressed={mode === "map"}
+            onClick={() => selectMode("map")}
+            disabled={!isLoaded}
+          >
+            Mapa
+          </button>
+          <button
+            type="button"
+            className={mode === "satellite" ? "is-active" : undefined}
+            aria-pressed={mode === "satellite"}
+            onClick={() => selectMode("satellite")}
+            disabled={!isLoaded}
+          >
+            Satélite
+          </button>
+          <button
+            type="button"
+            className={mode === "radar" ? "is-active" : undefined}
+            aria-pressed={mode === "radar"}
+            onClick={() => selectMode("radar")}
+            disabled={!isLoaded || radarStatusLoading || !radarStatus?.available}
+            title={radarButtonTitle}
+          >
+            Radar
+          </button>
+        </div>
+
+        {isLoaded && radarStatus && !radarStatus.available ? (
+          <div className="map-radar-unavailable" role="status">
+            <strong>Radar preparado</strong>
+            <span>{radarStatus.error}</span>
+          </div>
+        ) : null}
 
         <div
           className={`map-loading ${isLoaded ? "is-hidden" : ""} ${hasError ? "has-error" : ""}`}
@@ -228,16 +491,75 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
           <strong>{hasError ? "Mapa temporariamente indisponível" : "Carregando mapa regional"}</strong>
           <small>
             {hasError
-              ? "As temperaturas continuam disponíveis abaixo."
+              ? "As temperaturas continuam disponíveis na previsão."
               : "A camada geográfica é carregada somente quando necessária."}
           </small>
         </div>
 
-        <div className="map-legend" aria-label="Intervalo de temperatura regional">
-          <span>{temperatureRange.min}°</span>
-          <i aria-hidden="true" />
-          <span>{temperatureRange.max}°</span>
-        </div>
+        {mode === "radar" && radarStatus?.available && selectedRadarFrame ? (
+          <div className="radar-player" aria-label="Animação do radar de precipitação">
+            <div className="radar-player-topline">
+              <button
+                className="radar-play-button"
+                type="button"
+                onClick={() => setRadarPlaying((playing) => !playing)}
+                aria-label={radarPlaying ? "Pausar animação do radar" : "Reproduzir animação do radar"}
+              >
+                <PlayIcon playing={radarPlaying} />
+              </button>
+              <div className="radar-frame-status" aria-live="polite">
+                <span>{selectedRadarFrame.kind === "forecast" ? "Previsão" : "Observado"}</span>
+                <strong>{selectedRadarFrame.label}</strong>
+              </div>
+              <label className="radar-opacity-control">
+                <span>Opacidade</span>
+                <input
+                  type="range"
+                  min="35"
+                  max="100"
+                  step="5"
+                  value={radarOpacity}
+                  onChange={(event) => setRadarOpacity(Number(event.target.value))}
+                />
+              </label>
+            </div>
+
+            <input
+              className="radar-timeline"
+              type="range"
+              min="0"
+              max={radarStatus.frames.length - 1}
+              step="1"
+              value={selectedFrameIndex}
+              aria-label="Selecionar horário da animação do radar"
+              onChange={(event) => {
+                setRadarPlaying(false);
+                setSelectedFrameIndex(Number(event.target.value));
+              }}
+            />
+
+            <div className="radar-time-range" aria-hidden="true">
+              <span>{radarStatus.frames[0]?.label}</span>
+              <span>Agora</span>
+              <span>{radarStatus.frames.at(-1)?.label}</span>
+            </div>
+
+            <div className="radar-intensity-legend">
+              <span>Chuva fraca</span>
+              <i aria-hidden="true" />
+              <span>Chuva intensa</span>
+            </div>
+            <small className="radar-provider-note">
+              Estimativa de precipitação OpenWeather · histórico de 1h e previsão de até 2h
+            </small>
+          </div>
+        ) : (
+          <div className="map-legend" aria-label="Intervalo de temperatura regional">
+            <span>{temperatureRange.min}°</span>
+            <i aria-hidden="true" />
+            <span>{temperatureRange.max}°</span>
+          </div>
+        )}
       </div>
 
       <ul className="regional-weather-accessible">
