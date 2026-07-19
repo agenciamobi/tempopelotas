@@ -2,78 +2,42 @@ export type NivelGuaibaCity = {
   name: string;
   slug: string;
   url: string;
+  jsonUrl: string;
   isPrimary?: boolean;
 };
 
 const NIVEL_GUAIBA_BASE_URL = "https://nivelguaiba.com.br";
 
+function city(
+  name: string,
+  slug: string,
+  options: { isPrimary?: boolean } = {},
+): NivelGuaibaCity {
+  return {
+    name,
+    slug,
+    url: options.isPrimary
+      ? `${NIVEL_GUAIBA_BASE_URL}/`
+      : `${NIVEL_GUAIBA_BASE_URL}/${slug}`,
+    jsonUrl: `${NIVEL_GUAIBA_BASE_URL}/${slug}.json`,
+    ...options,
+  };
+}
+
 export const NIVEL_GUAIBA_CITIES: NivelGuaibaCity[] = [
-  {
-    name: "Porto Alegre",
-    slug: "portoalegre",
-    url: `${NIVEL_GUAIBA_BASE_URL}/`,
-    isPrimary: true,
-  },
-  {
-    name: "São Leopoldo",
-    slug: "saoleopoldo",
-    url: `${NIVEL_GUAIBA_BASE_URL}/saoleopoldo`,
-  },
-  {
-    name: "Lajeado",
-    slug: "lajeado",
-    url: `${NIVEL_GUAIBA_BASE_URL}/lajeado`,
-  },
-  {
-    name: "Bom Retiro do Sul",
-    slug: "bomretirodosul",
-    url: `${NIVEL_GUAIBA_BASE_URL}/bomretirodosul`,
-  },
-  {
-    name: "Cachoeira do Sul",
-    slug: "cachoeiradosul",
-    url: `${NIVEL_GUAIBA_BASE_URL}/cachoeiradosul`,
-  },
-  {
-    name: "Dona Francisca",
-    slug: "donafrancisca",
-    url: `${NIVEL_GUAIBA_BASE_URL}/donafrancisca`,
-  },
-  {
-    name: "Encantado",
-    slug: "encantado",
-    url: `${NIVEL_GUAIBA_BASE_URL}/encantado`,
-  },
-  {
-    name: "Feliz",
-    slug: "feliz",
-    url: `${NIVEL_GUAIBA_BASE_URL}/feliz`,
-  },
-  {
-    name: "Gravataí",
-    slug: "gravatai",
-    url: `${NIVEL_GUAIBA_BASE_URL}/gravatai`,
-  },
-  {
-    name: "Muçum",
-    slug: "mucum",
-    url: `${NIVEL_GUAIBA_BASE_URL}/mucum`,
-  },
-  {
-    name: "Rio Pardo",
-    slug: "riopardo",
-    url: `${NIVEL_GUAIBA_BASE_URL}/riopardo`,
-  },
-  {
-    name: "São Sebastião do Caí",
-    slug: "saosebastiaodocai",
-    url: `${NIVEL_GUAIBA_BASE_URL}/saosebastiaodocai`,
-  },
-  {
-    name: "Taquara",
-    slug: "taquara",
-    url: `${NIVEL_GUAIBA_BASE_URL}/taquara`,
-  },
+  city("Porto Alegre", "portoalegre", { isPrimary: true }),
+  city("São Leopoldo", "saoleopoldo"),
+  city("Lajeado", "lajeado"),
+  city("Bom Retiro do Sul", "bomretirodosul"),
+  city("Cachoeira do Sul", "cachoeiradosul"),
+  city("Dona Francisca", "donafrancisca"),
+  city("Encantado", "encantado"),
+  city("Feliz", "feliz"),
+  city("Gravataí", "gravatai"),
+  city("Muçum", "mucum"),
+  city("Rio Pardo", "riopardo"),
+  city("São Sebastião do Caí", "saosebastiaodocai"),
+  city("Taquara", "taquara"),
 ];
 
 export { NIVEL_GUAIBA_BASE_URL };
