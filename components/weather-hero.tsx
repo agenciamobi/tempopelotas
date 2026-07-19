@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { WeatherIcon } from "@/components/weather-icon";
 import type { WeatherData } from "@/lib/weather-data";
 import { getWeatherAdvisory } from "@/lib/weather-insights";
@@ -15,7 +16,7 @@ function HeroMetricIcon({ name }: { name: HeroMetricIcon }) {
     wind: <path d="M3 8h10.5c3.8 0 3.8-5.5.2-5.5-1.9 0-2.9 1-2.9 2.8M3 13h15.5c3.8 0 3.8 6.5.2 6.5-1.9 0-2.9-1-2.9-2.8M3 18h7.5" />,
     gust: <path d="M4 7.5h10.8M4 12h16M4 16.5h12.5M17.5 5.2l2.5 2.3-2.5 2.3" />,
     visibility: <path d="M2.5 12s3.4-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.4 5.5-9.5 5.5S2.5 12 2.5 12Zm9.5-2.8a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z" />,
-  } satisfies Record<HeroMetricIcon, React.ReactNode>;
+  } satisfies Record<HeroMetricIcon, ReactNode>;
 
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
