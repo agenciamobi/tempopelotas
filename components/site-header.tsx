@@ -17,8 +17,8 @@ const desktopNavItems: NavigationItem[] = [
   { label: "7 dias", href: "/previsao-7-dias-pelotas", icon: "week" },
   { label: "Chuva", href: "/chuva-em-pelotas", icon: "rain" },
   {
-    label: "Lagoa",
-    href: "/nivel-da-lagoa-dos-patos-laranjal",
+    label: "Águas",
+    href: "/situacao-hidrologica-pelotas",
     icon: "water",
   },
 ];
@@ -27,7 +27,7 @@ const mobileNavItems: NavigationItem[] = [
   { label: "Agora", href: "/", icon: "home" },
   { label: "Hoje", href: "/tempo-hoje-pelotas", icon: "today" },
   { label: "7 dias", href: "/previsao-7-dias-pelotas", icon: "week" },
-  { label: "Chuva", href: "/chuva-em-pelotas", icon: "rain" },
+  { label: "Águas", href: "/situacao-hidrologica-pelotas", icon: "water" },
   { label: "Alertas", href: "/alertas", icon: "alert" },
 ];
 
@@ -87,7 +87,16 @@ function NavigationIcon({ name }: { name: NavigationIconName }) {
 }
 
 function isActivePath(pathname: string, href: string) {
-  return href === "/" ? pathname === href : pathname.startsWith(href);
+  if (href === "/") return pathname === href;
+
+  if (href === "/situacao-hidrologica-pelotas") {
+    return (
+      pathname.startsWith(href) ||
+      pathname.startsWith("/nivel-da-lagoa-dos-patos-laranjal")
+    );
+  }
+
+  return pathname.startsWith(href);
 }
 
 export function SiteHeader() {
