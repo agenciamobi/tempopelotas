@@ -56,7 +56,7 @@ export default function manifest(): MetadataRoute.Manifest {
       "Previsão do tempo e situação das águas para ajudar a comunidade de Pelotas a se preparar.",
     start_url: "/",
     scope: "/",
-    display: "standalone",
+    display: "fullscreen",
     background_color: "#eaf0f3",
     theme_color: "#071e2f",
     lang: "pt-BR",
