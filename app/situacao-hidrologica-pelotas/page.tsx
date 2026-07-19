@@ -2,36 +2,38 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ForecastPageShell } from "@/components/forecast-page-shell";
 import { GuaibaLevelCard } from "@/components/guaiba-level-card";
-import { LagoonLevelDashboard } from "@/components/lagoon-level-dashboard";
+import { PelotasHydrologyWidget } from "@/components/pelotas-hydrology-widget";
 import { getGuaibaObservation } from "@/lib/guaiba-monitor";
 import {
   HYDROLOGY_FLOW,
   HYDROLOGY_STATIONS,
   SGB_SACE_URL,
 } from "@/lib/hydrology";
+import { getLaranjalLevelData } from "@/lib/laranjal-level";
 import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
 import { absoluteUrl } from "@/lib/site";
 import { getPelotasWeather } from "@/lib/weather-service";
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Situação das águas em Pelotas e na Lagoa dos Patos",
   description:
-    "Acompanhe o nível do Guaíba, a Lagoa dos Patos, a Estação Laranjal, o vento e a chuva para se preparar em Pelotas.",
+    "Acompanhe primeiro o nível no Laranjal e compare com o Guaíba, o vento e a chuva para entender melhor a situação das águas em Pelotas.",
   alternates: { canonical: "/situacao-hidrologica-pelotas" },
   openGraph: {
     title: "Situação das águas em Pelotas",
     description:
-      "Entenda como o Guaíba, outros rios, a Lagoa dos Patos, o vento e a chuva podem influenciar Pelotas.",
+      "Veja o nível no Laranjal, o Guaíba e as condições que podem influenciar Pelotas.",
     url: "/situacao-hidrologica-pelotas",
   },
 };
 
 export default async function SituacaoHidrologicaPelotasPage() {
-  const [weather, guaiba] = await Promise.all([
+  const [weather, guaiba, laranjalLevel] = await Promise.all([
     getPelotasWeather(),
     getGuaibaObservation(),
+    getLaranjalLevelData(),
   ]);
   const today = weather.daily[0];
   const maxHourlyGust = Math.max(
@@ -44,7 +46,7 @@ export default async function SituacaoHidrologicaPelotasPage() {
     "@type": "Dataset",
     name: "Informações sobre as águas relacionadas a Pelotas",
     description:
-      "Informações públicas sobre o Guaíba, a Lagoa dos Patos e a Praia do Laranjal.",
+      "Informações públicas sobre o nível no Laranjal, o Guaíba e a Lagoa dos Patos.",
     url: absoluteUrl("/situacao-hidrologica-pelotas"),
     spatialCoverage: "Pelotas, Lagoa dos Patos e Rio Grande do Sul",
     isAccessibleForFree: true,
@@ -56,7 +58,7 @@ export default async function SituacaoHidrologicaPelotasPage() {
       {
         "@type": "DataDownload",
         encodingFormat: "application/json",
-        contentUrl: absoluteUrl("/pelotas.json"),
+        contentUrl: absoluteUrl("/api/hydrology/laranjal"),
       },
       {
         "@type": "DataDownload",
@@ -71,7 +73,7 @@ export default async function SituacaoHidrologicaPelotasPage() {
       weather={weather}
       eyebrow="Águas e segurança em Pelotas"
       title="Situação das águas"
-      description="Acompanhe o Guaíba e a Lagoa dos Patos e entenda como chuva, vento, rios e arroios podem influenciar o Laranjal e as áreas mais baixas da cidade."
+      description="Veja primeiro o nível medido no Laranjal e compare com o Guaíba, a chuva e o vento. Juntas, essas informações ajudam a acompanhar o que pode afetar as áreas mais baixas de Pelotas."
       currentPath="/situacao-hidrologica-pelotas"
     >
       <script
@@ -80,6 +82,33 @@ export default async function SituacaoHidrologicaPelotasPage() {
           __html: JSON.stringify(datasetSchema).replace(/</g, "\\u003c"),
         }}
       />
+
+      <section className="topic-section hydrology-live-section" aria-labelledby="hydrology-live-title">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Acompanhamento agora</span>
+            <h2 id="hydrology-live-title">Pelotas primeiro, com o Guaíba ao lado</h2>
+          </div>
+          <p>
+            O quadro do Laranjal mostra a medição mais próxima de Pelotas. O Guaíba aparece ao lado para
+            ajudar a entender parte da água que segue para a Lagoa dos Patos.
+          </p>
+        </div>
+
+        <div className="hydrology-monitor-grid">
+          <PelotasHydrologyWidget
+            headingLevel="h3"
+            initialData={laranjalLevel}
+            weather={{
+              windSpeed: weather.current.windSpeed,
+              windDirection: weather.current.windDirection,
+              windGust: maxHourlyGust,
+              precipitation: today?.precipitation ?? 0,
+            }}
+          />
+          <GuaibaLevelCard data={guaiba} />
+        </div>
+      </section>
 
       <section className="topic-section" aria-labelledby="hydrology-path-title">
         <div className="section-heading">
@@ -104,31 +133,6 @@ export default async function SituacaoHidrologicaPelotasPage() {
           ))}
         </div>
       </section>
-
-      <section className="topic-section" aria-labelledby="guaiba-monitor-title">
-        <div className="section-heading">
-          <div>
-            <span className="eyebrow">Uma das entradas da Lagoa dos Patos</span>
-            <h2 id="guaiba-monitor-title">Nível do Guaíba em Porto Alegre</h2>
-          </div>
-          <p>
-            A subida ou a descida do Guaíba ajuda a entender parte do cenário que chega à Lagoa dos
-            Patos. Este valor, sozinho, não permite saber qual será o nível futuro no Laranjal.
-          </p>
-        </div>
-        <div className="guaiba-page-card">
-          <GuaibaLevelCard data={guaiba} />
-        </div>
-      </section>
-
-      <LagoonLevelDashboard
-        windSpeed={weather.current.windSpeed}
-        windDirection={weather.current.windDirection}
-        windGust={maxHourlyGust}
-        precipitation={today?.precipitation ?? 0}
-        condition={weather.current.condition}
-        updatedAt={weather.current.updatedAt}
-      />
 
       <section className="topic-section" aria-labelledby="station-network-title">
         <div className="section-heading">
