@@ -8,14 +8,14 @@ import { getPelotasWeather } from "@/lib/weather-service";
 export const revalidate = 21600;
 
 export const metadata: Metadata = {
-  title: "Histórico climático recente de Pelotas",
+  title: "Como foi o tempo nos últimos 30 dias em Pelotas",
   description:
-    "Consulte temperatura, chuva e rajadas registradas nos últimos 30 dias em Pelotas, RS, com comparações e destaques do período.",
+    "Compare temperatura, chuva e rajadas dos últimos 30 dias em Pelotas, RS.",
   alternates: { canonical: "/historico-climatico-pelotas" },
   openGraph: {
-    title: "Histórico recente do tempo em Pelotas",
+    title: "Últimos 30 dias do tempo em Pelotas",
     description:
-      "Compare temperatura, precipitação e vento dos últimos 30 dias em Pelotas, RS.",
+      "Veja os dias mais quentes, mais frios e mais chuvosos do período recente em Pelotas.",
     url: "/historico-climatico-pelotas",
   },
 };
@@ -32,7 +32,7 @@ export default async function HistoricoClimaticoPelotasPage() {
     "@type": "Dataset",
     name: "Histórico meteorológico recente de Pelotas",
     description:
-      "Série diária dos últimos 30 dias com temperaturas máximas e mínimas, precipitação acumulada e rajadas de vento em Pelotas, RS.",
+      "Informações diárias dos últimos 30 dias sobre temperaturas, chuva e rajadas de vento em Pelotas, RS.",
     url: absoluteUrl("/historico-climatico-pelotas"),
     temporalCoverage: `${history.days[0]?.date}/${history.days.at(-1)?.date}`,
     spatialCoverage: {
@@ -54,9 +54,9 @@ export default async function HistoricoClimaticoPelotasPage() {
   return (
     <ForecastPageShell
       weather={weather}
-      eyebrow="Histórico recente"
+      eyebrow="Veja os últimos 30 dias"
       title="Como foi o tempo em Pelotas"
-      description="Compare temperatura, chuva e rajadas dos últimos 30 dias para entender a variação meteorológica recente na cidade."
+      description="Compare temperatura, chuva e vento para entender como o tempo mudou durante o último mês."
       currentPath="/historico-climatico-pelotas"
     >
       <script
@@ -68,30 +68,30 @@ export default async function HistoricoClimaticoPelotasPage() {
 
       <section className="history-summary" aria-label="Resumo dos últimos 30 dias">
         <article>
-          <span>Média das máximas</span>
+          <span>Média das temperaturas mais altas</span>
           <strong>{summary.averageMax}°C</strong>
           <small>{summary.periodLabel}</small>
         </article>
         <article>
-          <span>Média das mínimas</span>
+          <span>Média das temperaturas mais baixas</span>
           <strong>{summary.averageMin}°C</strong>
-          <small>Temperatura mínima diária</small>
+          <small>Durante o período</small>
         </article>
         <article>
-          <span>Chuva acumulada</span>
+          <span>Chuva no período</span>
           <strong>{summary.totalPrecipitation.toFixed(1)} mm</strong>
-          <small>Soma estimada do período</small>
+          <small>Total estimado nos 30 dias</small>
         </article>
         <article>
-          <span>Maior rajada</span>
+          <span>Rajada mais forte</span>
           <strong>{summary.strongestWindGust} km/h</strong>
-          <small>Valor máximo diário</small>
+          <small>Maior valor encontrado</small>
         </article>
       </section>
 
       <WeatherHistoryChart days={history.days} />
 
-      <section className="history-records" aria-label="Destaques meteorológicos do período">
+      <section className="history-records" aria-label="Destaques dos últimos 30 dias">
         <article>
           <span>Dia mais quente</span>
           <strong>{summary.warmestDay.temperatureMax}°C</strong>
@@ -110,14 +110,15 @@ export default async function HistoricoClimaticoPelotasPage() {
       </section>
 
       <section className="history-note" aria-labelledby="history-method-title">
-        <span className="eyebrow">Metodologia</span>
-        <h2 id="history-method-title">Histórico de modelos meteorológicos</h2>
+        <span className="eyebrow">Importante saber</span>
+        <h2 id="history-method-title">Estes valores ajudam a comparar os dias</h2>
         <p>
-          Os valores representam uma série histórica modelada para as coordenadas de Pelotas. Eles são úteis para comparação e acompanhamento de tendência, mas podem diferir de medições realizadas por estações meteorológicas específicas. Fonte: {history.source.name}.
+          As informações representam uma estimativa para a região de Pelotas. Elas podem ser diferentes
+          das medições feitas por estações instaladas em pontos específicos da cidade. Fonte: {history.source.name}.
         </p>
         {history.source.isFallback ? (
           <p className="data-note">
-            A fonte histórica estava indisponível nesta atualização. O painel está exibindo uma amostra demonstrativa temporária e não deve ser utilizado para decisões técnicas.
+            A fonte habitual está temporariamente indisponível. Por isso, esta área mostra valores de exemplo e não deve ser usada para decisões importantes.
           </p>
         ) : null}
       </section>
