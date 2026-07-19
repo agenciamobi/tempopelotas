@@ -22,7 +22,7 @@ export function LagoonLevelHomeCard() {
           <h2 id="home-lagoon-card-title">Nível da Lagoa dos Patos</h2>
         </div>
         <Link href="/nivel-da-lagoa-dos-patos-laranjal">
-          Entender a medição
+          Saiba o que observar
           <span aria-hidden="true">→</span>
         </Link>
       </div>
@@ -30,7 +30,7 @@ export function LagoonLevelHomeCard() {
       <div className="home-lagoon-frame">
         <iframe
           src={LAGOON_LEVEL_SOURCE.dashboardUrl}
-          title="Medidor do nível da Lagoa dos Patos na Estação Laranjal"
+          title="Nível da Lagoa dos Patos na Estação Laranjal"
           loading="lazy"
           allow="fullscreen"
           allowFullScreen
@@ -47,15 +47,15 @@ export function LagoonLevelHomeCard() {
             target="_blank"
             rel="noreferrer"
           >
-            Abrir painel original
+            Abrir medidor completo
             <ExternalIcon />
           </a>
         </div>
       </div>
 
       <p className="home-lagoon-note">
-        Acompanhe a evolução do nível e considere também vento, chuva e comunicados da Defesa Civil e
-        dos órgãos responsáveis. Fonte do medidor: LabHidroSens / UFPel.
+        Veja se o nível está subindo ou baixando. Considere também o vento, a chuva e os avisos da
+        Defesa Civil. Medição fornecida pelo LabHidroSens / UFPel.
       </p>
     </section>
   );
