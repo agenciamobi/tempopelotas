@@ -37,6 +37,7 @@ import "./brand-assets.css";
 import "./home-hero-composition.css";
 import "./home-location-and-level.css";
 import "./mobile-usability-refinement.css";
+import "./mobile-interaction-fixes.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
