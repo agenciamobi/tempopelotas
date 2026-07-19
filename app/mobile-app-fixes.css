@@ -15,16 +15,12 @@
     order: 4;
   }
 
-  .home-lagoon-card {
+  .weekly-section {
     order: 5;
   }
 
-  .weekly-section {
-    order: 6;
-  }
-
   .map-panel {
-    order: 7;
+    order: 6;
   }
 }
 
