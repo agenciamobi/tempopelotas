@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { PwaManager } from "@/components/pwa-manager";
 import { siteUrl } from "@/lib/site";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
@@ -23,6 +24,7 @@ import "./embrapa-observation.css";
 import "./footer.css";
 import "./footer-resources.css";
 import "./interface-fixes.css";
+import "./pwa.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -86,7 +88,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        {children}
+        <PwaManager />
+      </body>
     </html>
   );
 }
