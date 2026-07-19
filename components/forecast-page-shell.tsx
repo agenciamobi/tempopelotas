@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WeatherNavigation } from "@/components/weather-navigation";
 import type { WeatherData } from "@/lib/weather-data";
+import { getWeatherAdvisory } from "@/lib/weather-insights";
 
 type ForecastPageShellProps = {
   weather: WeatherData;
@@ -21,9 +22,11 @@ export function ForecastPageShell({
   children,
   currentPath,
 }: ForecastPageShellProps) {
+  const advisoryLevel = getWeatherAdvisory(weather).level;
+
   return (
     <div className="site-shell">
-      <SiteHeader />
+      <SiteHeader advisoryLevel={advisoryLevel} />
 
       <main className="topic-page">
         <section className="topic-hero">
