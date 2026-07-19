@@ -10,12 +10,12 @@ export const revalidate = 600;
 export const metadata: Metadata = {
   title: "Nível da Lagoa dos Patos no Laranjal em tempo real",
   description:
-    "Acompanhe o nível da Lagoa dos Patos na Estação Laranjal, em Pelotas, e veja como vento e chuva podem influenciar o cenário local.",
+    "Acompanhe o nível da Lagoa dos Patos na Estação Laranjal, em Pelotas, e veja a relação com vento e chuva.",
   alternates: { canonical: "/nivel-da-lagoa-dos-patos-laranjal" },
   openGraph: {
     title: "Nível da Lagoa dos Patos no Laranjal",
     description:
-      "Veja a medição da Estação Laranjal e acompanhe as condições meteorológicas relacionadas em Pelotas.",
+      "Veja o nível medido na Praia do Laranjal e saiba o que observar.",
     url: "/nivel-da-lagoa-dos-patos-laranjal",
   },
 };
@@ -34,7 +34,7 @@ export default async function NivelDaLagoaPage() {
     name: "Nível da Lagoa dos Patos na Estação Laranjal",
     url: absoluteUrl("/nivel-da-lagoa-dos-patos-laranjal"),
     description:
-      "Monitoramento do nível da Lagoa dos Patos na Praia do Laranjal, em Pelotas, com contexto de vento e chuva.",
+      "Nível da Lagoa dos Patos na Praia do Laranjal, em Pelotas, com informações de vento e chuva.",
     inLanguage: "pt-BR",
     about: {
       "@type": "BodyOfWater",
@@ -50,9 +50,9 @@ export default async function NivelDaLagoaPage() {
   return (
     <ForecastPageShell
       weather={weather}
-      eyebrow="Lagoa dos Patos em Pelotas"
-      title="Nível da Lagoa no Laranjal"
-      description="Veja a medição da Estação Laranjal, acompanhe se o nível está subindo ou baixando e considere também vento, chuva e avisos oficiais."
+      eyebrow="Praia do Laranjal"
+      title="Nível da Lagoa dos Patos"
+      description="Veja a medição atual, acompanhe se o nível está subindo ou baixando e confira também o vento, a chuva e os avisos oficiais."
       currentPath="/nivel-da-lagoa-dos-patos-laranjal"
     >
       <script
@@ -74,30 +74,30 @@ export default async function NivelDaLagoaPage() {
       <section className="topic-section lagoon-explanation" aria-labelledby="lagoon-explanation-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Antes de tomar decisões</span>
+            <span className="eyebrow">Use a informação com atenção</span>
             <h2 id="lagoon-explanation-title">O que observar no medidor</h2>
           </div>
           <p>
-            O número atual é importante, mas a evolução ao longo das horas oferece uma leitura mais
-            útil. Compare o nível com as condições meteorológicas e com os comunicados das autoridades.
+            Um único número não conta toda a situação. Observe como o nível muda ao longo das horas e
+            compare com o vento, a chuva e os comunicados das autoridades.
           </p>
         </div>
 
         <div className="lagoon-explanation-grid">
           <article>
             <span>01</span>
-            <h3>Veja se está subindo ou baixando</h3>
+            <h3>Veja se o nível continua subindo</h3>
             <p>
-              Acompanhe vários pontos do gráfico. Uma sequência contínua de alta merece mais atenção do
-              que uma única leitura isolada.
+              Acompanhe vários horários no gráfico. Uma alta contínua merece mais atenção do que uma
+              mudança pequena em uma única leitura.
             </p>
           </article>
           <article>
             <span>02</span>
-            <h3>Observe vento e chuva</h3>
+            <h3>Observe o vento e a chuva</h3>
             <p>
-              Vento persistente pode deslocar ou represar água na lagoa, enquanto chuva local e nas
-              bacias contribuintes pode aumentar o volume recebido.
+              O vento pode empurrar ou segurar a água perto do Laranjal. A chuva em Pelotas e em outras
+              regiões que deságuam na lagoa também pode aumentar o nível.
             </p>
           </article>
           <article>
@@ -105,17 +105,16 @@ export default async function NivelDaLagoaPage() {
             <h3>Confirme os avisos oficiais</h3>
             <p>
               Em caso de risco, siga as orientações da Defesa Civil, Prefeitura, Sanep e demais órgãos
-              responsáveis pela resposta à emergência.
+              responsáveis pela segurança da população.
             </p>
           </article>
         </div>
 
         <div className="lagoon-disclaimer">
-          <strong>Use o medidor como apoio</strong>
+          <strong>O medidor ajuda no acompanhamento</strong>
           <p>
-            O TEMPO Pelotas não estabelece cotas de inundação para bairros, não emite ordem de
-            evacuação e não substitui os alertas oficiais. A medição pertence à fonte identificada no
-            painel.
+            O TEMPO Pelotas não determina quando um bairro vai alagar e não emite ordens de saída. Em
+            situações de risco, siga os avisos oficiais. A medição é fornecida pela fonte indicada no quadro.
           </p>
         </div>
       </section>
