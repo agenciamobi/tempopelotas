@@ -6,7 +6,10 @@ import {
 } from "@/lib/push-subscription-store";
 import { getWeatherAdvisory } from "@/lib/weather-insights";
 import { getPelotasWeather } from "@/lib/weather-service";
-import { broadcastPushNotification } from "@/lib/web-push-service";
+import {
+  broadcastPushNotification,
+  getPushConfigurationStatus,
+} from "@/lib/web-push-service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -35,6 +38,15 @@ function formatLevel(value: number) {
 export async function GET(request: NextRequest) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
+  }
+
+  const configuration = getPushConfigurationStatus();
+  if (!configuration.enabled) {
+    return NextResponse.json({
+      success: true,
+      skipped: true,
+      reason: "push-not-configured",
+    });
   }
 
   const fingerprint = `previsao-diaria-${localDateKey()}`;
