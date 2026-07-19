@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getEmbrapaObservation } from "@/lib/embrapa-observation";
+import { getGuaibaObservation } from "@/lib/guaiba-monitor";
 import {
   HYDROLOGY_DATA_SOURCES,
   HYDROLOGY_STATIONS,
@@ -11,14 +12,15 @@ import { getPelotasWeather } from "@/lib/weather-service";
 export const revalidate = 300;
 
 export async function GET() {
-  const [weather, embrapaObservation] = await Promise.all([
+  const [weather, embrapaObservation, guaibaObservation] = await Promise.all([
     getPelotasWeather(),
     getEmbrapaObservation(),
+    getGuaibaObservation(),
   ]);
 
   return NextResponse.json(
     {
-      schema_version: "1.1",
+      schema_version: "1.2",
       generated_at: new Date().toISOString(),
       location: {
         city: "Pelotas",
@@ -42,8 +44,13 @@ export async function GET() {
       },
       hydrology: {
         status: "contextual-monitoring",
-        live_level: null,
-        live_level_note:
+        upstream_indicator: {
+          guaiba: guaibaObservation,
+          interpretation:
+            "Indicador regional a montante. Não representa previsão isolada do nível futuro em Pelotas.",
+        },
+        local_level: null,
+        local_level_note:
           "O nível local é exibido no painel externo do LabHidroSens / UFPel. A integração numérica oficial com ANA/SGB ainda depende de credenciais e validação da API.",
         local_dashboard: {
           station: LAGOON_LEVEL_SOURCE.station,
@@ -51,6 +58,8 @@ export async function GET() {
           location: LAGOON_LEVEL_SOURCE.location,
           url: LAGOON_LEVEL_SOURCE.dashboardUrl,
         },
+        system_note:
+          "A Lagoa dos Patos recebe contribuições do Guaíba e de outras bacias, rios e arroios. O nível em Pelotas também depende do vento, do Canal São Gonçalo e do escoamento pela Barra de Rio Grande.",
         official_stations: HYDROLOGY_STATIONS,
         sources: HYDROLOGY_DATA_SOURCES,
       },
@@ -59,11 +68,12 @@ export async function GET() {
         embrapa_station: absoluteUrl("/estacao-embrapa-pelotas"),
         embrapa_api: absoluteUrl("/api/weather/embrapa"),
         hydrology: absoluteUrl("/situacao-hidrologica-pelotas"),
+        guaiba_api: absoluteUrl("/api/hydrology/guaiba"),
         methodology: absoluteUrl("/metodologia"),
         feed: absoluteUrl("/feed"),
       },
       disclaimer:
-        "Informação comunitária. Leituras meteorológicas representam o ponto da estação e não substituem alertas ou orientações da Defesa Civil e das autoridades competentes.",
+        "Informação comunitária. Leituras representam pontos específicos e não substituem alertas ou orientações da Defesa Civil e das autoridades competentes.",
     },
     {
       headers: {
