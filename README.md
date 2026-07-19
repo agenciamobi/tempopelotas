@@ -9,9 +9,11 @@ Portal meteorológico local para Pelotas e a Zona Sul do Rio Grande do Sul.
 - TypeScript
 - Tailwind CSS 4
 - Open-Meteo como fonte meteorológica inicial
+- OpenWeather para radar global de precipitação
 - Supabase opcional para arquivo histórico próprio
 - MapLibre GL JS para visualização geográfica
 - OpenFreeMap como camada cartográfica
+- Esri World Imagery como camada de satélite
 - Vercel para validação de produção e captura diária
 
 ## Desenvolvimento local
@@ -166,11 +168,12 @@ A interface para celulares segue uma linguagem próxima de aplicativo nativo:
 - cartões compactos com hierarquia adaptada para toque;
 - carrosséis horizontais com scroll snap para previsão horária, histórico, câmeras e conteúdos relacionados;
 - painel da lagoa responsivo e carregado sob demanda;
+- controles de mapa, satélite e radar adaptados para toque;
 - suporte a `viewport-fit=cover` e `safe-area-inset`;
 - manifesto com atalhos para tempo atual, previsão semanal, chuva, lagoa, câmeras, histórico e alertas;
 - estilos específicos para execução em modo `standalone`.
 
-Os principais ajustes estão em `app/mobile-app.css`, `app/cameras.css`, `app/lagoon-level.css` e `components/site-header.tsx`.
+Os principais ajustes estão em `app/mobile-app.css`, `app/cameras.css`, `app/lagoon-level.css`, `app/radar-map.css` e `components/site-header.tsx`.
 
 ## Gráficos meteorológicos
 
@@ -188,6 +191,35 @@ Recursos:
 
 O componente `components/weather-history-chart.tsx` aplica a mesma arquitetura ao histórico diário e permite alternar o período exibido.
 
+## Satélite e radar de precipitação
+
+O mapa regional possui um seletor com três modos:
+
+- `Mapa` — cartografia vetorial do OpenFreeMap;
+- `Satélite` — Esri World Imagery com atribuição dos provedores;
+- `Radar` — precipitação observada e prevista pelo OpenWeather Global Precipitation Map Forecast.
+
+O radar oferece:
+
+- histórico da última hora em intervalos de 10 minutos;
+- previsão de até duas horas para Pelotas e a Zona Sul;
+- reprodução e pausa da animação;
+- seleção manual do horário;
+- identificação de quadro observado ou previsto;
+- controle de transparência;
+- legenda de intensidade;
+- cidades e temperaturas mantidas acima da camada meteorológica.
+
+A chave do OpenWeather nunca é enviada ao navegador. O componente consulta `/api/weather/radar/status` e os tiles passam pelo proxy restrito `/api/weather/radar/tiles/[timestamp]/[z]/[x]/[y]`, que valida horário, zoom e coordenadas antes de acessar o provedor.
+
+Configuração necessária:
+
+```env
+OPENWEATHER_API_KEY=CHAVE_COM_ACESSO_AO_GLOBAL_PRECIPITATION_MAP_FORECAST
+```
+
+Sem a chave ou sem acesso ao produto contratado, o botão `Radar` permanece desativado e o mapa convencional e a camada de satélite continuam disponíveis.
+
 ## Mapa regional
 
 O mapa da página inicial utiliza coordenadas geográficas reais e apresenta marcadores meteorológicos para as cidades monitoradas.
@@ -199,8 +231,9 @@ Características:
 - marcadores acessíveis com temperatura e condição atual;
 - popup com detalhes por cidade;
 - gestos cooperativos para não bloquear a rolagem da página;
-- atribuição cartográfica automática;
-- fallback visual quando a camada externa não puder ser carregada.
+- alternância entre mapa, imagem de satélite e radar;
+- atribuição cartográfica automática de OpenFreeMap, Esri e OpenWeather;
+- fallback visual quando uma camada externa não puder ser carregada.
 
 ## Páginas
 
@@ -215,6 +248,8 @@ Características:
 - `/alertas` — leitura automática de condições de atenção;
 - `/api/weather` — endpoint interno com dados normalizados;
 - `/api/weather/history` — endpoint interno do histórico recente;
+- `/api/weather/radar/status` — disponibilidade e linha do tempo do radar;
+- `/api/weather/radar/tiles/[timestamp]/[z]/[x]/[y]` — proxy protegido dos tiles meteorológicos;
 - `/api/cron/weather-snapshot` — captura e backfill protegidos do arquivo diário.
 
 ## SEO e distribuição
@@ -230,11 +265,12 @@ Características:
 
 ## Alertas
 
-A página de alertas utiliza critérios internos para destacar chuva, rajadas e indicação de temporal. Essa leitura não representa um alerta oficial e não substitui a Defesa Civil, o INMET ou as autoridades locais. O medidor da lagoa é apresentado apenas como informação complementar.
+A página de alertas utiliza critérios internos para destacar chuva, rajadas e indicação de temporal. Essa leitura não representa um alerta oficial e não substitui a Defesa Civil, o INMET ou as autoridades locais. O medidor da lagoa e o radar são apresentados como informações complementares.
 
 ## Próximas etapas
 
 - configurar um projeto Supabase exclusivo e iniciar o arquivo diário próprio;
+- configurar uma chave OpenWeather com acesso ao radar de precipitação;
 - integrar avisos oficiais do INMET e referências da Defesa Civil;
 - ativar as primeiras fontes públicas e estáveis de câmera;
 - avaliar integração estruturada do nível da lagoa quando houver API pública documentada;
