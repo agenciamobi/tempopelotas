@@ -11,48 +11,48 @@ import { getPelotasWeather } from "@/lib/weather-service";
 export const revalidate = 600;
 
 export const metadata: Metadata = {
-  title: "Metodologia, fontes e dados do TEMPO Pelotas",
+  title: "De onde vêm as informações do TEMPO Pelotas",
   description:
-    "Conheça as fontes meteorológicas e hidrológicas, observações da Embrapa, regras de validação, limitações e endpoints públicos do TEMPO Pelotas.",
+    "Saiba de onde vêm a previsão, as medições da Embrapa, o nível da lagoa e as informações sobre o Guaíba.",
   alternates: { canonical: "/metodologia" },
   openGraph: {
-    title: "Metodologia e fontes do TEMPO Pelotas",
+    title: "Fontes das informações do TEMPO Pelotas",
     description:
-      "Transparência sobre previsão, observações meteorológicas, nível da lagoa, radar e integrações hidrológicas.",
+      "Veja quem fornece cada informação e quais cuidados o portal toma antes de exibi-la.",
     url: "/metodologia",
   },
 };
 
 const validationRules = [
   {
-    title: "Origem identificada",
+    title: "Sempre mostramos a fonte",
     description:
-      "Cada informação deve manter instituição responsável, fonte original, horário de consulta e local de referência.",
+      "Cada informação deve indicar quem é responsável pela medição ou previsão e quando ela foi atualizada.",
   },
   {
-    title: "Sem regressão de horário",
+    title: "Uma leitura antiga não substitui uma nova",
     description:
-      "Ao persistir séries próprias, uma leitura mais antiga não deve substituir a última medição válida conhecida.",
+      "Quando guardamos valores anteriores, impedimos que uma informação mais velha apareça como se fosse a mais recente.",
   },
   {
-    title: "Valores hidrológicos válidos",
+    title: "Só mostramos valores reconhecidos",
     description:
-      "Quando a API oficial estiver integrada, registros sem nível válido serão descartados e dados de chuva não serão tratados como nível do corpo hídrico.",
+      "Quando um número não pode ser confirmado, ele é ignorado e a página informa que a medição está indisponível.",
   },
   {
-    title: "Observação separada de previsão",
+    title: "Medição e previsão são diferentes",
     description:
-      "Dados medidos, resultados de modelos numéricos e alertas oficiais permanecem identificados como categorias diferentes.",
+      "O que foi medido por uma estação aparece separado do que está previsto para as próximas horas ou dias.",
   },
   {
-    title: "Falha visível",
+    title: "Falhas ficam visíveis",
     description:
-      "Sensor atrasado, indisponibilidade da fonte, mudança no HTML ou uso de contingência deve ser informado sem apresentar estimativa como medição real.",
+      "Quando uma estação atrasa, uma página fica fora do ar ou uma informação não pode ser lida, o visitante é avisado.",
   },
   {
-    title: "Sem alerta inventado",
+    title: "Não criamos alertas oficiais",
     description:
-      "O portal não cria cotas locais de atenção, alerta ou inundação sem documentação técnica da autoridade responsável.",
+      "O portal não inventa marcas de risco para bairros e não substitui os avisos da Defesa Civil e das autoridades responsáveis.",
   },
 ];
 
@@ -61,10 +61,10 @@ export default async function MetodologiaPage() {
 
   const techArticleSchema = {
     "@context": "https://schema.org",
-    "@type": "TechArticle",
-    headline: "Metodologia, fontes e proveniência do TEMPO Pelotas",
+    "@type": "Article",
+    headline: "Fontes das informações do TEMPO Pelotas",
     description:
-      "Documentação pública sobre dados meteorológicos e hidrológicos utilizados pelo portal.",
+      "Explicação pública sobre a origem e os cuidados adotados com as informações exibidas no portal.",
     url: absoluteUrl("/metodologia"),
     inLanguage: "pt-BR",
     dateModified: new Date().toISOString(),
@@ -77,9 +77,9 @@ export default async function MetodologiaPage() {
   return (
     <ForecastPageShell
       weather={weather}
-      eyebrow="Transparência e dados públicos"
-      title="Metodologia e fontes"
-      description="Esta página documenta o que o portal usa hoje, como as fontes são interpretadas, o que ainda está em preparação e quais regras protegem a comunidade contra leituras enganosas."
+      eyebrow="Transparência"
+      title="De onde vêm as informações"
+      description="Veja quem fornece cada medição e previsão, como o portal apresenta esses valores e quais limites devem ser considerados."
       currentPath="/metodologia"
     >
       <script
@@ -92,43 +92,39 @@ export default async function MetodologiaPage() {
       <section className="topic-section" aria-labelledby="method-purpose-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Finalidade pública</span>
-            <h2 id="method-purpose-title">Informar para ajudar a comunidade a se preparar</h2>
+            <span className="eyebrow">Nosso objetivo</span>
+            <h2 id="method-purpose-title">Facilitar o acesso a informações importantes</h2>
           </div>
           <p>
-            O TEMPO Pelotas reúne informações dispersas em uma linguagem local e acessível. A
-            prioridade é apresentar proveniência, horário e limitações, sem substituir órgãos de
-            monitoramento, alerta ou resposta.
+            O TEMPO Pelotas reúne informações que estavam espalhadas em diferentes páginas. Nosso papel
+            é apresentá-las de forma clara, mostrar quem é responsável por cada valor e avisar quando uma
+            informação estiver atrasada ou indisponível.
           </p>
         </div>
 
         <div className="methodology-rules-grid">
           <article>
-            <h3>Previsão meteorológica</h3>
+            <h3>Previsão do tempo</h3>
             <p>
-              A previsão é obtida via Open-Meteo, que distribui modelos numéricos de instituições
-              como ECMWF, DWD e NOAA. O radar usa OpenWeather quando o produto está habilitado.
+              A temperatura, a chuva e o vento previstos vêm do Open-Meteo, que reúne previsões de grandes serviços meteorológicos internacionais.
             </p>
           </article>
           <article>
-            <h3>Observação meteorológica</h3>
+            <h3>Medições da Embrapa</h3>
             <p>
-              Temperatura, umidade, pressão, vento, chuva e evapotranspiração são consultados na
-              página pública da estação automática da Embrapa Clima Temperado em Pelotas.
+              Temperatura, umidade, pressão, vento e chuva são consultados na página pública da Embrapa Clima Temperado em Pelotas.
             </p>
           </article>
           <article>
-            <h3>Hidrologia</h3>
+            <h3>Nível da Lagoa dos Patos</h3>
             <p>
-              O medidor local incorporado é fornecido pelo LabHidroSens / UFPel. ANA e SGB são as
-              referências oficiais para níveis, vazões, chuva e boletins hidrológicos.
+              O medidor da Praia do Laranjal é fornecido pelo LabHidroSens / UFPel e aparece sem alteração dentro do portal.
             </p>
           </article>
           <article>
-            <h3>Fontes futuras</h3>
+            <h3>Nível do Guaíba</h3>
             <p>
-              NOAA/NESDIS STAR, CEMADEN e GloFAS estão documentados como integrações em preparação ou
-              experimentais. Eles não aparecem como fontes ativas antes da validação.
+              O acompanhamento de Porto Alegre é apresentado pelo projeto Nível Guaíba, que reúne informações da ANA e do Serviço Geológico do Brasil.
             </p>
           </article>
         </div>
@@ -137,42 +133,37 @@ export default async function MetodologiaPage() {
       <section className="topic-section" aria-labelledby="method-embrapa-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Coleta Embrapa</span>
-            <h2 id="method-embrapa-title">Como a página meteorológica é interpretada</h2>
+            <span className="eyebrow">Medições da Embrapa</span>
+            <h2 id="method-embrapa-title">Como os valores chegam ao portal</h2>
           </div>
           <p>
-            Como não existe uma API pública documentada para o monitor atual, a consulta é feita pelo
-            servidor do TEMPO Pelotas e nunca diretamente pelo navegador do usuário.
+            O TEMPO Pelotas consulta periodicamente a página pública da estação e mostra os mesmos valores encontrados nela.
           </p>
         </div>
 
         <div className="methodology-rules-grid">
           <article>
-            <h3>Consulta server-side</h3>
+            <h3>Consulta frequente</h3>
             <p>
-              O HTML público é obtido a cada cinco minutos, com timeout e cache. A página original
-              permanece sempre vinculada para conferência.
+              A página da Embrapa é consultada várias vezes ao longo do dia para buscar as medições mais recentes.
             </p>
           </article>
           <article>
-            <h3>Codificação legada</h3>
+            <h3>Valores mantidos como publicados</h3>
             <p>
-              O conteúdo é decodificado como Windows-1252 antes da leitura dos rótulos, evitando que
-              acentos antigos interrompam o processamento.
+              O portal organiza os números para facilitar a leitura, mas não altera a temperatura, a chuva, o vento ou os demais valores.
             </p>
           </article>
           <article>
-            <h3>Rótulos conhecidos</h3>
+            <h3>Somente informações reconhecidas</h3>
             <p>
-              O parser procura nomes estáveis como temperatura do ar, umidade relativa, pressão,
-              chuva diária, extremos e evapotranspiração, sem depender da posição visual da tabela.
+              Quando um valor não aparece de forma clara na página original, ele não é preenchido por aproximação.
             </p>
           </article>
           <article>
-            <h3>Falha segura</h3>
+            <h3>A fonte original continua disponível</h3>
             <p>
-              Se leituras essenciais não forem reconhecidas, o portal exibe indisponibilidade e não
-              completa valores com estimativas ou dados antigos não identificados.
+              Todas as páginas mantêm um caminho para consultar diretamente a instituição responsável pela informação.
             </p>
           </article>
         </div>
@@ -181,12 +172,11 @@ export default async function MetodologiaPage() {
       <section className="topic-section" aria-labelledby="method-sources-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">De onde vêm os dados</span>
-            <h2 id="method-sources-title">Fontes, situação e responsabilidade</h2>
+            <span className="eyebrow">Fontes consultadas</span>
+            <h2 id="method-sources-title">Quem fornece cada informação</h2>
           </div>
           <p>
-            O status diferencia integrações em uso, consultas oficiais externas e recursos ainda em
-            preparação. Essa separação impede que uma intenção futura pareça um dado operacional.
+            Algumas fontes já aparecem no portal. Outras ainda estão sendo estudadas e não são apresentadas como se estivessem funcionando.
           </p>
         </div>
 
@@ -200,7 +190,7 @@ export default async function MetodologiaPage() {
               <h3>{source.name}</h3>
               <p>{source.description}</p>
               <a href={source.url} target="_blank" rel="noreferrer">
-                Consultar fonte
+                Consultar responsável
                 <span aria-hidden="true">↗</span>
               </a>
             </article>
@@ -211,24 +201,24 @@ export default async function MetodologiaPage() {
       <section className="topic-section" aria-labelledby="method-stations-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Identificação das estações</span>
-            <h2 id="method-stations-title">Pontos de referência hidrológica</h2>
+            <span className="eyebrow">Locais de medição das águas</span>
+            <h2 id="method-stations-title">Pontos acompanhados na região</h2>
           </div>
           <p>
-            Os códigos abaixo são mantidos para rastreabilidade. Um nível em metros ou centímetros só
-            deve ser interpretado dentro da referência técnica da própria estação.
+            Cada ponto possui uma identificação própria. Como os medidores podem usar referências diferentes,
+            o número de uma cidade não deve ser comparado diretamente com o de outra.
           </p>
         </div>
 
         <div className="hydrology-stations-grid">
           {HYDROLOGY_STATIONS.map((station) => (
             <article key={station.code}>
-              <span className="station-code">ANA {station.code}</span>
+              <span className="station-code">Identificação ANA {station.code}</span>
               <small>{station.city}</small>
               <h3>{station.name}</h3>
               <p>{station.role}</p>
               <a href={station.officialUrl} target="_blank" rel="noreferrer">
-                Abrir telemetria
+                Consultar medição oficial
                 <span aria-hidden="true">↗</span>
               </a>
             </article>
@@ -239,12 +229,11 @@ export default async function MetodologiaPage() {
       <section className="topic-section" aria-labelledby="method-validation-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Tratamento e consistência</span>
-            <h2 id="method-validation-title">Regras para não induzir a comunidade ao erro</h2>
+            <span className="eyebrow">Cuidados com as informações</span>
+            <h2 id="method-validation-title">Como evitamos confundir o visitante</h2>
           </div>
           <p>
-            As regras abaixo orientam as integrações meteorológicas, o arquivo próprio e as futuras
-            conexões com APIs hidrológicas oficiais.
+            Estas regras ajudam a separar o que foi medido, o que está previsto e o que ainda não está disponível.
           </p>
         </div>
 
@@ -261,40 +250,34 @@ export default async function MetodologiaPage() {
       <section className="topic-section" aria-labelledby="method-raw-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Acesso aberto</span>
-            <h2 id="method-raw-title">Dados brutos e integração</h2>
+            <span className="eyebrow">Informações públicas</span>
+            <h2 id="method-raw-title">Arquivos disponíveis para consulta</h2>
           </div>
           <p>
-            Os endpoints abaixo são públicos, não exigem autenticação e podem ser usados por
-            pesquisadores, aplicativos e agregadores. O conteúdo informa a fonte e sua situação.
+            Pesquisadores, estudantes e outros projetos também podem consultar os resumos públicos mantidos pelo TEMPO Pelotas.
           </p>
         </div>
 
         <div className="raw-data-grid">
           <a href="/pelotas.json">
             <strong>Resumo de Pelotas</strong>
-            <span>Previsão, observação da Embrapa e referências hidrológicas.</span>
-            <code>/pelotas.json</code>
+            <span>Reúne previsão, medições da Embrapa e informações sobre as águas.</span>
           </a>
           <a href="/api/weather/embrapa">
-            <strong>Observação da Embrapa</strong>
-            <span>Leituras reconhecidas no monitor meteorológico da estação.</span>
-            <code>/api/weather/embrapa</code>
+            <strong>Medições da Embrapa</strong>
+            <span>Apresenta os valores reconhecidos na estação de Pelotas.</span>
           </a>
           <a href="/api/weather">
-            <strong>Previsão normalizada</strong>
-            <span>Estrutura interna utilizada pelas páginas meteorológicas.</span>
-            <code>/api/weather</code>
+            <strong>Previsão do tempo</strong>
+            <span>Reúne temperatura, chuva, vento e previsão para os próximos dias.</span>
           </a>
           <a href="/api/weather/history">
-            <strong>Histórico recente</strong>
-            <span>Série diária de temperatura, chuva e rajadas dos últimos 30 dias.</span>
-            <code>/api/weather/history</code>
+            <strong>Últimos 30 dias</strong>
+            <span>Apresenta temperatura, chuva e rajadas do período recente.</span>
           </a>
           <a href="/feed">
-            <strong>Feed público</strong>
-            <span>JSON Feed 1.1 com resumos para agregadores e automações.</span>
-            <code>/feed</code>
+            <strong>Atualizações do portal</strong>
+            <span>Permite acompanhar as principais informações publicadas pelo TEMPO Pelotas.</span>
           </a>
         </div>
       </section>
@@ -302,27 +285,27 @@ export default async function MetodologiaPage() {
       <section className="topic-section" aria-labelledby="method-limit-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Limitações</span>
-            <h2 id="method-limit-title">O que o portal não faz</h2>
+            <span className="eyebrow">Importante</span>
+            <h2 id="method-limit-title">O portal não substitui as autoridades</h2>
           </div>
         </div>
 
         <div className="lagoon-disclaimer">
-          <strong>Não é um sistema oficial de alerta</strong>
+          <strong>Em situações de risco, siga os avisos oficiais</strong>
           <p>
-            O TEMPO Pelotas não define cotas de inundação, não emite ordem de evacuação e não garante
-            disponibilidade contínua de fontes externas. Em risco iminente, siga exclusivamente as
-            orientações da Defesa Civil e das autoridades competentes.
+            O TEMPO Pelotas não determina quando uma área vai alagar, não emite ordens de saída e não
+            consegue garantir que todas as fontes externas estarão disponíveis o tempo todo. Em risco
+            iminente, siga a Defesa Civil e as autoridades responsáveis.
           </p>
         </div>
 
         <div className="hydrology-home-actions">
           <Link className="hydrology-primary-action" href="/situacao-hidrologica-pelotas">
-            Abrir situação hidrológica
+            Ver situação das águas
             <span aria-hidden="true">→</span>
           </Link>
           <Link className="hydrology-secondary-action" href="/estacao-embrapa-pelotas">
-            Ver estação Embrapa
+            Ver medições da Embrapa
           </Link>
           <Link className="hydrology-secondary-action" href="/">
             Voltar à página inicial
