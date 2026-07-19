@@ -63,7 +63,7 @@
 .home-lagoon-frame {
   position: relative;
   width: calc(100% - 20px);
-  height: 620px;
+  height: 720px;
   margin: 0 10px;
   overflow: hidden;
   border: 1px solid rgba(7, 30, 47, 0.1);
@@ -160,7 +160,7 @@
   }
 
   .home-lagoon-frame {
-    height: clamp(540px, 58vw, 620px);
+    height: clamp(640px, 64vw, 720px);
   }
 }
 
@@ -182,8 +182,8 @@
 
   .home-lagoon-frame {
     width: calc(100% - 16px);
-    height: min(680px, 82vh);
-    min-height: 560px;
+    height: min(780px, 92vh);
+    min-height: 660px;
     margin-inline: 8px;
     border-radius: 23px;
   }
@@ -205,8 +205,8 @@
   }
 
   .home-lagoon-frame {
-    height: min(620px, 78vh);
-    min-height: 520px;
+    height: min(720px, 90vh);
+    min-height: 620px;
   }
 
   .home-lagoon-toolbar {
@@ -228,7 +228,7 @@
 
 @media (max-width: 430px) {
   .home-lagoon-frame {
-    height: 560px;
+    height: 660px;
     min-height: 0;
   }
 
