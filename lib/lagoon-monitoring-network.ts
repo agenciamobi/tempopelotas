@@ -2,13 +2,17 @@ import "server-only";
 
 export const LAGOON_MONITORING_SOURCE_URL =
   "https://monitoramentolagoadospatos.com.br/";
+export const LAGOON_MONITORING_API_URL =
+  "https://api-medidas-porto-7bni.onrender.com";
 
 const REVALIDATE_SECONDS = 300;
-const REQUEST_TIMEOUT_MS = 10_000;
-const STALE_AFTER_MINUTES = 180;
+const REQUEST_TIMEOUT_MS = 12_000;
+const STALE_AFTER_MINUTES = 120;
+const MAX_SERIES_POINTS = 280;
 
 export type LagoonMonitoringStationDefinition = {
   id: string;
+  sensorId: `sensor_${number}`;
   name: string;
   city: string;
   role: string;
@@ -27,12 +31,24 @@ export type LagoonMonitoringRisk =
   | "flooding"
   | "unavailable";
 
+export type LagoonMonitoringPoint = {
+  timestamp: string;
+  levelCm: number;
+};
+
 export type LagoonMonitoringObservation = {
   station: LagoonMonitoringStationDefinition;
   status: LagoonMonitoringObservationStatus;
   risk: LagoonMonitoringRisk;
   currentLevelCm: number | null;
   updatedAt: string | null;
+  trendCmPerHour: number | null;
+  change1hCm: number | null;
+  change6hCm: number | null;
+  change24hCm: number | null;
+  periodMinimumCm: number | null;
+  periodMaximumCm: number | null;
+  series: LagoonMonitoringPoint[];
   floodLevelCm: number;
   may2024MaximumCm: number;
   distanceToFloodCm: number | null;
@@ -50,15 +66,35 @@ export type LagoonMonitoringNetworkData = {
     name: string;
     organizations: string;
     url: string;
+    apiUrl: string;
     reference: string;
     fetchedAt: string;
   };
   error: string | null;
 };
 
+type ApiLatestPayload = {
+  dado?: {
+    data_hora?: unknown;
+    valor?: unknown;
+    sensor_id?: unknown;
+    criado_em?: unknown;
+  };
+};
+
+type ApiGraphPoint = {
+  data?: unknown;
+  valor?: unknown;
+};
+
+type ParsedPoint = LagoonMonitoringPoint & {
+  epoch: number;
+};
+
 export const LAGOON_MONITORING_STATIONS: LagoonMonitoringStationDefinition[] = [
   {
     id: "furg-ccmar",
+    sensorId: "sensor_1",
     name: "FURG CCMAR",
     city: "Rio Grande / RS",
     role: "Acompanha o estuário e a saída da Lagoa dos Patos para o oceano.",
@@ -67,6 +103,7 @@ export const LAGOON_MONITORING_STATIONS: LagoonMonitoringStationDefinition[] = [
   },
   {
     id: "sao-lourenco-do-sul",
+    sensorId: "sensor_2",
     name: "São Lourenço do Sul",
     city: "São Lourenço do Sul / RS",
     role: "Ajuda a observar a margem oeste da lagoa entre Arambaré e Pelotas.",
@@ -75,6 +112,7 @@ export const LAGOON_MONITORING_STATIONS: LagoonMonitoringStationDefinition[] = [
   },
   {
     id: "arambare",
+    sensorId: "sensor_3",
     name: "Arambaré",
     city: "Arambaré / RS",
     role: "Mostra a propagação dos níveis pela região centro-oeste da lagoa.",
@@ -83,6 +121,7 @@ export const LAGOON_MONITORING_STATIONS: LagoonMonitoringStationDefinition[] = [
   },
   {
     id: "sao-jose-do-norte",
+    sensorId: "sensor_4",
     name: "São José do Norte",
     city: "São José do Norte / RS",
     role: "Complementa a leitura do estuário no lado oposto a Rio Grande.",
@@ -91,6 +130,7 @@ export const LAGOON_MONITORING_STATIONS: LagoonMonitoringStationDefinition[] = [
   },
   {
     id: "itapua",
+    sensorId: "sensor_5",
     name: "Itapuã",
     city: "Viamão / RS",
     role: "Acompanha a porção norte da lagoa, próxima à comunicação com o Guaíba.",
@@ -104,90 +144,112 @@ function round(value: number, digits = 1) {
   return Math.round(value * factor) / factor;
 }
 
-function decodeEntities(value: string) {
-  const named: Record<string, string> = {
-    amp: "&",
-    apos: "'",
-    gt: ">",
-    lt: "<",
-    nbsp: " ",
-    quot: '"',
-  };
-
-  return value.replace(/&(#x[\da-f]+|#\d+|[a-z]+);/gi, (match, entity: string) => {
-    if (entity.startsWith("#x")) {
-      const codePoint = Number.parseInt(entity.slice(2), 16);
-      return Number.isFinite(codePoint) && codePoint <= 0x10ffff
-        ? String.fromCodePoint(codePoint)
-        : match;
-    }
-
-    if (entity.startsWith("#")) {
-      const codePoint = Number.parseInt(entity.slice(1), 10);
-      return Number.isFinite(codePoint) && codePoint <= 0x10ffff
-        ? String.fromCodePoint(codePoint)
-        : match;
-    }
-
-    return named[entity.toLowerCase()] ?? match;
-  });
-}
-
-function decodeEscapedText(value: string) {
-  return value
-    .replace(/\\u([\da-f]{4})/gi, (_, hexadecimal: string) =>
-      String.fromCharCode(Number.parseInt(hexadecimal, 16)),
-    )
-    .replace(/\\x([\da-f]{2})/gi, (_, hexadecimal: string) =>
-      String.fromCharCode(Number.parseInt(hexadecimal, 16)),
-    )
-    .replace(/\\[nrt]/g, " ")
-    .replace(/\\"/g, '"')
-    .replace(/\\\//g, "/");
-}
-
-function htmlToSearchableText(html: string) {
-  return decodeEntities(decodeEscapedText(html))
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/[{}\[\]"|]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function parseNumber(value: string | undefined) {
-  if (!value) return null;
-
-  const compact = value.trim().replace(/\s/g, "");
-  const normalized = compact.includes(",")
-    ? compact.replace(/\./g, "").replace(",", ".")
-    : compact;
-  const parsed = Number(normalized);
-
+function parseLevel(value: unknown) {
+  const parsed = typeof value === "number" ? value : Number(value);
   return Number.isFinite(parsed) && parsed > -500 && parsed < 5_000
     ? parsed
     : null;
 }
 
-function parseUpdatedAt(segment: string) {
-  const brazilian = segment.match(
-    /Última atualização\s*:?\s*(\d{2}\/\d{2}\/\d{4})\s*,?\s*(\d{2}:\d{2}(?::\d{2})?)/i,
+/**
+ * A API publica a hora local em uma string terminada em Z. O próprio frontend
+ * da fonte remove o Z antes de exibir. Mantemos o mesmo significado,
+ * interpretando esses campos como horário de Brasília.
+ */
+function parseSourceTimestamp(value: unknown) {
+  if (typeof value !== "string" || !value.trim()) return null;
+
+  const trimmed = value.trim();
+  const localWallClock = trimmed.match(
+    /^(20\d{2}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?)Z$/,
+  );
+  const parsed = new Date(
+    localWallClock ? `${localWallClock[1]}-03:00` : trimmed,
   );
 
-  if (brazilian) {
-    const [day, month, year] = brazilian[1].split("/");
-    const clock = brazilian[2].length === 5 ? `${brazilian[2]}:00` : brazilian[2];
-    const parsed = new Date(`${year}-${month}-${day}T${clock}-03:00`);
-    return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function parseLatestPayload(payload: unknown, expectedSensorId: string) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return null;
   }
 
-  const iso = segment.match(
-    /(20\d{2}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2}))/i,
-  );
-  if (!iso) return null;
+  const data = (payload as ApiLatestPayload).dado;
+  if (!data || typeof data !== "object") return null;
+  if (
+    typeof data.sensor_id === "string" &&
+    data.sensor_id !== expectedSensorId
+  ) {
+    return null;
+  }
 
-  const parsed = new Date(iso[1]);
-  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+  const date = parseSourceTimestamp(data.data_hora);
+  const level = parseLevel(data.valor);
+  if (!date || level === null) return null;
+
+  return {
+    timestamp: date.toISOString(),
+    levelCm: round(level),
+    epoch: date.getTime(),
+  } satisfies ParsedPoint;
+}
+
+function parseGraphPayload(payload: unknown) {
+  if (!Array.isArray(payload)) return [];
+
+  const points = new Map<number, ParsedPoint>();
+
+  for (const rawPoint of payload) {
+    if (!rawPoint || typeof rawPoint !== "object" || Array.isArray(rawPoint)) {
+      continue;
+    }
+
+    const point = rawPoint as ApiGraphPoint;
+    const date = parseSourceTimestamp(point.data);
+    const level = parseLevel(point.valor);
+    if (!date || level === null) continue;
+
+    points.set(date.getTime(), {
+      timestamp: date.toISOString(),
+      levelCm: round(level),
+      epoch: date.getTime(),
+    });
+  }
+
+  return [...points.values()]
+    .sort((first, second) => first.epoch - second.epoch)
+    .slice(-MAX_SERIES_POINTS);
+}
+
+function findClosestPoint(points: ParsedPoint[], targetEpoch: number) {
+  return points.reduce<ParsedPoint | null>((closest, point) => {
+    if (!closest) return point;
+
+    return Math.abs(point.epoch - targetEpoch) <
+      Math.abs(closest.epoch - targetEpoch)
+      ? point
+      : closest;
+  }, null);
+}
+
+function calculateChange(
+  points: ParsedPoint[],
+  current: ParsedPoint,
+  hours: number,
+) {
+  const targetEpoch = current.epoch - hours * 60 * 60 * 1_000;
+  const baseline = findClosestPoint(points, targetEpoch);
+  if (!baseline || baseline.epoch >= current.epoch) return null;
+
+  const elapsedHours = (current.epoch - baseline.epoch) / 3_600_000;
+  const minimumUsefulWindow = hours === 1 ? 0.4 : hours * 0.45;
+  if (elapsedHours < minimumUsefulWindow) return null;
+
+  return {
+    centimeters: current.levelCm - baseline.levelCm,
+    elapsedHours,
+  };
 }
 
 function stationUnavailable(
@@ -200,6 +262,13 @@ function stationUnavailable(
     risk: "unavailable",
     currentLevelCm: null,
     updatedAt: null,
+    trendCmPerHour: null,
+    change1hCm: null,
+    change6hCm: null,
+    change24hCm: null,
+    periodMinimumCm: null,
+    periodMaximumCm: null,
+    series: [],
     floodLevelCm: station.floodLevelCm,
     may2024MaximumCm: station.may2024MaximumCm,
     distanceToFloodCm: null,
@@ -208,74 +277,127 @@ function stationUnavailable(
   };
 }
 
-function parseStation(
-  text: string,
-  station: LagoonMonitoringStationDefinition,
-  nextStationName: string | null,
-  fetchedAt: Date,
-): LagoonMonitoringObservation {
-  const start = text.indexOf(station.name);
-  if (start === -1) {
-    return stationUnavailable(station, "A estação não foi encontrada na página da fonte.");
+async function fetchApiJson(path: string) {
+  const response = await fetch(`${LAGOON_MONITORING_API_URL}${path}`, {
+    headers: {
+      Accept: "application/json",
+      "User-Agent":
+        "TEMPO-Pelotas/1.0 (+https://tempopelotas.agenciamobi.com.br)",
+    },
+    next: { revalidate: REVALIDATE_SECONDS },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
+
+  if (!response.ok) {
+    throw new Error(`${path} respondeu com status ${response.status}`);
   }
 
-  const next = nextStationName
-    ? text.indexOf(nextStationName, start + station.name.length)
-    : -1;
-  const segment = text.slice(start, next > start ? next : start + 2_500);
-  const currentLevel = parseNumber(
-    segment.match(/Cota Atual\s*([+-]?\d+(?:[.,]\d+)?)\s*cm/i)?.[1],
-  );
-  const updatedAt = parseUpdatedAt(segment);
-  const parsedFloodLevel = parseNumber(
-    segment.match(/Cota de Inundação\s*:?\s*([+-]?\d+(?:[.,]\d+)?)\s*cm/i)?.[1],
-  );
-  const parsedMaximum = parseNumber(
-    segment.match(/Máx\.?\s*Maio\/2024\s*:?\s*([+-]?\d+(?:[.,]\d+)?)\s*cm/i)?.[1],
-  );
+  return response.json() as Promise<unknown>;
+}
 
-  if (currentLevel === null || !updatedAt) {
+async function getStationObservation(
+  station: LagoonMonitoringStationDefinition,
+  fetchedAt: Date,
+): Promise<LagoonMonitoringObservation> {
+  const [latestResult, graphResult] = await Promise.allSettled([
+    fetchApiJson(`/dados/${station.sensorId}`),
+    fetchApiJson(`/dados/${station.sensorId}/grafico`),
+  ]);
+
+  const latest =
+    latestResult.status === "fulfilled"
+      ? parseLatestPayload(latestResult.value, station.sensorId)
+      : null;
+  const graph =
+    graphResult.status === "fulfilled"
+      ? parseGraphPayload(graphResult.value)
+      : [];
+
+  const pointMap = new Map<number, ParsedPoint>();
+  for (const point of graph) pointMap.set(point.epoch, point);
+  if (latest) pointMap.set(latest.epoch, latest);
+
+  const points = [...pointMap.values()].sort(
+    (first, second) => first.epoch - second.epoch,
+  );
+  const current = latest ?? points.at(-1) ?? null;
+
+  if (!current) {
+    const detail = [
+      latestResult.status === "rejected" ? "leitura atual" : null,
+      graphResult.status === "rejected" ? "série histórica" : null,
+    ]
+      .filter(Boolean)
+      .join(" e ");
+
     return stationUnavailable(
       station,
-      "A fonte foi carregada, mas a leitura atual não pôde ser interpretada.",
+      detail
+        ? `A ${detail} de ${station.name} está temporariamente indisponível.`
+        : `A fonte não devolveu uma leitura válida para ${station.name}.`,
     );
   }
 
-  const floodLevelCm = parsedFloodLevel ?? station.floodLevelCm;
-  const may2024MaximumCm = parsedMaximum ?? station.may2024MaximumCm;
-  const distanceToFloodCm = round(floodLevelCm - currentLevel);
-  const floodThresholdPercentage = round((currentLevel / floodLevelCm) * 100);
+  const currentIndex = points.findIndex((point) => point.epoch === current.epoch);
+  const calculationPoints =
+    currentIndex >= 0 ? points.slice(0, currentIndex + 1) : [...points, current];
+  const change1h = calculateChange(calculationPoints, current, 1);
+  const change6h = calculateChange(calculationPoints, current, 6);
+  const change24h = calculateChange(calculationPoints, current, 24);
+  const trendSource = change6h ?? change1h;
   const ageMinutes = Math.max(
     0,
-    (fetchedAt.getTime() - new Date(updatedAt).getTime()) / 60_000,
+    (fetchedAt.getTime() - current.epoch) / 60_000,
   );
   const status: LagoonMonitoringObservationStatus =
     ageMinutes > STALE_AFTER_MINUTES ? "stale" : "live";
+  const distanceToFloodCm = round(station.floodLevelCm - current.levelCm);
+  const floodThresholdPercentage = round(
+    (current.levelCm / station.floodLevelCm) * 100,
+  );
   const risk: LagoonMonitoringRisk =
-    currentLevel >= floodLevelCm
+    current.levelCm >= station.floodLevelCm
       ? "flooding"
-      : currentLevel >= floodLevelCm * 0.85
+      : current.levelCm >= station.floodLevelCm * 0.85
         ? "attention"
         : "normal";
+  const values = calculationPoints.map((point) => point.levelCm);
+  const series = calculationPoints.map(({ timestamp, levelCm }) => ({
+    timestamp,
+    levelCm,
+  }));
 
   return {
     station,
     status,
     risk,
-    currentLevelCm: round(currentLevel),
-    updatedAt,
-    floodLevelCm: round(floodLevelCm),
-    may2024MaximumCm: round(may2024MaximumCm),
+    currentLevelCm: current.levelCm,
+    updatedAt: current.timestamp,
+    trendCmPerHour: trendSource
+      ? round(trendSource.centimeters / trendSource.elapsedHours)
+      : null,
+    change1hCm: change1h ? round(change1h.centimeters) : null,
+    change6hCm: change6h ? round(change6h.centimeters) : null,
+    change24hCm: change24h ? round(change24h.centimeters) : null,
+    periodMinimumCm: values.length ? round(Math.min(...values)) : null,
+    periodMaximumCm: values.length ? round(Math.max(...values)) : null,
+    series,
+    floodLevelCm: station.floodLevelCm,
+    may2024MaximumCm: station.may2024MaximumCm,
     distanceToFloodCm,
     floodThresholdPercentage,
-    error: status === "stale" ? "A última leitura publicada está atrasada." : null,
+    error:
+      status === "stale"
+        ? "A última leitura publicada está atrasada."
+        : graphResult.status === "rejected"
+          ? "A leitura atual está disponível, mas a série histórica não pôde ser carregada."
+          : null,
   };
 }
 
 function buildNetwork(
   observations: LagoonMonitoringObservation[],
   fetchedAt: Date,
-  error: string | null = null,
 ): LagoonMonitoringNetworkData {
   const availableObservations = observations.filter(
     (observation) => observation.currentLevelCm !== null,
@@ -305,69 +427,39 @@ function buildNetwork(
       name: "Rede de Monitoramento do Nível da Lagoa dos Patos",
       organizations: "FURG & Portos RS",
       url: LAGOON_MONITORING_SOURCE_URL,
+      apiUrl: LAGOON_MONITORING_API_URL,
       reference: "Referencial vertical brasileiro — Marégrafo de Imbituba/SC",
       fetchedAt: fetchedAt.toISOString(),
     },
-    error,
+    error:
+      availableObservations.length === 0
+        ? "A Rede de Monitoramento da Lagoa dos Patos está temporariamente indisponível."
+        : null,
   };
 }
 
-export function normalizeLagoonMonitoringHtml(
-  html: string,
-  fetchedAt = new Date(),
-): LagoonMonitoringNetworkData {
-  const text = htmlToSearchableText(html);
-  const observations = LAGOON_MONITORING_STATIONS.map((station, index) =>
-    parseStation(
-      text,
-      station,
-      LAGOON_MONITORING_STATIONS[index + 1]?.name ?? null,
-      fetchedAt,
+export async function getLagoonMonitoringNetwork(): Promise<LagoonMonitoringNetworkData> {
+  const fetchedAt = new Date();
+  const observations = await Promise.all(
+    LAGOON_MONITORING_STATIONS.map((station) =>
+      getStationObservation(station, fetchedAt).catch((error) => {
+        console.error(
+          `Falha ao consultar a estação ${station.sensorId} (${station.name}):`,
+          error,
+        );
+        return stationUnavailable(
+          station,
+          `A leitura de ${station.name} está temporariamente indisponível.`,
+        );
+      }),
     ),
   );
 
   return buildNetwork(observations, fetchedAt);
 }
 
-export async function getLagoonMonitoringNetwork(): Promise<LagoonMonitoringNetworkData> {
-  const fetchedAt = new Date();
-
-  try {
-    const response = await fetch(LAGOON_MONITORING_SOURCE_URL, {
-      headers: {
-        Accept: "text/html,application/xhtml+xml",
-        "User-Agent": "TEMPO-Pelotas/1.0 (+https://tempopelotas.agenciamobi.com.br)",
-      },
-      next: { revalidate: REVALIDATE_SECONDS },
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-    });
-
-    if (!response.ok) {
-      throw new Error(`A fonte respondeu com status ${response.status}`);
-    }
-
-    const html = await response.text();
-    if (html.length < 200) {
-      throw new Error("A fonte devolveu uma página sem conteúdo suficiente.");
-    }
-
-    return normalizeLagoonMonitoringHtml(html, fetchedAt);
-  } catch (error) {
-    console.error("Falha ao consultar a rede da Lagoa dos Patos:", error);
-    return buildNetwork(
-      LAGOON_MONITORING_STATIONS.map((station) =>
-        stationUnavailable(
-          station,
-          "A leitura desta estação está temporariamente indisponível.",
-        ),
-      ),
-      fetchedAt,
-      "A Rede de Monitoramento da Lagoa dos Patos está temporariamente indisponível.",
-    );
-  }
-}
-
 export const LAGOON_MONITORING_CONFIG = {
+  apiUrl: LAGOON_MONITORING_API_URL,
   revalidateSeconds: REVALIDATE_SECONDS,
   staleAfterMinutes: STALE_AFTER_MINUTES,
   sourceUrl: LAGOON_MONITORING_SOURCE_URL,
