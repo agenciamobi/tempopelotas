@@ -228,8 +228,8 @@ export function PwaManager() {
     const registration = await navigator.serviceWorker.ready;
     await registration.showNotification("TEMPO Pelotas", {
       body: "Os avisos estão funcionando neste aparelho.",
-      icon: "/icon.svg",
-      badge: "/icon.svg",
+      icon: "/pwa-icons/192",
+      badge: "/pwa-icons/192",
       tag: "teste-tempo-pelotas",
       data: { url: "/" },
     });
