@@ -9,12 +9,18 @@ const baseRoutes = [
   { path: "/chuva-em-pelotas", priority: 0.85, changeFrequency: "hourly" },
   { path: "/vento-em-pelotas", priority: 0.85, changeFrequency: "hourly" },
   {
+    path: "/situacao-hidrologica-pelotas",
+    priority: 0.94,
+    changeFrequency: "hourly",
+  },
+  {
     path: "/nivel-da-lagoa-dos-patos-laranjal",
-    priority: 0.9,
+    priority: 0.92,
     changeFrequency: "hourly",
   },
   { path: "/historico-climatico-pelotas", priority: 0.82, changeFrequency: "daily" },
-  { path: "/alertas", priority: 0.8, changeFrequency: "hourly" },
+  { path: "/metodologia", priority: 0.78, changeFrequency: "monthly" },
+  { path: "/alertas", priority: 0.88, changeFrequency: "hourly" },
 ] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
