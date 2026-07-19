@@ -36,7 +36,7 @@ export async function GET() {
       frames,
       currentIndex,
       updatedAt,
-      error: "Radar aguardando configuração da chave OpenWeather no servidor.",
+      error: "Radar de precipitação em ativação.",
     });
   }
 
@@ -55,7 +55,9 @@ export async function GET() {
     });
 
     if (!response.ok) {
-      const accessError = response.status === 401 || response.status === 403;
+      console.error(
+        `Validação do radar OpenWeather respondeu com status ${response.status}`,
+      );
 
       return jsonResponse({
         configured: true,
@@ -65,9 +67,7 @@ export async function GET() {
         frames,
         currentIndex,
         updatedAt,
-        error: accessError
-          ? "A chave configurada ainda não possui acesso ao produto Global Precipitation Map Forecast."
-          : "O radar OpenWeather está temporariamente indisponível.",
+        error: "Radar temporariamente indisponível.",
       });
     }
 
@@ -92,7 +92,7 @@ export async function GET() {
       frames,
       currentIndex,
       updatedAt,
-      error: "Não foi possível validar o radar neste momento.",
+      error: "Radar temporariamente indisponível.",
     });
   }
 }
