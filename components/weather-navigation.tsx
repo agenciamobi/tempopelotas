@@ -22,6 +22,11 @@ const pages = [
     description: "Velocidade, direção e rajadas.",
   },
   {
+    href: "/estacao-embrapa-pelotas",
+    title: "Estação Embrapa",
+    description: "Temperatura, chuva e vento observados.",
+  },
+  {
     href: "/situacao-hidrologica-pelotas",
     title: "Situação das águas",
     description: "Guaíba, Lagoa dos Patos e contexto local.",
