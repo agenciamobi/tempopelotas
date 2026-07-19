@@ -1,13 +1,15 @@
+import { EmbrapaObservationOverview } from "@/components/embrapa-observation-overview";
 import { HydrologyOverview } from "@/components/hydrology-overview";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WeatherDashboard } from "@/components/weather-dashboard";
 import { WeatherMap } from "@/components/weather-map";
 import { WeatherNavigation } from "@/components/weather-navigation";
+import { getEmbrapaObservation } from "@/lib/embrapa-observation";
 import { absoluteUrl } from "@/lib/site";
 import { getPelotasWeather } from "@/lib/weather-service";
 
-export const revalidate = 600;
+export const revalidate = 300;
 
 const websiteSchema = {
   "@context": "https://schema.org",
@@ -28,7 +30,10 @@ const websiteSchema = {
 };
 
 export default async function Home() {
-  const weather = await getPelotasWeather();
+  const [weather, embrapaObservation] = await Promise.all([
+    getPelotasWeather(),
+    getEmbrapaObservation(),
+  ]);
 
   return (
     <>
@@ -46,6 +51,8 @@ export default async function Home() {
           <WeatherMap regionalWeather={weather.regional} />
           <WeatherDashboard weather={weather} />
         </div>
+
+        <EmbrapaObservationOverview observation={embrapaObservation} />
 
         <HydrologyOverview weather={weather} />
 
