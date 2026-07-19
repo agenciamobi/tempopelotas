@@ -41,9 +41,9 @@ export default function manifest(): MetadataRoute.Manifest {
         ]
       : []),
     {
-      name: "Alertas meteorológicos",
+      name: "Condições de atenção",
       short_name: "Alertas",
-      description: "Abrir a análise de condições de atenção.",
+      description: "Abrir as condições que merecem acompanhamento.",
       url: "/alertas",
     },
   ];
@@ -53,7 +53,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "TEMPO Pelotas",
     short_name: "Tempo Pelotas",
     description:
-      "Previsão do tempo e situação hidrológica para preparação comunitária em Pelotas, RS.",
+      "Previsão do tempo e situação das águas para ajudar a comunidade de Pelotas a se preparar.",
     start_url: "/",
     scope: "/",
     display: "standalone",
@@ -65,15 +65,21 @@ export default function manifest(): MetadataRoute.Manifest {
     shortcuts,
     icons: [
       {
-        src: "/icon.svg",
-        sizes: "any",
-        type: "image/svg+xml",
+        src: "/pwa-icons/192",
+        sizes: "192x192",
+        type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icon.svg",
-        sizes: "any",
-        type: "image/svg+xml",
+        src: "/pwa-icons/512",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/pwa-icons/512",
+        sizes: "512x512",
+        type: "image/png",
         purpose: "maskable",
       },
     ],
