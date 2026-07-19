@@ -87,11 +87,12 @@ export default async function SituacaoHidrologicaPelotasPage() {
         <div className="section-heading">
           <div>
             <span className="eyebrow">Acompanhamento agora</span>
-            <h2 id="hydrology-live-title">Pelotas primeiro, com o Guaíba ao lado</h2>
+            <h2 id="hydrology-live-title">Nível no Laranjal e no Guaíba</h2>
           </div>
           <p>
-            O quadro do Laranjal mostra a medição mais próxima de Pelotas. O Guaíba aparece ao lado para
-            ajudar a entender parte da água que segue para a Lagoa dos Patos.
+            Comece pela medição da Praia do Laranjal, que representa Pelotas. O nível do Guaíba ajuda a
+            compreender parte da água que segue para a Lagoa dos Patos, mas não determina sozinho o que
+            acontecerá na cidade.
           </p>
         </div>
 
