@@ -13,6 +13,7 @@
 # local
 .DS_Store
 *.pem
+/.diagnostics/
 
 # debug
 npm-debug.log*
