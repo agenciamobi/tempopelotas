@@ -14,6 +14,7 @@ type NavigationItem = {
 
 type SiteHeaderProps = {
   advisoryLevel?: AdvisoryLevel;
+  variant?: "default" | "hero";
 };
 
 const desktopNavItems: NavigationItem[] = [
@@ -104,13 +105,17 @@ function isActivePath(pathname: string, href: string) {
   return pathname.startsWith(href);
 }
 
-export function SiteHeader({ advisoryLevel = "normal" }: SiteHeaderProps) {
+export function SiteHeader({
+  advisoryLevel = "normal",
+  variant = "default",
+}: SiteHeaderProps) {
   const pathname = usePathname();
   const alertsActive = isActivePath(pathname, "/alertas");
+  const headerClassName = `site-header${variant === "hero" ? " site-header--hero" : ""}`;
 
   return (
     <>
-      <header className="site-header">
+      <header className={headerClassName} data-advisory-level={advisoryLevel}>
         <Link className="brand" href="/" aria-label="TEMPO Pelotas — página inicial">
           <img
             className="brand-logo"
