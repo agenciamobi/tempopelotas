@@ -11,6 +11,7 @@ import {
 } from "@/lib/hydrology";
 import { getLaranjalLevelData } from "@/lib/laranjal-level";
 import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
+import { getNivelGuaibaRegionalObservations } from "@/lib/nivel-guaiba-regional";
 import { absoluteUrl } from "@/lib/site";
 import { getPelotasWeather } from "@/lib/weather-service";
 
@@ -30,9 +31,10 @@ export const metadata: Metadata = {
 };
 
 export default async function SituacaoHidrologicaPelotasPage() {
-  const [weather, guaiba, laranjalLevel] = await Promise.all([
+  const [weather, guaiba, guaibaRegional, laranjalLevel] = await Promise.all([
     getPelotasWeather(),
     getGuaibaObservation(),
+    getNivelGuaibaRegionalObservations(),
     getLaranjalLevelData(),
   ]);
   const today = weather.daily[0];
@@ -46,7 +48,7 @@ export default async function SituacaoHidrologicaPelotasPage() {
     "@type": "Dataset",
     name: "Informações sobre as águas relacionadas a Pelotas",
     description:
-      "Informações públicas sobre o nível no Laranjal, o Guaíba e a Lagoa dos Patos.",
+      "Informações públicas sobre o nível no Laranjal, o Guaíba e outros pontos monitorados no Rio Grande do Sul.",
     url: absoluteUrl("/situacao-hidrologica-pelotas"),
     spatialCoverage: "Pelotas, Lagoa dos Patos e Rio Grande do Sul",
     isAccessibleForFree: true,
@@ -65,6 +67,11 @@ export default async function SituacaoHidrologicaPelotasPage() {
         encodingFormat: "application/json",
         contentUrl: absoluteUrl("/api/hydrology/guaiba"),
       },
+      {
+        "@type": "DataDownload",
+        encodingFormat: "application/json",
+        contentUrl: absoluteUrl("/api/hydrology/guaiba/cities"),
+      },
     ],
   };
 
@@ -79,7 +86,7 @@ export default async function SituacaoHidrologicaPelotasPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(datasetSchema).replace(/</g, "\\u003c"),
+          __html: JSON.stringify(datasetSchema).replace(/</g, "\u003c"),
         }}
       />
 
@@ -87,11 +94,11 @@ export default async function SituacaoHidrologicaPelotasPage() {
         <div className="section-heading">
           <div>
             <span className="eyebrow">Acompanhamento agora</span>
-            <h2 id="hydrology-live-title">Nível no Laranjal e no Guaíba</h2>
+            <h2 id="hydrology-live-title">Nível no Laranjal, no Guaíba e na rede regional</h2>
           </div>
           <p>
-            Comece pela medição da Praia do Laranjal, que representa Pelotas. O nível do Guaíba ajuda a
-            compreender parte da água que segue para a Lagoa dos Patos, mas não determina sozinho o que
+            Comece pela medição da Praia do Laranjal, que representa Pelotas. O nível do Guaíba e os demais
+            pontos regionais ajudam a compreender o caminho da água, mas não determinam sozinhos o que
             acontecerá na cidade.
           </p>
         </div>
@@ -107,7 +114,7 @@ export default async function SituacaoHidrologicaPelotasPage() {
               precipitation: today?.precipitation ?? 0,
             }}
           />
-          <GuaibaLevelCard data={guaiba} />
+          <GuaibaLevelCard data={guaiba} regional={guaibaRegional} />
         </div>
       </section>
 
