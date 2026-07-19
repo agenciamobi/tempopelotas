@@ -30,6 +30,7 @@ import "./mobile-width-guard.css";
 import "./mobile-structure-refinement.css";
 import "./mobile-special-sections.css";
 import "./pwa-fullscreen-refinement.css";
+import "./mobile-history-footer-refinement.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
