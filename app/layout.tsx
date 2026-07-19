@@ -14,6 +14,7 @@ import "./history.css";
 import "./cameras.css";
 import "./lagoon-level.css";
 import "./lagoon-layout-refinement.css";
+import "./home-lagoon-card.css";
 import "./footer.css";
 
 export const metadata: Metadata = {
