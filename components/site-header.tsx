@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { AdvisoryLevel } from "@/lib/weather-insights";
 
 type NavigationIconName = "home" | "today" | "week" | "rain" | "water" | "alert";
 
@@ -9,6 +10,10 @@ type NavigationItem = {
   label: string;
   href: string;
   icon: NavigationIconName;
+};
+
+type SiteHeaderProps = {
+  advisoryLevel?: AdvisoryLevel;
 };
 
 const desktopNavItems: NavigationItem[] = [
@@ -99,8 +104,9 @@ function isActivePath(pathname: string, href: string) {
   return pathname.startsWith(href);
 }
 
-export function SiteHeader() {
+export function SiteHeader({ advisoryLevel = "normal" }: SiteHeaderProps) {
   const pathname = usePathname();
+  const alertsActive = isActivePath(pathname, "/alertas");
 
   return (
     <>
@@ -135,10 +141,10 @@ export function SiteHeader() {
         </nav>
 
         <Link
-          className={`header-action ${isActivePath(pathname, "/alertas") ? "is-active" : ""}`}
+          className={`header-action header-action--${advisoryLevel}${alertsActive ? " is-active" : ""}`}
           href="/alertas"
-          aria-current={isActivePath(pathname, "/alertas") ? "page" : undefined}
-          aria-label="Abrir alertas meteorológicos"
+          aria-current={alertsActive ? "page" : undefined}
+          aria-label="Abrir condições de atenção meteorológica"
         >
           <span className="header-action-dot" aria-hidden="true" />
           <span className="header-action-icon" aria-hidden="true">
