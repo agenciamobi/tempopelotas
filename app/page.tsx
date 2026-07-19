@@ -48,8 +48,8 @@ export default async function Home() {
         }}
       />
 
-      <div className="site-shell">
-        <SiteHeader advisoryLevel={advisoryLevel} />
+      <div className="site-shell site-shell--home">
+        <SiteHeader advisoryLevel={advisoryLevel} variant="hero" />
         <WeatherHero weather={weather} />
 
         <div className="dashboard-layout dashboard-layout--after-hero">
