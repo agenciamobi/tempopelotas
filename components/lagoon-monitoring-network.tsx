@@ -3,12 +3,26 @@ import type {
   LagoonMonitoringObservation,
 } from "@/lib/lagoon-monitoring-network";
 
+const CHART_WIDTH = 240;
+const CHART_HEIGHT = 54;
+const CHART_PADDING = 3;
+
 function formatLevel(value: number | null) {
   if (value === null) return "—";
 
   return new Intl.NumberFormat("pt-BR", {
     minimumFractionDigits: value % 1 === 0 ? 0 : 1,
     maximumFractionDigits: 1,
+  }).format(value);
+}
+
+function formatSigned(value: number | null) {
+  if (value === null) return "—";
+
+  return new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: Math.abs(value) % 1 === 0 ? 0 : 1,
+    maximumFractionDigits: 1,
+    signDisplay: "exceptZero",
   }).format(value);
 }
 
@@ -47,6 +61,79 @@ function getDistanceLabel(observation: LagoonMonitoringObservation) {
   return "Na cota de inundação local";
 }
 
+function getTrend(observation: LagoonMonitoringObservation) {
+  const rate = observation.trendCmPerHour;
+
+  if (rate === null) {
+    return {
+      direction: "unavailable" as const,
+      symbol: "·",
+      label: "Sem tendência",
+      detail: "série insuficiente",
+    };
+  }
+
+  if (Math.abs(rate) < 0.1) {
+    return {
+      direction: "stable" as const,
+      symbol: "→",
+      label: "Estável",
+      detail: "sem mudança relevante",
+    };
+  }
+
+  if (rate > 0) {
+    return {
+      direction: "rising" as const,
+      symbol: "↑",
+      label: "Subindo",
+      detail: `${formatSigned(rate)} cm/h`,
+    };
+  }
+
+  return {
+    direction: "falling" as const,
+    symbol: "↓",
+    label: "Baixando",
+    detail: `${formatSigned(Math.abs(rate))} cm/h`,
+  };
+}
+
+function buildChart(observation: LagoonMonitoringObservation) {
+  if (observation.series.length < 2) return null;
+
+  const points = observation.series.slice(-96);
+  const levels = points.map((point) => point.levelCm);
+  const minimum = Math.min(...levels);
+  const maximum = Math.max(...levels);
+  const range = Math.max(maximum - minimum, 1);
+  const innerWidth = CHART_WIDTH - CHART_PADDING * 2;
+  const innerHeight = CHART_HEIGHT - CHART_PADDING * 2;
+
+  const coordinates = points.map((point, index) => ({
+    x: CHART_PADDING + (index / (points.length - 1)) * innerWidth,
+    y:
+      CHART_PADDING +
+      ((maximum - point.levelCm) / range) * innerHeight,
+  }));
+
+  const line = coordinates
+    .map(
+      (point, index) =>
+        `${index === 0 ? "M" : "L"}${point.x.toFixed(1)},${point.y.toFixed(1)}`,
+    )
+    .join(" ");
+  const first = coordinates[0];
+  const last = coordinates.at(-1)!;
+
+  return {
+    line,
+    area: `${line} L${last.x.toFixed(1)},${CHART_HEIGHT} L${first.x.toFixed(1)},${CHART_HEIGHT} Z`,
+    minimum,
+    maximum,
+  };
+}
+
 export function LagoonMonitoringNetwork({
   data,
   variant = "full",
@@ -66,7 +153,8 @@ export function LagoonMonitoringNetwork({
             Rede de Monitoramento da Lagoa dos Patos
           </h3>
           <p>
-            Compare diferentes pontos da lagoa, do encontro com o Guaíba até o estuário em Rio Grande e São José do Norte.
+            Leituras diretas da API pública dos linígrafos, com série recente,
+            tendência e comparação com a cota de inundação de cada local.
           </p>
         </div>
         <a href={data.source.url} target="_blank" rel="noreferrer">
@@ -94,6 +182,8 @@ export function LagoonMonitoringNetwork({
             0,
             Math.min(observation.floodThresholdPercentage ?? 0, 100),
           );
+          const trend = getTrend(observation);
+          const chart = buildChart(observation);
 
           return (
             <article
@@ -102,7 +192,9 @@ export function LagoonMonitoringNetwork({
             >
               <div className="lagoon-monitoring-card-head">
                 <div>
-                  <small>{observation.station.city}</small>
+                  <small>
+                    {observation.station.city} · {observation.station.sensorId}
+                  </small>
                   <h4>{observation.station.name}</h4>
                 </div>
                 <span>{getRiskLabel(observation)}</span>
@@ -110,10 +202,23 @@ export function LagoonMonitoringNetwork({
 
               {available ? (
                 <>
-                  <div className="lagoon-monitoring-reading">
-                    <strong>{formatLevel(observation.currentLevelCm)}</strong>
-                    <span>cm</span>
+                  <div className="lagoon-monitoring-reading-row">
+                    <div className="lagoon-monitoring-reading">
+                      <strong>{formatLevel(observation.currentLevelCm)}</strong>
+                      <span>cm</span>
+                    </div>
+                    <div
+                      className={`lagoon-monitoring-trend is-${trend.direction}`}
+                      aria-label={`${trend.label}: ${trend.detail}`}
+                    >
+                      <b aria-hidden="true">{trend.symbol}</b>
+                      <span>
+                        <strong>{trend.label}</strong>
+                        <small>{trend.detail}</small>
+                      </span>
+                    </div>
                   </div>
+
                   <p className="lagoon-monitoring-distance">
                     {getDistanceLabel(observation)}
                   </p>
@@ -123,10 +228,42 @@ export function LagoonMonitoringNetwork({
                   >
                     <span style={{ width: `${progress}%` }} />
                   </div>
+
+                  {chart ? (
+                    <div
+                      className="lagoon-monitoring-chart"
+                      aria-label={`Variação recente do nível em ${observation.station.name}`}
+                    >
+                      <div>
+                        <span>{formatLevel(chart.maximum)} cm</span>
+                        <span>{formatLevel(chart.minimum)} cm</span>
+                      </div>
+                      <svg
+                        viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
+                        role="img"
+                        aria-hidden="true"
+                      >
+                        <path
+                          className="lagoon-monitoring-chart-area"
+                          d={chart.area}
+                        />
+                        <path
+                          className="lagoon-monitoring-chart-line"
+                          d={chart.line}
+                        />
+                      </svg>
+                      <small>Últimas leituras disponíveis</small>
+                    </div>
+                  ) : null}
+
                   <dl className="lagoon-monitoring-metrics">
                     <div>
                       <dt>Cota local</dt>
                       <dd>{formatLevel(observation.floodLevelCm)} cm</dd>
+                    </div>
+                    <div>
+                      <dt>Variação 24h</dt>
+                      <dd>{formatSigned(observation.change24hCm)} cm</dd>
                     </div>
                     <div>
                       <dt>Máx. mai/2024</dt>
@@ -141,14 +278,21 @@ export function LagoonMonitoringNetwork({
                 </div>
               )}
 
-              <p className="lagoon-monitoring-role">{observation.station.role}</p>
+              <p className="lagoon-monitoring-role">
+                {observation.station.role}
+              </p>
               <footer>
                 <small>
                   {observation.updatedAt
                     ? `Atualizado em ${formatUpdatedAt(observation.updatedAt)}`
                     : "Aguardando atualização da fonte"}
                 </small>
-                <a href={data.source.url} target="_blank" rel="noreferrer" aria-label={`Abrir fonte de ${observation.station.name}`}>
+                <a
+                  href={data.source.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Abrir fonte de ${observation.station.name}`}
+                >
                   ↗
                 </a>
               </footer>
@@ -160,7 +304,10 @@ export function LagoonMonitoringNetwork({
       <div className="lagoon-monitoring-note">
         <strong>Como interpretar</strong>
         <p>
-          As medições são reduzidas ao referencial vertical brasileiro, mas cada município possui sua própria cota de inundação. Para risco local, compare cada leitura com a cota exibida no mesmo card. Estes dados não substituem avisos da Defesa Civil.
+          A tendência e a variação são calculadas a partir da série pública de
+          cinco dias. Cada município possui sua própria cota de inundação:
+          compare cada leitura somente com a cota exibida no mesmo card. Estes
+          dados não substituem avisos da Defesa Civil.
         </p>
       </div>
     </section>
