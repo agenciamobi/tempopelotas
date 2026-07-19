@@ -65,21 +65,15 @@ export default function manifest(): MetadataRoute.Manifest {
     shortcuts,
     icons: [
       {
-        src: "/pwa-icons/192",
-        sizes: "192x192",
-        type: "image/png",
+        src: "/brand/tempo-pelotas-icon",
+        sizes: "any",
+        type: "image/svg+xml",
         purpose: "any",
       },
       {
-        src: "/pwa-icons/512",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "any",
-      },
-      {
-        src: "/pwa-icons/512",
-        sizes: "512x512",
-        type: "image/png",
+        src: "/brand/tempo-pelotas-icon",
+        sizes: "any",
+        type: "image/svg+xml",
         purpose: "maskable",
       },
     ],
