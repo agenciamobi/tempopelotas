@@ -415,20 +415,20 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
   };
 
   const radarButtonTitle = radarStatusLoading
-    ? "Verificando disponibilidade do radar"
-    : radarStatus?.error ?? "Mostrar radar animado de precipitação";
+    ? "Verificando se o radar está disponível"
+    : radarStatus?.error ?? "Mostrar a chuva no mapa";
 
   return (
     <section className="map-panel" id="regiao" aria-labelledby="map-title">
       <div className="map-panel-heading">
         <div>
-          <span className="eyebrow">Zona Sul do RS</span>
+          <span className="eyebrow">Pelotas e Zona Sul</span>
           <h2 id="map-title">Tempo na região</h2>
         </div>
         <button
           className="map-control"
           type="button"
-          aria-label="Centralizar mapa em Pelotas"
+          aria-label="Voltar o mapa para Pelotas"
           onClick={centerOnPelotas}
           disabled={!isLoaded}
         >
@@ -440,11 +440,11 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
 
       <div
         className={`map-canvas map-canvas--interactive map-canvas--${mode}`}
-        aria-label="Mapa interativo com condições meteorológicas de Pelotas e cidades da Zona Sul"
+        aria-label="Mapa com o tempo em Pelotas e cidades da Zona Sul"
       >
         <div ref={mapContainerRef} className="regional-map-engine" />
 
-        <div className="map-layer-switcher" aria-label="Camadas do mapa">
+        <div className="map-layer-switcher" aria-label="Escolha como deseja ver o mapa">
           <button
             type="button"
             className={mode === "map" ? "is-active" : undefined}
@@ -471,13 +471,13 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
             disabled={!isLoaded || radarStatusLoading || !radarStatus?.available}
             title={radarButtonTitle}
           >
-            Radar
+            Chuva
           </button>
         </div>
 
         {isLoaded && radarStatus && !radarStatus.available ? (
           <div className="map-radar-unavailable" role="status">
-            <strong>Radar preparado</strong>
+            <strong>Mapa de chuva indisponível</strong>
             <span>{radarStatus.error}</span>
           </div>
         ) : null}
@@ -488,31 +488,31 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
           aria-live="polite"
         >
           <span aria-hidden="true" />
-          <strong>{hasError ? "Mapa temporariamente indisponível" : "Carregando mapa regional"}</strong>
+          <strong>{hasError ? "Mapa temporariamente indisponível" : "Carregando mapa da região"}</strong>
           <small>
             {hasError
-              ? "As temperaturas continuam disponíveis na previsão."
-              : "A camada geográfica é carregada somente quando necessária."}
+              ? "As temperaturas continuam disponíveis ao lado."
+              : "O mapa aparecerá em alguns instantes."}
           </small>
         </div>
 
         {mode === "radar" && radarStatus?.available && selectedRadarFrame ? (
-          <div className="radar-player" aria-label="Animação do radar de precipitação">
+          <div className="radar-player" aria-label="Movimento da chuva no mapa">
             <div className="radar-player-topline">
               <button
                 className="radar-play-button"
                 type="button"
                 onClick={() => setRadarPlaying((playing) => !playing)}
-                aria-label={radarPlaying ? "Pausar animação do radar" : "Reproduzir animação do radar"}
+                aria-label={radarPlaying ? "Pausar movimento da chuva" : "Mostrar movimento da chuva"}
               >
                 <PlayIcon playing={radarPlaying} />
               </button>
               <div className="radar-frame-status" aria-live="polite">
-                <span>{selectedRadarFrame.kind === "forecast" ? "Previsão" : "Observado"}</span>
+                <span>{selectedRadarFrame.kind === "forecast" ? "Previsão" : "Registrado"}</span>
                 <strong>{selectedRadarFrame.label}</strong>
               </div>
               <label className="radar-opacity-control">
-                <span>Opacidade</span>
+                <span>Deixar a chuva mais clara</span>
                 <input
                   type="range"
                   min="35"
@@ -531,7 +531,7 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
               max={radarStatus.frames.length - 1}
               step="1"
               value={selectedFrameIndex}
-              aria-label="Selecionar horário da animação do radar"
+              aria-label="Escolher o horário da chuva no mapa"
               onChange={(event) => {
                 setRadarPlaying(false);
                 setSelectedFrameIndex(Number(event.target.value));
@@ -547,14 +547,14 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
             <div className="radar-intensity-legend">
               <span>Chuva fraca</span>
               <i aria-hidden="true" />
-              <span>Chuva intensa</span>
+              <span>Chuva forte</span>
             </div>
             <small className="radar-provider-note">
-              Estimativa de precipitação OpenWeather · histórico de 1h e previsão de até 2h
+              Chuva mostrada pelo OpenWeather · última hora e próximas 2 horas
             </small>
           </div>
         ) : (
-          <div className="map-legend" aria-label="Intervalo de temperatura regional">
+          <div className="map-legend" aria-label="Temperaturas mostradas no mapa">
             <span>{temperatureRange.min}°</span>
             <i aria-hidden="true" />
             <span>{temperatureRange.max}°</span>
