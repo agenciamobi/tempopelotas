@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { GuaibaLevelCard } from "@/components/guaiba-level-card";
-import { LagoonLevelHomeCard } from "@/components/lagoon-level-home-card";
+import { PelotasHydrologyWidget } from "@/components/pelotas-hydrology-widget";
 import { HYDROLOGY_FLOW, SGB_SACE_URL } from "@/lib/hydrology";
 import type { GuaibaObservationData } from "@/lib/guaiba-monitor";
+import type { LaranjalLevelData } from "@/lib/laranjal-level";
 import type { WeatherData } from "@/lib/weather-data";
 
 type HydrologyOverviewProps = {
   weather: WeatherData;
   guaiba: GuaibaObservationData;
+  laranjal: LaranjalLevelData;
 };
 
 function FlowArrow() {
@@ -18,7 +20,7 @@ function FlowArrow() {
   );
 }
 
-export function HydrologyOverview({ weather, guaiba }: HydrologyOverviewProps) {
+export function HydrologyOverview({ weather, guaiba, laranjal }: HydrologyOverviewProps) {
   const today = weather.daily[0];
   const strongestUpcomingGust = Math.max(
     weather.current.windGust,
@@ -71,28 +73,20 @@ export function HydrologyOverview({ weather, guaiba }: HydrologyOverviewProps) {
       </ol>
 
       <div className="hydrology-home-grid">
-        <LagoonLevelHomeCard />
+        <PelotasHydrologyWidget
+          initialData={laranjal}
+          weather={{
+            windSpeed: weather.current.windSpeed,
+            windDirection: weather.current.windDirection,
+            windGust: strongestUpcomingGust,
+            precipitation: today?.precipitation ?? 0,
+          }}
+          headingLevel="h3"
+          className="pelotas-hydrology-widget--home"
+        />
 
         <aside className="hydrology-context-column" aria-label="Informações sobre o Guaíba e o Laranjal">
           <GuaibaLevelCard data={guaiba} />
-
-          <div className="hydrology-driver-grid" aria-label="Vento e chuva em Pelotas">
-            <article>
-              <span>Vento agora</span>
-              <strong>{weather.current.windSpeed} km/h</strong>
-              <small>Direção {weather.current.windDirection}</small>
-            </article>
-            <article>
-              <span>Rajada mais forte nas próximas horas</span>
-              <strong>{strongestUpcomingGust} km/h</strong>
-              <small>Previsão para Pelotas</small>
-            </article>
-            <article>
-              <span>Chuva prevista hoje</span>
-              <strong>{today?.precipitation ?? 0} mm</strong>
-              <small>{today?.rainChance ?? 0}% de chance</small>
-            </article>
-          </div>
 
           <a className="hydrology-sgb-link" href={SGB_SACE_URL} target="_blank" rel="noreferrer">
             <span>
