@@ -41,8 +41,8 @@ function getTrend(data: GuaibaObservationData) {
 
   if (rate === null) {
     return {
-      label: "Tendência indisponível",
-      detail: "série insuficiente",
+      label: "Sem comparação disponível",
+      detail: "faltam leituras anteriores",
       direction: "unavailable" as const,
       symbol: "·",
     };
@@ -51,7 +51,7 @@ function getTrend(data: GuaibaObservationData) {
   if (Math.abs(rate) < 0.1) {
     return {
       label: "Estável",
-      detail: "média das últimas 6h",
+      detail: "sem mudança importante nas últimas horas",
       direction: "stable" as const,
       symbol: "→",
     };
@@ -60,15 +60,15 @@ function getTrend(data: GuaibaObservationData) {
   if (rate > 0) {
     return {
       label: "Subindo",
-      detail: `${formatSigned(rate)} cm/h · média 6h`,
+      detail: `${formatSigned(rate)} cm por hora`,
       direction: "rising" as const,
       symbol: "↑",
     };
   }
 
   return {
-    label: "Descendo",
-    detail: `${formatSigned(Math.abs(rate))} cm/h · média 6h`,
+    label: "Baixando",
+    detail: `${formatSigned(Math.abs(rate))} cm por hora`,
     direction: "falling" as const,
     symbol: "↓",
   };
@@ -112,11 +112,11 @@ function DistanceToReference({ data }: { data: GuaibaObservationData }) {
     <p className="guaiba-reference-message">
       {distance >= 0 ? (
         <>
-          <strong>{formatLevel(distance)} m</strong> abaixo da cota de inundação usada para Porto Alegre.
+          O nível está <strong>{formatLevel(distance)} m</strong> abaixo da marca de inundação usada em Porto Alegre.
         </>
       ) : (
         <>
-          <strong>{formatLevel(Math.abs(distance))} m</strong> acima da cota de inundação usada para Porto Alegre.
+          O nível está <strong>{formatLevel(Math.abs(distance))} m</strong> acima da marca de inundação usada em Porto Alegre.
         </>
       )}
     </p>
@@ -132,16 +132,16 @@ export function GuaibaLevelCard({ data }: { data: GuaibaObservationData }) {
     <article className={`guaiba-level-card guaiba-level-card--${data.status}`}>
       <div className="guaiba-level-card-header">
         <div>
-          <span className="eyebrow">Indicador regional a montante</span>
+          <span className="eyebrow">Uma das entradas de água da Lagoa dos Patos</span>
           <h3>Nível do Guaíba</h3>
-          <p>Porto Alegre / RS · Estação {data.station}</p>
+          <p>Porto Alegre / RS · Medição na {data.station}</p>
         </div>
         <span className="guaiba-data-status">
           <i aria-hidden="true" />
           {data.status === "live"
-            ? "Dados recentes"
+            ? "Atualizado"
             : data.status === "stale"
-              ? "Leitura atrasada"
+              ? "Atualização atrasada"
               : "Indisponível"}
         </span>
       </div>
@@ -166,7 +166,7 @@ export function GuaibaLevelCard({ data }: { data: GuaibaObservationData }) {
           <DistanceToReference data={data} />
 
           {chart ? (
-            <div className="guaiba-mini-chart" aria-label="Variação do nível do Guaíba nas últimas 24 horas">
+            <div className="guaiba-mini-chart" aria-label="Mudança do nível do Guaíba nas últimas 24 horas">
               <div className="guaiba-chart-labels">
                 <span>{formatLevel(chart.maximum)} m</span>
                 <span>{formatLevel(chart.minimum)} m</span>
@@ -183,7 +183,7 @@ export function GuaibaLevelCard({ data }: { data: GuaibaObservationData }) {
               </svg>
               <div className="guaiba-chart-range">
                 <span>24 horas atrás</span>
-                <strong>Variação {formatSigned(data.variation24hCm)} cm</strong>
+                <strong>Mudança de {formatSigned(data.variation24hCm)} cm</strong>
                 <span>Agora</span>
               </div>
             </div>
@@ -191,15 +191,15 @@ export function GuaibaLevelCard({ data }: { data: GuaibaObservationData }) {
 
           <dl className="guaiba-summary-grid">
             <div>
-              <dt>Cota de inundação</dt>
+              <dt>Marca de inundação em Porto Alegre</dt>
               <dd>{formatLevel(data.floodReference)} m</dd>
             </div>
             <div>
-              <dt>Média da série</dt>
+              <dt>Média do período disponível</dt>
               <dd>{formatLevel(data.periodAverage)} m</dd>
             </div>
             <div>
-              <dt>Faixa observada</dt>
+              <dt>Menor e maior nível</dt>
               <dd>
                 {formatLevel(data.periodMinimum)}–{formatLevel(data.periodMaximum)} m
               </dd>
@@ -214,27 +214,27 @@ export function GuaibaLevelCard({ data }: { data: GuaibaObservationData }) {
       )}
 
       <div className="guaiba-context-note">
-        <strong>Por que acompanhar?</strong>
+        <strong>Por que este nível importa para Pelotas?</strong>
         <p>
-          O Guaíba é uma das grandes entradas de água da Lagoa dos Patos, mas não é a única. O cenário
-          de Pelotas também depende de outras bacias, rios e arroios, do vento sobre a lagoa e do
-          escoamento pelo canal da Barra entre Rio Grande e São José do Norte.
+          Parte da água do Guaíba segue para a Lagoa dos Patos. Mesmo assim, o nível no Laranjal também
+          depende de outros rios e arroios, da chuva, do vento e da saída para o oceano entre Rio Grande
+          e São José do Norte.
         </p>
       </div>
 
       <div className="guaiba-source-links">
         <a href={data.source.url} target="_blank" rel="noreferrer">
-          Abrir monitor completo
+          Ver o acompanhamento completo
           <span aria-hidden="true">↗</span>
         </a>
         <a href={data.source.methodologyUrl} target="_blank" rel="noreferrer">
-          Metodologia da fonte
+          Saiba como a fonte reúne as informações
           <span aria-hidden="true">↗</span>
         </a>
       </div>
       <small className="guaiba-attribution">
-        Agregação: {data.source.name}. Dados originais: {data.source.originalInstitutions}. Indicador
-        regional, não previsão isolada para Pelotas.
+        Fonte: {data.source.name}, com informações de {data.source.originalInstitutions}. Este valor ajuda
+        a entender o cenário regional, mas não prevê sozinho o que acontecerá em Pelotas.
       </small>
     </article>
   );
