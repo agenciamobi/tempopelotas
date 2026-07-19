@@ -45,9 +45,14 @@ export const metadata: Metadata = {
     telephone: false,
   },
   icons: {
-    icon: "/icon.svg",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/pwa-icons/192", sizes: "192x192", type: "image/png" },
+    ],
     shortcut: "/icon.svg",
-    apple: "/icon.svg",
+    apple: [
+      { url: "/pwa-icons/192", sizes: "192x192", type: "image/png" },
+    ],
   },
   alternates: { canonical: "/" },
   openGraph: {
