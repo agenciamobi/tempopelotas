@@ -51,6 +51,7 @@ import "./lagoon-monitoring-network.css";
 import "./lagoon-monitoring-api.css";
 import "./hydrology-page-reorganization.css";
 import "./home-page-reorganization.css";
+import "./project-refinement.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
