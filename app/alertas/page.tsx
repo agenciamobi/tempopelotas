@@ -7,14 +7,14 @@ import { getPelotasWeather } from "@/lib/weather-service";
 export const revalidate = 600;
 
 export const metadata: Metadata = {
-  title: "Alertas meteorológicos e condições de atenção em Pelotas",
+  title: "Condições de atenção para chuva e vento em Pelotas",
   description:
-    "Acompanhe indicativos automáticos de chuva intensa, temporal e rajadas de vento em Pelotas e consulte orientações de segurança.",
+    "Veja sinais de chuva forte, temporal e rajadas em Pelotas e consulte orientações de segurança.",
   alternates: { canonical: "/alertas" },
   openGraph: {
-    title: "Alertas meteorológicos em Pelotas",
+    title: "Condições de atenção em Pelotas",
     description:
-      "Leitura automática das condições de chuva, vento e temporal para Pelotas, RS.",
+      "Acompanhe chuva, vento e temporais previstos para Pelotas, RS.",
     url: "/alertas",
   },
 };
@@ -35,9 +35,9 @@ export default async function AlertasPage() {
   return (
     <ForecastPageShell
       weather={weather}
-      eyebrow="Monitoramento meteorológico"
-      title="Alertas e condições de atenção em Pelotas"
-      description="Uma leitura automática da previsão para destacar chuva intensa, temporais e vento forte. Não substitui alertas emitidos por órgãos oficiais."
+      eyebrow="Atenção ao tempo"
+      title="Condições de atenção em Pelotas"
+      description="Veja quando a previsão indica chuva forte, temporal ou vento intenso. Esta página ajuda no acompanhamento, mas não substitui os avisos oficiais."
       currentPath="/alertas"
     >
       <section className={`advisory-panel advisory-panel--${advisory.level}`} aria-labelledby="advisory-title">
@@ -56,35 +56,35 @@ export default async function AlertasPage() {
         </div>
       </section>
 
-      <section className="topic-metrics" aria-label="Indicadores usados na análise automática">
+      <section className="topic-metrics" aria-label="Informações usadas nesta avaliação">
         <article>
-          <span>Chance máxima de chuva</span>
+          <span>Maior chance de chuva</span>
           <strong>{maxHourlyRain}%</strong>
           <small>Hoje e próximas horas</small>
         </article>
         <article>
-          <span>Acumulado estimado</span>
+          <span>Volume de chuva previsto</span>
           <strong>{formatMillimeters(today?.precipitation ?? 0)} mm</strong>
-          <small>Previsão para hoje</small>
+          <small>Para hoje</small>
         </article>
         <article>
-          <span>Maior rajada próxima</span>
+          <span>Rajada mais forte prevista</span>
           <strong>{maxHourlyGust} km/h</strong>
-          <small>Agora e previsão horária</small>
+          <small>Agora e próximas horas</small>
         </article>
         <article>
-          <span>Condição atual</span>
+          <span>Tempo agora</span>
           <strong>{weather.current.temperature}°C</strong>
           <small>{weather.current.condition}</small>
         </article>
       </section>
 
-      <section className="lagoon-alert-card" aria-label="Monitoramento do nível da lagoa">
+      <section className="lagoon-alert-card" aria-label="Nível da Lagoa dos Patos">
         <span aria-hidden="true">≋</span>
         <div>
-          <strong>Nível da Lagoa dos Patos — Estação Laranjal</strong>
+          <strong>Nível da Lagoa dos Patos no Laranjal</strong>
           <small>
-            Consulte o painel público do LabHidroSens / UFPel como informação complementar.
+            Veja se o nível está subindo ou baixando e compare com vento, chuva e avisos oficiais.
           </small>
         </div>
         <Link href="/nivel-da-lagoa-dos-patos-laranjal">Ver medidor</Link>
@@ -93,26 +93,26 @@ export default async function AlertasPage() {
       <section className="topic-section" aria-labelledby="monitoring-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Critérios internos</span>
-            <h2 id="monitoring-title">Como funciona a leitura automática</h2>
+            <span className="eyebrow">Como classificamos a atenção</span>
+            <h2 id="monitoring-title">O que significa cada situação</h2>
           </div>
-          <p>Os limites servem apenas para organizar a atenção do usuário e não possuem caráter oficial.</p>
+          <p>Esta classificação organiza as informações da previsão. Ela não é um alerta emitido pela Defesa Civil ou pelo INMET.</p>
         </div>
         <div className="threshold-grid">
           <article>
             <span className="threshold-dot threshold-dot--normal" aria-hidden="true" />
-            <h3>Condição normal</h3>
-            <p>Sem temporal indicado, chuva acumulada abaixo de 25 mm e rajadas abaixo de 50 km/h.</p>
+            <h3>Sem sinal importante no momento</h3>
+            <p>A previsão não mostra temporal, chuva muito volumosa ou rajadas fortes para o período analisado.</p>
           </article>
           <article>
             <span className="threshold-dot threshold-dot--attention" aria-hidden="true" />
             <h3>Atenção</h3>
-            <p>Probabilidade de chuva a partir de 70%, acumulado de 25 mm ou rajadas de 50 km/h.</p>
+            <p>Há chance alta de chuva, volume mais elevado ou rajadas que merecem acompanhamento.</p>
           </article>
           <article>
             <span className="threshold-dot threshold-dot--warning" aria-hidden="true" />
-            <h3>Indicativo severo</h3>
-            <p>Temporal no modelo, acumulado a partir de 50 mm ou rajadas de 75 km/h.</p>
+            <h3>Atenção redobrada</h3>
+            <p>A previsão mostra temporal, chuva muito volumosa ou rajadas fortes. Consulte imediatamente os avisos oficiais.</p>
           </article>
         </div>
       </section>
@@ -121,21 +121,21 @@ export default async function AlertasPage() {
         <div className="section-heading">
           <div>
             <span className="eyebrow">Segurança</span>
-            <h2 id="official-alerts-title">Priorize sempre os alertas oficiais</h2>
+            <h2 id="official-alerts-title">Siga sempre os avisos oficiais</h2>
           </div>
         </div>
         <div className="copy-columns">
           <div>
             <h3>Defesa Civil</h3>
-            <p>Em situações de risco, siga as orientações da Defesa Civil do Rio Grande do Sul e da Defesa Civil municipal.</p>
+            <p>Em situações de risco, siga as orientações da Defesa Civil do Rio Grande do Sul e da Defesa Civil de Pelotas.</p>
           </div>
           <div>
             <h3>INMET e autoridades locais</h3>
-            <p>Consulte os avisos meteorológicos oficiais e evite deslocamentos ou atividades externas quando houver recomendação de segurança.</p>
+            <p>Consulte os avisos oficiais e evite deslocamentos ou atividades externas quando houver recomendação de segurança.</p>
           </div>
         </div>
         <p className="data-note">
-          O TEMPO Pelotas interpreta automaticamente dados de previsão. A ausência de indicativo nesta página não garante ausência de risco.
+          A ausência de aviso nesta página não garante ausência de risco. Confira os canais oficiais sempre que o tempo estiver instável.
         </p>
       </section>
     </ForecastPageShell>
