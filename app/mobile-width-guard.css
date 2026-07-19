@@ -1,6 +1,7 @@
 html,
 body {
   max-width: 100%;
+  overflow-x: hidden;
   overflow-x: clip;
 }
 
@@ -85,7 +86,7 @@ iframe {
   .hydrology-home,
   .site-footer {
     width: auto;
-    max-width: calc(100% - (var(--mobile-gutter) * 2));
+    max-width: calc(100% - var(--mobile-gutter) - var(--mobile-gutter));
   }
 
   .current-weather,
