@@ -1,3 +1,4 @@
+import { HydrologyOverview } from "@/components/hydrology-overview";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WeatherDashboard } from "@/components/weather-dashboard";
@@ -14,7 +15,7 @@ const websiteSchema = {
   name: "TEMPO Pelotas",
   url: absoluteUrl("/"),
   description:
-    "Portal meteorológico local com previsão do tempo para Pelotas e a Zona Sul do Rio Grande do Sul.",
+    "Portal meteorológico e hidrológico local para preparação comunitária em Pelotas e na Zona Sul do Rio Grande do Sul.",
   inLanguage: "pt-BR",
   areaServed: {
     "@type": "City",
@@ -45,6 +46,8 @@ export default async function Home() {
           <WeatherMap regionalWeather={weather.regional} />
           <WeatherDashboard weather={weather} />
         </div>
+
+        <HydrologyOverview weather={weather} />
 
         <div className="home-weather-navigation">
           <WeatherNavigation />
