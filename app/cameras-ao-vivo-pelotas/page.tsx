@@ -15,10 +15,10 @@ export function generateMetadata(): Metadata {
   return {
     title: hasOnlineCamera
       ? "Câmeras ao vivo de Pelotas e Praia do Laranjal"
-      : "Câmeras meteorológicas de Pelotas",
+      : "Câmeras de Pelotas e Praia do Laranjal",
     description: hasOnlineCamera
-      ? "Acompanhe câmeras meteorológicas de Pelotas, Praia do Laranjal e Canal São Gonçalo para observar chuva, nuvens, vento e visibilidade."
-      : "Conheça os pontos preparados para observação visual do tempo em Pelotas, Praia do Laranjal e Canal São Gonçalo.",
+      ? "Acompanhe câmeras de Pelotas, Praia do Laranjal e Canal São Gonçalo para observar chuva, nuvens e visibilidade."
+      : "Veja os locais previstos para câmeras no Laranjal, Centro e Canal São Gonçalo.",
     alternates: { canonical: "/cameras-ao-vivo-pelotas" },
     robots: {
       index: hasOnlineCamera,
@@ -27,10 +27,10 @@ export function generateMetadata(): Metadata {
     openGraph: {
       title: hasOnlineCamera
         ? "Câmeras ao vivo de Pelotas"
-        : "Câmeras meteorológicas de Pelotas",
+        : "Câmeras de Pelotas",
       description: hasOnlineCamera
-        ? "Visualize pontos de Pelotas e acompanhe as condições meteorológicas locais por imagem."
-        : "Rede de pontos preparada para observação visual das condições meteorológicas de Pelotas.",
+        ? "Veja imagens de diferentes pontos de Pelotas e acompanhe as condições do céu."
+        : "Locais previstos para observação do tempo em Pelotas.",
       url: "/cameras-ao-vivo-pelotas",
     },
   };
@@ -44,7 +44,7 @@ export default async function CamerasAoVivoPelotasPage() {
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "Câmeras meteorológicas de Pelotas",
+    name: "Câmeras de Pelotas",
     url: absoluteUrl("/cameras-ao-vivo-pelotas"),
     numberOfItems: cameras.length,
     itemListElement: cameras.map((camera, index) => ({
@@ -59,12 +59,12 @@ export default async function CamerasAoVivoPelotasPage() {
   return (
     <ForecastPageShell
       weather={weather}
-      eyebrow="Observação visual"
-      title={onlineCount ? "Câmeras ao vivo de Pelotas" : "Câmeras meteorológicas de Pelotas"}
+      eyebrow="Veja Pelotas pelas câmeras"
+      title={onlineCount ? "Câmeras ao vivo de Pelotas" : "Câmeras de Pelotas"}
       description={
         onlineCount
-          ? "Acompanhe pontos estratégicos da cidade para complementar a leitura da previsão com imagens locais, sem substituir dados de estações ou alertas oficiais."
-          : "A rede visual está estruturada para receber transmissões do Laranjal, Centro e Canal São Gonçalo assim que fontes públicas e estáveis forem ativadas."
+          ? "Observe o céu, a visibilidade e a presença de chuva em diferentes pontos da cidade."
+          : "As câmeras ainda não estão disponíveis. Os locais previstos são Laranjal, Centro e Canal São Gonçalo."
       }
       currentPath="/cameras-ao-vivo-pelotas"
     >
@@ -75,31 +75,31 @@ export default async function CamerasAoVivoPelotasPage() {
         }}
       />
 
-      <section className="camera-overview" aria-label="Resumo da rede de câmeras">
+      <section className="camera-overview" aria-label="Resumo das câmeras">
         <article>
-          <span>Pontos mapeados</span>
+          <span>Locais previstos</span>
           <strong>{cameras.length}</strong>
           <small>Laranjal, Centro e São Gonçalo</small>
         </article>
         <article>
           <span>Disponíveis agora</span>
           <strong>{onlineCount}</strong>
-          <small>{onlineCount ? "Transmissões configuradas" : "Aguardando ativação das fontes"}</small>
+          <small>{onlineCount ? "Câmeras funcionando" : "Nenhuma câmera disponível no momento"}</small>
         </article>
         <article>
-          <span>Temperatura atual</span>
+          <span>Temperatura agora</span>
           <strong>{weather.current.temperature}°C</strong>
           <small>{weather.current.condition}</small>
         </article>
         <article>
-          <span>Maior rajada próxima</span>
+          <span>Rajada mais forte nas próximas horas</span>
           <strong>
             {Math.max(
               weather.current.windGust,
               ...weather.hourly.map((hour) => hour.windGust),
             )} km/h
           </strong>
-          <small>Agora e próximas horas</small>
+          <small>Previsão para Pelotas</small>
         </article>
       </section>
 
@@ -108,34 +108,32 @@ export default async function CamerasAoVivoPelotasPage() {
       <section className="topic-section camera-guidance" aria-labelledby="camera-guidance-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Como interpretar</span>
-            <h2 id="camera-guidance-title">Imagem complementa, mas não mede o tempo</h2>
+            <span className="eyebrow">Use as imagens como apoio</span>
+            <h2 id="camera-guidance-title">A câmera mostra o local, mas não mede o tempo</h2>
           </div>
           <p>
-            Câmeras ajudam a verificar visibilidade, cobertura de nuvens e presença aparente de
-            chuva, mas não fornecem uma medição meteorológica completa.
+            A imagem ajuda a perceber neblina, nuvens e chuva, mas deve ser consultada junto da previsão e dos avisos oficiais.
           </p>
         </div>
         <div className="camera-guidance-grid">
           <article>
             <span>01</span>
             <h3>Observe a visibilidade</h3>
-            <p>Neblina, chuva intensa e baixa nebulosidade podem reduzir a visão do horizonte.</p>
+            <p>Neblina, chuva forte e nuvens baixas podem dificultar a visão do horizonte.</p>
           </article>
           <article>
             <span>02</span>
             <h3>Compare com a previsão</h3>
-            <p>Use a imagem junto dos gráficos de chuva, vento e temperatura do portal.</p>
+            <p>Veja também as páginas de chuva, vento e temperatura do portal.</p>
           </article>
           <article>
             <span>03</span>
-            <h3>Considere atrasos</h3>
-            <p>Transmissões externas podem apresentar latência, pausas ou indisponibilidade.</p>
+            <h3>A imagem pode atrasar</h3>
+            <p>A câmera pode pausar, ficar fora do ar ou mostrar uma imagem com alguns segundos de atraso.</p>
           </article>
         </div>
         <p className="data-note">
-          As imagens pertencem aos respectivos provedores informados em cada transmissão. A
-          disponibilidade pode variar sem aviso prévio.
+          As imagens pertencem aos responsáveis informados em cada câmera e podem ficar indisponíveis sem aviso.
         </p>
       </section>
     </ForecastPageShell>
