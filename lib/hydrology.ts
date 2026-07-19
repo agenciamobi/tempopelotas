@@ -36,23 +36,33 @@ export const OPEN_METEO_URL = "https://open-meteo.com/";
 export const EMBRAPA_AGROMET_URL =
   "https://agromet.cpact.embrapa.br/online/Current_Monitor.htm";
 export const GLOFAS_URL = "https://global-flood.emergency.copernicus.eu/";
+export const NIVEL_GUAIBA_URL = "https://nivelguaiba.com.br/";
 
 export const HYDROLOGY_FLOW = [
   {
-    title: "Bacias e rios do RS",
-    description: "A chuva nas bacias contribuintes altera o volume que segue para o Guaíba.",
+    title: "Bacias do Guaíba",
+    description:
+      "Jacuí, Taquari-Antas, Caí, Sinos, Gravataí e outras bacias conduzem água para o Guaíba.",
   },
   {
     title: "Guaíba",
-    description: "O nível em Porto Alegre funciona como indicador regional a montante.",
+    description:
+      "É uma das maiores contribuições para a Lagoa dos Patos e funciona como indicador regional a montante.",
   },
   {
-    title: "Lagoa dos Patos",
-    description: "Recebe grande parte dessa água e responde também ao vento e à descarga pela barra.",
+    title: "Outros afluentes",
+    description:
+      "Camaquã, Litoral Médio, Mirim–São Gonçalo, rios e arroios também alimentam o sistema lagunar.",
   },
   {
-    title: "Pelotas",
-    description: "Laranjal, Canal São Gonçalo e áreas baixas exigem leitura local e avisos oficiais.",
+    title: "Lagoa e Pelotas",
+    description:
+      "O nível no Laranjal depende do volume acumulado, da chuva local, do vento e do Canal São Gonçalo.",
+  },
+  {
+    title: "Barra de Rio Grande",
+    description:
+      "O escoamento ao oceano ocorre pelo canal da Barra, entre Rio Grande e São José do Norte.",
   },
 ] as const;
 
@@ -110,6 +120,17 @@ export const HYDROLOGY_DATA_SOURCES: HydrologyDataSource[] = [
     status: "active",
     statusLabel: "Em uso",
     url: LAGOON_LEVEL_SOURCE.dashboardUrl,
+  },
+  {
+    id: "nivel-guaiba",
+    name: "Nível do Guaíba em Porto Alegre",
+    organization: "Nível Guaíba",
+    category: "Indicador regional agregado",
+    description:
+      "Série pública materializada a partir de dados telemétricos de ANA e SGB. O TEMPO Pelotas calcula tendência de seis horas e variação de 24 horas sem tratar o Guaíba como previsão isolada para Pelotas.",
+    status: "active",
+    statusLabel: "Em uso",
+    url: NIVEL_GUAIBA_URL,
   },
   {
     id: "ana",
