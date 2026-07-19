@@ -39,6 +39,7 @@ import "./home-location-and-level.css";
 import "./mobile-usability-refinement.css";
 import "./mobile-interaction-fixes.css";
 import "./theme-refinement.css";
+import "./home-first-fold-refinement.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
