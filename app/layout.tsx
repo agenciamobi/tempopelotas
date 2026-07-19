@@ -15,16 +15,17 @@ import "./cameras.css";
 import "./lagoon-level.css";
 import "./lagoon-layout-refinement.css";
 import "./home-lagoon-card.css";
+import "./hydrology.css";
 import "./footer.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "TEMPO Pelotas | Previsão do tempo em Pelotas, RS",
+    default: "TEMPO Pelotas | Previsão e situação hidrológica em Pelotas, RS",
     template: "%s | TEMPO Pelotas",
   },
   description:
-    "Previsão do tempo em Pelotas, RS, com condições atuais, chuva, vento, alertas e tendência para os próximos dias.",
+    "Previsão do tempo e monitoramento hidrológico para Pelotas, com chuva, vento, radar, nível da Lagoa dos Patos e fontes oficiais para preparação comunitária.",
   applicationName: "TEMPO Pelotas",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
@@ -45,15 +46,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     siteName: "TEMPO Pelotas",
-    title: "TEMPO Pelotas | Clima e previsão local",
+    title: "TEMPO Pelotas | Tempo, águas e preparação comunitária",
     description:
-      "Condições atuais e previsão meteorológica para Pelotas e a Zona Sul do Rio Grande do Sul.",
+      "Condições meteorológicas e contexto hidrológico para Pelotas e a Zona Sul do Rio Grande do Sul.",
     url: "/",
   },
   twitter: {
     card: "summary_large_image",
     title: "TEMPO Pelotas",
-    description: "Clima e previsão do tempo em Pelotas, RS.",
+    description: "Tempo, nível da lagoa e situação hidrológica em Pelotas, RS.",
   },
   robots: {
     index: true,
