@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ForecastPageShell } from "@/components/forecast-page-shell";
-import { LaranjalLevelCard } from "@/components/laranjal-level-card";
+import { PelotasHydrologyWidget } from "@/components/pelotas-hydrology-widget";
 import { getLaranjalLevelData } from "@/lib/laranjal-level";
 import { absoluteUrl } from "@/lib/site";
 import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
@@ -66,7 +66,7 @@ export default async function NivelDaLagoaPage() {
         }}
       />
 
-      <LaranjalLevelCard
+      <PelotasHydrologyWidget
         initialData={laranjalLevel}
         weather={{
           windSpeed: weather.current.windSpeed,
