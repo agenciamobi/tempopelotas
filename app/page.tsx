@@ -8,6 +8,7 @@ import { WeatherMap } from "@/components/weather-map";
 import { WeatherNavigation } from "@/components/weather-navigation";
 import { getGuaibaObservation } from "@/lib/guaiba-monitor";
 import { getLaranjalLevelData } from "@/lib/laranjal-level";
+import { getNivelGuaibaRegionalObservations } from "@/lib/nivel-guaiba-regional";
 import { absoluteUrl } from "@/lib/site";
 import { getWeatherAdvisory } from "@/lib/weather-insights";
 import { getPelotasWeatherWithObservation } from "@/lib/weather-service";
@@ -36,10 +37,12 @@ export default async function Home() {
   const [
     { weather, observation: embrapaObservation },
     guaibaObservation,
+    guaibaRegional,
     laranjalObservation,
   ] = await Promise.all([
     getPelotasWeatherWithObservation(),
     getGuaibaObservation(),
+    getNivelGuaibaRegionalObservations(),
     getLaranjalLevelData(),
   ]);
   const advisoryLevel = getWeatherAdvisory(weather).level;
@@ -67,6 +70,7 @@ export default async function Home() {
         <HydrologyOverview
           weather={weather}
           guaiba={guaibaObservation}
+          guaibaRegional={guaibaRegional}
           laranjal={laranjalObservation}
         />
 
