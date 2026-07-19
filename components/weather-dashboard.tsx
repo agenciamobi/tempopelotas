@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { LagoonLevelHomeCard } from "@/components/lagoon-level-home-card";
 import { WeatherIcon } from "@/components/weather-icon";
 import { WeatherTrendChart } from "@/components/weather-trend-chart";
 import type { WeatherData } from "@/lib/weather-data";
@@ -114,8 +113,6 @@ export function WeatherDashboard({ weather }: WeatherDashboardProps) {
         </div>
         <Link href="/alertas">Ver análise</Link>
       </section>
-
-      <LagoonLevelHomeCard />
 
       <section className="weekly-section" id="semana" aria-labelledby="weekly-title">
         <div className="section-heading">
