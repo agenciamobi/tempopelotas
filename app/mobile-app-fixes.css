@@ -1,3 +1,33 @@
+@media (max-width: 900px) {
+  .current-weather {
+    order: 1;
+  }
+
+  .hourly-section {
+    order: 2;
+  }
+
+  .trend-chart {
+    order: 3;
+  }
+
+  .alert-card {
+    order: 4;
+  }
+
+  .lagoon-teaser {
+    order: 5;
+  }
+
+  .weekly-section {
+    order: 6;
+  }
+
+  .map-panel {
+    order: 7;
+  }
+}
+
 @media (max-width: 640px) {
   .alert-card > a {
     grid-column: auto;
