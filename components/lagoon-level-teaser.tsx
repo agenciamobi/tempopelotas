@@ -20,11 +20,11 @@ export function LagoonLevelTeaser() {
         <span className="eyebrow">Praia do Laranjal</span>
         <h2 id="lagoon-teaser-title">Nível da Lagoa dos Patos</h2>
         <p>
-          Consulte o medidor da Estação Laranjal, com painel externo do LabHidroSens / UFPel.
+          Veja a medição da Estação Laranjal e acompanhe se o nível está subindo, estável ou baixando.
         </p>
       </div>
       <Link href="/nivel-da-lagoa-dos-patos-laranjal">
-        Ver nível da lagoa
+        Acompanhar o nível
         <span aria-hidden="true">→</span>
       </Link>
     </section>
