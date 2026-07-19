@@ -7,6 +7,11 @@
   margin-top: 18px;
 }
 
+.guaiba-trend--unavailable {
+  background: rgba(107, 122, 132, 0.12);
+  color: var(--ink-soft);
+}
+
 @media (max-width: 1180px) {
   .hydrology-page-flow {
     grid-template-columns: repeat(3, minmax(0, 1fr));
