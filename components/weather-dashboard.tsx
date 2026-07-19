@@ -31,7 +31,7 @@ export function WeatherDashboard({ weather, showCurrent = true }: WeatherDashboa
   const advisory = getWeatherAdvisory(weather);
 
   return (
-    <main className="weather-content">
+    <div className="weather-content">
       {showCurrent ? (
         <section className="current-weather" id="agora" aria-labelledby="current-title">
           <div className="current-topline">
@@ -137,6 +137,6 @@ export function WeatherDashboard({ weather, showCurrent = true }: WeatherDashboa
           ))}
         </div>
       </section>
-    </main>
+    </div>
   );
 }
