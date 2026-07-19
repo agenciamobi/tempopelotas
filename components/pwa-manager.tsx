@@ -64,15 +64,19 @@ export function PwaManager() {
 
   useEffect(() => {
     const standaloneQuery = window.matchMedia("(display-mode: standalone)");
+    const fullscreenQuery = window.matchMedia("(display-mode: fullscreen)");
     const updateInstalledState = () => {
       setIsInstalled(
-        standaloneQuery.matches || Boolean((navigator as NavigatorWithStandalone).standalone),
+        standaloneQuery.matches ||
+          fullscreenQuery.matches ||
+          Boolean((navigator as NavigatorWithStandalone).standalone),
       );
     };
     const userAgent = navigator.userAgent.toLowerCase();
     setIsIos(/iphone|ipad|ipod/.test(userAgent));
     updateInstalledState();
     standaloneQuery.addEventListener("change", updateInstalledState);
+    fullscreenQuery.addEventListener("change", updateInstalledState);
 
     const handleInstallPrompt = (event: Event) => {
       event.preventDefault();
@@ -116,6 +120,7 @@ export function PwaManager() {
 
     return () => {
       standaloneQuery.removeEventListener("change", updateInstalledState);
+      fullscreenQuery.removeEventListener("change", updateInstalledState);
       window.removeEventListener("beforeinstallprompt", handleInstallPrompt);
       window.removeEventListener("appinstalled", handleInstalled);
     };
