@@ -9,12 +9,12 @@ export const revalidate = 600;
 export const metadata: Metadata = {
   title: "Vento em Pelotas agora e previsão de rajadas",
   description:
-    "Consulte a velocidade e direção do vento em Pelotas, além das rajadas previstas para as próximas horas e dias.",
+    "Consulte a velocidade e a direção do vento em Pelotas, além das rajadas previstas para as próximas horas e dias.",
   alternates: { canonical: "/vento-em-pelotas" },
   openGraph: {
     title: "Vento e rajadas em Pelotas",
     description:
-      "Velocidade, direção e previsão de rajadas para Pelotas, RS.",
+      "Veja como está o vento agora e quando ele pode ficar mais forte em Pelotas, RS.",
     url: "/vento-em-pelotas",
   },
 };
@@ -35,9 +35,9 @@ export default async function VentoEmPelotasPage() {
   return (
     <ForecastPageShell
       weather={weather}
-      eyebrow="Vento e rajadas"
-      title="Vento em Pelotas"
-      description="Veja a velocidade atual, a direção predominante e a previsão de rajadas para organizar atividades ao ar livre e deslocamentos."
+      eyebrow="Vento em Pelotas"
+      title="Veja como está o vento agora"
+      description="Acompanhe a velocidade, a direção e os horários em que as rajadas podem ficar mais fortes."
       currentPath="/vento-em-pelotas"
     >
       <section className="wind-hero" aria-labelledby="wind-now-title">
@@ -56,24 +56,24 @@ export default async function VentoEmPelotasPage() {
         </div>
       </section>
 
-      <section className="topic-metrics" aria-label="Resumo do vento previsto">
+      <section className="topic-metrics" aria-label="Resumo do vento">
         <article>
-          <span>Vento atual</span>
+          <span>Vento agora</span>
           <strong>{weather.current.windSpeed} km/h</strong>
           <small>Direção {weather.current.windDirection}</small>
         </article>
         <article>
-          <span>Rajada atual</span>
+          <span>Rajada agora</span>
           <strong>{weather.current.windGust} km/h</strong>
-          <small>Valor instantâneo</small>
+          <small>Pico rápido do vento</small>
         </article>
         <article>
-          <span>Pico nas próximas horas</span>
+          <span>Rajada mais forte nas próximas horas</span>
           <strong>{peakHour?.windGust ?? 0} km/h</strong>
-          <small>{peakHour?.time ?? "Sem horário disponível"}</small>
+          <small>{peakHour?.time ?? "Horário indisponível"}</small>
         </article>
         <article>
-          <span>Maior rajada da semana</span>
+          <span>Vento mais forte da semana</span>
           <strong>{peakDay?.windGust ?? 0} km/h</strong>
           <small>{peakDay?.weekday} · {peakDay?.date}</small>
         </article>
@@ -84,10 +84,10 @@ export default async function VentoEmPelotasPage() {
       <section className="topic-section" aria-labelledby="wind-hours-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Próximas horas</span>
-            <h2 id="wind-hours-title">Velocidade e rajadas de vento</h2>
+            <span className="eyebrow">Hora por hora</span>
+            <h2 id="wind-hours-title">Quando o vento pode ficar mais forte</h2>
           </div>
-          <p>A rajada é um aumento breve da velocidade e pode ser bem superior ao vento médio.</p>
+          <p>A rajada é um aumento rápido do vento e pode ser mais forte que a velocidade mostrada como vento normal.</p>
         </div>
         <div className="wind-hourly-grid">
           {weather.hourly.map((hour, index) => (
@@ -106,16 +106,16 @@ export default async function VentoEmPelotasPage() {
       <section className="topic-section" aria-labelledby="wind-week-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Tendência semanal</span>
-            <h2 id="wind-week-title">Rajadas máximas previstas</h2>
+            <span className="eyebrow">Próximos 7 dias</span>
+            <h2 id="wind-week-title">Rajadas previstas para a semana</h2>
           </div>
         </div>
         <div className="data-table" role="table" aria-label="Previsão semanal de rajadas">
           <div className="data-table-head" role="row">
             <span role="columnheader">Dia</span>
-            <span role="columnheader">Rajada máxima</span>
+            <span role="columnheader">Rajada mais forte</span>
             <span role="columnheader">Temperatura</span>
-            <span role="columnheader">Condição</span>
+            <span role="columnheader">Tempo</span>
           </div>
           {weather.daily.map((day) => (
             <div className="data-table-row" role="row" key={`${day.weekday}-${day.date}`}>
@@ -131,18 +131,18 @@ export default async function VentoEmPelotasPage() {
       <section className="topic-section topic-copy" aria-labelledby="wind-care-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Orientação geral</span>
-            <h2 id="wind-care-title">Cuidados em dias de vento forte</h2>
+            <span className="eyebrow">Cuidados importantes</span>
+            <h2 id="wind-care-title">Como se proteger em dias de vento forte</h2>
           </div>
         </div>
         <div className="copy-columns">
           <div>
-            <h3>Objetos e estruturas externas</h3>
-            <p>Recolha objetos soltos em sacadas e pátios. Evite permanecer próximo a árvores, placas, estruturas metálicas e redes elétricas durante rajadas fortes.</p>
+            <h3>Recolha objetos soltos</h3>
+            <p>Guarde objetos de sacadas, pátios e telhados. Evite permanecer perto de árvores, placas, estruturas metálicas e fios de energia durante rajadas fortes.</p>
           </div>
           <div>
-            <h3>Acompanhe avisos oficiais</h3>
-            <p>As previsões são estimativas. Em condições adversas, siga as orientações da Defesa Civil, do INMET e das autoridades locais.</p>
+            <h3>Siga os avisos oficiais</h3>
+            <p>A previsão pode mudar. Quando houver risco, siga as orientações da Defesa Civil, do INMET e das autoridades locais.</p>
           </div>
         </div>
       </section>
