@@ -28,6 +28,8 @@ import "./interface-fixes.css";
 import "./pwa.css";
 import "./mobile-width-guard.css";
 import "./mobile-structure-refinement.css";
+import "./mobile-special-sections.css";
+import "./pwa-fullscreen-refinement.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
