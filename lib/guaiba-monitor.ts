@@ -144,13 +144,15 @@ export function normalizeGuaibaSeries(
   const variation24hCm = baseline24h
     ? (current.level - baseline24h.level) * 100
     : null;
+  const trendCmPerHour = calculateRate(points, current, 6);
   const ageMinutes = (fetchedAt.getTime() - current.epoch) / 60_000;
 
   return {
     status: ageMinutes > STALE_AFTER_MINUTES ? "stale" : "live",
     currentLevel: round(current.level),
     updatedAt: current.timestamp,
-    trendCmPerHour: round(calculateRate(points, current, 6) ?? 0, 1),
+    trendCmPerHour:
+      trendCmPerHour === null ? null : round(trendCmPerHour, 1),
     variation24hCm: variation24hCm === null ? null : round(variation24hCm, 1),
     periodAverage: round(values.reduce((sum, value) => sum + value, 0) / values.length),
     periodMinimum: round(Math.min(...values)),
