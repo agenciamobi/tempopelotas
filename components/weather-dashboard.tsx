@@ -41,7 +41,7 @@ export function WeatherDashboard({ weather, showCurrent = true }: WeatherDashboa
                 {current.city}, <span>{current.state}</span>
               </h1>
             </div>
-            <span className="demo-badge">Atualizado em {current.updatedAt}</span>
+            <span className="demo-badge">{current.updatedAt} · {current.source.name}</span>
           </div>
 
           <div className="current-main">
