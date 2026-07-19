@@ -37,6 +37,8 @@ export const EMBRAPA_AGROMET_URL =
   "https://agromet.cpact.embrapa.br/online/Current_Monitor.htm";
 export const GLOFAS_URL = "https://global-flood.emergency.copernicus.eu/";
 export const NIVEL_GUAIBA_URL = "https://nivelguaiba.com.br/";
+export const LAGOON_MONITORING_NETWORK_URL =
+  "https://monitoramentolagoadospatos.com.br/";
 
 export const HYDROLOGY_FLOW = [
   {
@@ -120,6 +122,17 @@ export const HYDROLOGY_DATA_SOURCES: HydrologyDataSource[] = [
     status: "active",
     statusLabel: "Em uso",
     url: LAGOON_LEVEL_SOURCE.dashboardUrl,
+  },
+  {
+    id: "lagoon-monitoring-network",
+    name: "Rede de Monitoramento da Lagoa dos Patos",
+    organization: "FURG & Portos RS",
+    category: "Cotas em diferentes pontos da lagoa",
+    description:
+      "Publica cotas atuais, cotas locais de inundação e referências históricas em Rio Grande, São Lourenço do Sul, Arambaré, São José do Norte e Itapuã.",
+    status: "active",
+    statusLabel: "Em uso",
+    url: LAGOON_MONITORING_NETWORK_URL,
   },
   {
     id: "nivel-guaiba",
