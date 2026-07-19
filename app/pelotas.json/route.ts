@@ -5,6 +5,8 @@ import {
   HYDROLOGY_DATA_SOURCES,
   HYDROLOGY_STATIONS,
 } from "@/lib/hydrology";
+import { getLagoonMonitoringNetwork } from "@/lib/lagoon-monitoring-network";
+import { getLaranjalLevelData } from "@/lib/laranjal-level";
 import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
 import { getNivelGuaibaRegionalObservations } from "@/lib/nivel-guaiba-regional";
 import { absoluteUrl } from "@/lib/site";
@@ -18,16 +20,20 @@ export async function GET() {
     embrapaObservation,
     guaibaObservation,
     guaibaRegional,
+    lagoonMonitoring,
+    laranjalLevel,
   ] = await Promise.all([
     getPelotasWeather(),
     getEmbrapaObservation(),
     getGuaibaObservation(),
     getNivelGuaibaRegionalObservations(),
+    getLagoonMonitoringNetwork(),
+    getLaranjalLevelData(),
   ]);
 
   return NextResponse.json(
     {
-      schema_version: "1.3",
+      schema_version: "1.4",
       generated_at: new Date().toISOString(),
       location: {
         city: "Pelotas",
@@ -51,6 +57,11 @@ export async function GET() {
       },
       hydrology: {
         status: "contextual-monitoring",
+        local_level: {
+          laranjal: laranjalLevel,
+          interpretation:
+            "Medição local prioritária para acompanhar a Lagoa dos Patos na região de Pelotas.",
+        },
         upstream_indicator: {
           guaiba: guaibaObservation,
           interpretation:
@@ -62,9 +73,11 @@ export async function GET() {
           interpretation:
             "Cada cidade utiliza uma régua e uma referência próprias. Compare a tendência de cada ponto, não os níveis absolutos entre cidades.",
         },
-        local_level: null,
-        local_level_note:
-          "O nível local é exibido no painel externo do LabHidroSens / UFPel. A integração numérica oficial com ANA/SGB ainda depende de credenciais e validação da API.",
+        lagoon_network: {
+          data: lagoonMonitoring,
+          interpretation:
+            "Rede FURG e Portos RS com cotas em diferentes pontos da Lagoa dos Patos. Compare cada leitura com a cota de inundação indicada para a mesma estação.",
+        },
         local_dashboard: {
           station: LAGOON_LEVEL_SOURCE.station,
           provider: LAGOON_LEVEL_SOURCE.name,
@@ -81,8 +94,10 @@ export async function GET() {
         embrapa_station: absoluteUrl("/estacao-embrapa-pelotas"),
         embrapa_api: absoluteUrl("/api/weather/embrapa"),
         hydrology: absoluteUrl("/situacao-hidrologica-pelotas"),
+        laranjal_api: absoluteUrl("/api/hydrology/laranjal"),
         guaiba_api: absoluteUrl("/api/hydrology/guaiba"),
         guaiba_cities_api: absoluteUrl("/api/hydrology/guaiba/cities"),
+        lagoon_network_api: absoluteUrl("/api/hydrology/lagoon-network"),
         methodology: absoluteUrl("/metodologia"),
         feed: absoluteUrl("/feed"),
       },
