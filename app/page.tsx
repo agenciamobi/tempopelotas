@@ -68,7 +68,7 @@ export default async function Home() {
         <SiteHeader advisoryLevel={advisory.level} variant="hero" />
         <WeatherHero weather={weather} />
 
-        <main className="home-main-v2">
+        <main className="home-main-v2" id="conteudo-principal" tabIndex={-1}>
           <nav className="home-reading-order-v2" aria-label="Principais informações da homepage">
             <div className="home-reading-order-v2__intro">
               <span className="eyebrow">Leitura rápida</span>
