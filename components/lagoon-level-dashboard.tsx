@@ -61,15 +61,15 @@ export function LagoonLevelDashboard({
     <section className="lagoon-dashboard" aria-labelledby="lagoon-dashboard-title">
       <div className="lagoon-dashboard-heading">
         <div>
-          <span className="eyebrow">Monitoramento na Praia do Laranjal</span>
+          <span className="eyebrow">Praia do Laranjal</span>
           <h2 id="lagoon-dashboard-title">Nível da Lagoa dos Patos</h2>
           <p>
-            Acompanhe a medição da Estação Laranjal e observe a evolução do nível junto das condições
-            de vento e chuva em Pelotas. O gráfico é atualizado pelo LabHidroSens / UFPel.
+            Veja o nível medido na Estação Laranjal e acompanhe se ele está subindo, estável ou baixando.
+            Compare também com o vento e a chuva em Pelotas.
           </p>
         </div>
         <div className="lagoon-source-badge">
-          <span>Dados do medidor</span>
+          <span>Responsável pela medição</span>
           <strong>{LAGOON_LEVEL_SOURCE.name}</strong>
           <small>{LAGOON_LEVEL_SOURCE.location}</small>
         </div>
@@ -80,7 +80,7 @@ export function LagoonLevelDashboard({
           <div className="lagoon-dashboard-frame">
             <iframe
               src={LAGOON_LEVEL_SOURCE.dashboardUrl}
-              title="Painel do nível da Lagoa dos Patos na Estação Laranjal"
+              title="Nível da Lagoa dos Patos na Estação Laranjal"
               loading="eager"
               allow="fullscreen"
               allowFullScreen
@@ -97,23 +97,23 @@ export function LagoonLevelDashboard({
                 target="_blank"
                 rel="noreferrer"
               >
-                Abrir painel original
+                Abrir medidor completo
                 <b aria-hidden="true">↗</b>
               </a>
             </div>
           </div>
 
           <p className="lagoon-dashboard-note">
-            O medidor representa a Estação Laranjal. Caso o gráfico não apareça, abra o painel original
-            para consultar diretamente a fonte responsável pela leitura.
+            Esta medição representa a Praia do Laranjal. Quando o gráfico não aparecer, use o botão
+            acima para consultar diretamente a página responsável pela leitura.
           </p>
         </div>
 
-        <aside className="lagoon-dashboard-aside" aria-label="Condições relacionadas ao nível da lagoa">
+        <aside className="lagoon-dashboard-aside" aria-label="Informações que ajudam a entender o nível da lagoa">
           <article className="lagoon-station-card">
             <span className="lagoon-station-status">
               <i aria-hidden="true" />
-              Estação em acompanhamento
+              Medição acompanhada
             </span>
             <strong>Praia do Laranjal</strong>
             <small>Pelotas / RS · tempo atualizado em {formatUpdatedAt(updatedAt)}</small>
@@ -125,9 +125,9 @@ export function LagoonLevelDashboard({
                 <WindIcon />
               </span>
               <div>
-                <small>Vento em Pelotas agora</small>
+                <small>Vento agora</small>
                 <strong>{windSpeed} km/h</strong>
-                <span>{windDirection}</span>
+                <span>Direção {windDirection}</span>
               </div>
             </article>
             <article>
@@ -135,7 +135,7 @@ export function LagoonLevelDashboard({
                 <WindIcon />
               </span>
               <div>
-                <small>Maior rajada nas próximas horas</small>
+                <small>Rajada mais forte nas próximas horas</small>
                 <strong>{windGust} km/h</strong>
                 <span>Previsão para Pelotas</span>
               </div>
@@ -147,17 +147,17 @@ export function LagoonLevelDashboard({
               <div>
                 <small>Chuva prevista para hoje</small>
                 <strong>{formatMillimeters(precipitation)} mm</strong>
-                <span>Estimativa meteorológica</span>
+                <span>Volume previsto para Pelotas</span>
               </div>
             </article>
           </div>
 
           <article className="lagoon-reading-card">
-            <span className="eyebrow">Condições em Pelotas</span>
+            <span className="eyebrow">Tempo em Pelotas</span>
             <h3>{condition}</h3>
             <p>
-              Observe se o nível está subindo, estável ou baixando e acompanhe os avisos das
-              autoridades. Vento e chuva podem alterar o comportamento da água no Laranjal.
+              Vento e chuva podem mudar o comportamento da água no Laranjal. Observe a evolução do
+              nível e siga os avisos da Defesa Civil e das autoridades locais.
             </p>
           </article>
 
@@ -169,7 +169,7 @@ export function LagoonLevelDashboard({
           >
             <span>
               <small>LabHidroSens / UFPel</small>
-              <strong>Consultar o painel completo</strong>
+              <strong>Ver a medição diretamente na fonte</strong>
             </span>
             <b aria-hidden="true">↗</b>
           </a>
