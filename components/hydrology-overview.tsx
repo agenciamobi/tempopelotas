@@ -23,7 +23,9 @@ function FlowArrow() {
 }
 
 export function HydrologyOverview({ weather, guaiba }: HydrologyOverviewProps) {
-  const laranjalStation = HYDROLOGY_STATIONS[1];
+  const laranjalStation =
+    HYDROLOGY_STATIONS.find((station) => station.code === "87955000") ??
+    HYDROLOGY_STATIONS[0];
   const today = weather.daily[0];
   const strongestUpcomingGust = Math.max(
     weather.current.windGust,
