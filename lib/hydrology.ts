@@ -40,29 +40,29 @@ export const NIVEL_GUAIBA_URL = "https://nivelguaiba.com.br/";
 
 export const HYDROLOGY_FLOW = [
   {
-    title: "Bacias do Guaíba",
+    title: "Rios que chegam ao Guaíba",
     description:
-      "Jacuí, Taquari-Antas, Caí, Sinos, Gravataí e outras bacias conduzem água para o Guaíba.",
+      "Jacuí, Taquari-Antas, Caí, Sinos, Gravataí e outros rios levam água para o Guaíba.",
   },
   {
     title: "Guaíba",
     description:
-      "É uma das maiores contribuições para a Lagoa dos Patos e funciona como indicador regional a montante.",
+      "Parte dessa água segue para a Lagoa dos Patos e ajuda a entender o cenário regional.",
   },
   {
-    title: "Outros afluentes",
+    title: "Outros rios e arroios",
     description:
-      "Camaquã, Litoral Médio, Mirim–São Gonçalo, rios e arroios também alimentam o sistema lagunar.",
+      "Camaquã, Litoral Médio, Mirim–São Gonçalo e outros cursos de água também chegam à lagoa.",
   },
   {
     title: "Lagoa e Pelotas",
     description:
-      "O nível no Laranjal depende do volume acumulado, da chuva local, do vento e do Canal São Gonçalo.",
+      "O nível no Laranjal também depende da chuva, do vento e da água que passa pelo Canal São Gonçalo.",
   },
   {
-    title: "Barra de Rio Grande",
+    title: "Saída para o oceano",
     description:
-      "O escoamento ao oceano ocorre pelo canal da Barra, entre Rio Grande e São José do Norte.",
+      "A água sai da lagoa pelo canal entre Rio Grande e São José do Norte.",
   },
 ] as const;
 
@@ -72,7 +72,7 @@ export const HYDROLOGY_STATIONS: HydrologyStation[] = [
     code: "87450004",
     waterBody: "Guaíba",
     city: "Porto Alegre / RS",
-    role: "Indicador regional a montante da Lagoa dos Patos.",
+    role: "Ajuda a acompanhar uma das principais entradas de água da Lagoa dos Patos.",
     officialUrl: ANA_TELEMETRY_URL,
   },
   {
@@ -80,7 +80,7 @@ export const HYDROLOGY_STATIONS: HydrologyStation[] = [
     code: "87955000",
     waterBody: "Lagoa dos Patos",
     city: "Pelotas / RS",
-    role: "Referência oficial para acompanhamento do nível na região de Pelotas.",
+    role: "Ponto oficial de acompanhamento do nível da lagoa na região de Pelotas.",
     officialUrl: ANA_TELEMETRY_URL,
   },
   {
@@ -88,7 +88,7 @@ export const HYDROLOGY_STATIONS: HydrologyStation[] = [
     code: "87540000",
     waterBody: "Lagoa dos Patos",
     city: "Arambaré / RS",
-    role: "Ajuda a observar o comportamento da lagoa em seu setor norte e central.",
+    role: "Mostra como o nível está se comportando em outra parte da Lagoa dos Patos.",
     officialUrl: ANA_TELEMETRY_URL,
   },
   {
@@ -96,7 +96,7 @@ export const HYDROLOGY_STATIONS: HydrologyStation[] = [
     code: "87921000",
     waterBody: "Lagoa dos Patos",
     city: "São Lourenço do Sul / RS",
-    role: "Ponto intermediário para leitura espacial da Lagoa dos Patos.",
+    role: "Ajuda a observar a mudança do nível entre o norte e o sul da lagoa.",
     officialUrl: ANA_TELEMETRY_URL,
   },
   {
@@ -104,7 +104,7 @@ export const HYDROLOGY_STATIONS: HydrologyStation[] = [
     code: "87980000",
     waterBody: "Lagoa dos Patos",
     city: "Rio Grande / RS",
-    role: "Referência próxima à saída da lagoa e à Barra do Rio Grande.",
+    role: "Fica próximo da saída da lagoa para o oceano.",
     officialUrl: ANA_TELEMETRY_URL,
   },
 ];
@@ -114,9 +114,9 @@ export const HYDROLOGY_DATA_SOURCES: HydrologyDataSource[] = [
     id: "labhidrosens",
     name: "Estação Laranjal",
     organization: "LabHidroSens / UFPel",
-    category: "Nível local da lagoa",
+    category: "Nível da lagoa no Laranjal",
     description:
-      "Painel público incorporado ao portal para consulta visual do nível na Praia do Laranjal.",
+      "Mostra o nível medido na Praia do Laranjal e sua mudança ao longo do tempo.",
     status: "active",
     statusLabel: "Em uso",
     url: LAGOON_LEVEL_SOURCE.dashboardUrl,
@@ -125,88 +125,88 @@ export const HYDROLOGY_DATA_SOURCES: HydrologyDataSource[] = [
     id: "nivel-guaiba",
     name: "Nível do Guaíba em Porto Alegre",
     organization: "Nível Guaíba",
-    category: "Indicador regional agregado",
+    category: "Acompanhamento do Guaíba",
     description:
-      "Série pública materializada a partir de dados telemétricos de ANA e SGB. O TEMPO Pelotas calcula tendência de seis horas e variação de 24 horas sem tratar o Guaíba como previsão isolada para Pelotas.",
+      "Mostra o nível atual, a mudança nas últimas horas e o histórico recente do Guaíba.",
     status: "active",
     statusLabel: "Em uso",
     url: NIVEL_GUAIBA_URL,
   },
   {
     id: "ana",
-    name: "Rede Hidrometeorológica Nacional",
-    organization: "ANA / SNIRH",
-    category: "Níveis, vazões e chuva",
+    name: "Rede Nacional de Medição das Águas",
+    organization: "ANA",
+    category: "Níveis dos rios e chuva",
     description:
-      "Rede telemétrica oficial com estações automáticas e séries hidrológicas. A integração automatizada depende de credenciais da API HidroWebService.",
+      "Reúne medições oficiais feitas em rios, lagos e lagoas de todo o Brasil.",
     status: "official-reference",
-    statusLabel: "Consulta oficial",
+    statusLabel: "Fonte oficial",
     url: ANA_MONITORING_URL,
   },
   {
     id: "sgb",
-    name: "SACE",
+    name: "Acompanhamento de rios e cheias",
     organization: "Serviço Geológico do Brasil",
-    category: "Monitoramento e alertas hidrológicos",
+    category: "Níveis, boletins e avisos",
     description:
-      "Boletins, níveis de rios, chuva e sistemas de alerta produzidos pelo SGB para apoio à prevenção de eventos críticos.",
+      "Publica níveis de rios, chuva, boletins e avisos para ajudar na prevenção de enchentes.",
     status: "official-reference",
-    statusLabel: "Consulta oficial",
+    statusLabel: "Fonte oficial",
     url: SGB_SACE_URL,
   },
   {
     id: "open-meteo",
-    name: "Modelos meteorológicos",
+    name: "Previsão do tempo",
     organization: "Open-Meteo",
-    category: "Previsão do tempo",
+    category: "Temperatura, chuva e vento",
     description:
-      "Distribuição de previsões numéricas de modelos como ECMWF IFS, DWD ICON e NOAA GFS, normalizadas pelo portal.",
+      "Reúne previsões de grandes serviços meteorológicos e entrega os valores usados pelo portal.",
     status: "active",
     statusLabel: "Em uso",
     url: OPEN_METEO_URL,
   },
   {
     id: "embrapa-agromet",
-    name: "Posto Meteorológico da Sede",
+    name: "Estação da Sede da Embrapa",
     organization: "Embrapa Clima Temperado",
-    category: "Observação meteorológica local",
+    category: "Medições do tempo em Pelotas",
     description:
-      "Leituras automáticas de temperatura, umidade, pressão, vento, chuva, extremos do dia e evapotranspiração em um ponto físico de Pelotas.",
+      "Mede temperatura, umidade, pressão, vento e chuva em um ponto da cidade.",
     status: "active",
     statusLabel: "Em uso",
     url: EMBRAPA_AGROMET_URL,
   },
   {
     id: "cemaden",
-    name: "Rede de pluviômetros",
-    organization: "CEMADEN / MCTI",
-    category: "Precipitação observada",
+    name: "Medidores de chuva",
+    organization: "CEMADEN",
+    category: "Chuva observada",
     description:
-      "Fonte prevista para complementar a chuva modelada com registros de pluviômetros automáticos e comunitários.",
+      "Poderá complementar o portal com medições de chuva feitas em diferentes locais.",
     status: "prepared",
     statusLabel: "Em preparação",
     url: CEMADEN_URL,
   },
   {
     id: "noaa-star",
-    name: "GOES-19",
+    name: "Imagens do satélite GOES-19",
     organization: "NOAA / NESDIS STAR",
-    category: "Imagens meteorológicas",
+    category: "Imagens do céu e das nuvens",
     description:
-      "Fonte planejada para imagens oficiais de satélite e acompanhamento da evolução de sistemas meteorológicos.",
+      "Poderá mostrar a aproximação e a evolução de nuvens e tempestades.",
     status: "prepared",
     statusLabel: "Em preparação",
     url: NOAA_STAR_URL,
   },
   {
     id: "glofas",
-    name: "GloFAS v4",
+    name: "Previsão experimental de cheias",
     organization: "Copernicus / ECMWF",
-    category: "Vazão preditiva",
+    category: "Antecipação de possíveis cheias",
     description:
-      "Modelo global de previsão de cheias considerado para análises experimentais, sem substituir previsões hidrológicas oficiais locais.",
+      "Poderá ajudar a observar possíveis aumentos de água com antecedência, sempre como informação complementar.",
     status: "experimental",
-    statusLabel: "Experimental",
+    statusLabel: "Em estudo",
     url: GLOFAS_URL,
   },
 ];
