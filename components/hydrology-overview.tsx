@@ -1,15 +1,17 @@
 import Link from "next/link";
+import { GuaibaLevelCard } from "@/components/guaiba-level-card";
 import { LagoonLevelHomeCard } from "@/components/lagoon-level-home-card";
 import {
-  ANA_TELEMETRY_URL,
   HYDROLOGY_FLOW,
   HYDROLOGY_STATIONS,
   SGB_SACE_URL,
 } from "@/lib/hydrology";
+import type { GuaibaObservationData } from "@/lib/guaiba-monitor";
 import type { WeatherData } from "@/lib/weather-data";
 
 type HydrologyOverviewProps = {
   weather: WeatherData;
+  guaiba: GuaibaObservationData;
 };
 
 function FlowArrow() {
@@ -20,17 +22,7 @@ function FlowArrow() {
   );
 }
 
-function WaterIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3.5c3 3.7 5 6.3 5 9a5 5 0 0 1-10 0c0-2.7 2-5.3 5-9Z" />
-      <path d="M4 19c2 0 2-1.2 4-1.2S10 19 12 19s2-1.2 4-1.2S18 19 20 19" />
-    </svg>
-  );
-}
-
-export function HydrologyOverview({ weather }: HydrologyOverviewProps) {
-  const guaibaStation = HYDROLOGY_STATIONS[0];
+export function HydrologyOverview({ weather, guaiba }: HydrologyOverviewProps) {
   const laranjalStation = HYDROLOGY_STATIONS[1];
   const today = weather.daily[0];
   const strongestUpcomingGust = Math.max(
@@ -50,9 +42,10 @@ export function HydrologyOverview({ weather }: HydrologyOverviewProps) {
           <span className="eyebrow">Monitoramento para prevenção</span>
           <h2 id="hydrology-home-title">Situação das águas no Rio Grande do Sul e em Pelotas</h2>
           <p>
-            O nível observado em Pelotas precisa ser interpretado dentro de um sistema maior. A água
-            que chega ao Guaíba segue para a Lagoa dos Patos, enquanto vento, chuva e condições de
-            escoamento influenciam a resposta no Laranjal e nas áreas baixas da cidade.
+            O Guaíba é uma contribuição importante para a Lagoa dos Patos, mas não explica sozinho o
+            nível observado em Pelotas. A lagoa recebe água de várias bacias, rios e arroios; sua
+            resposta também depende do vento, da chuva local, do Canal São Gonçalo e da capacidade de
+            escoamento pelo canal da Barra, entre Rio Grande e São José do Norte.
           </p>
         </div>
         <div className="hydrology-home-actions">
@@ -66,7 +59,7 @@ export function HydrologyOverview({ weather }: HydrologyOverviewProps) {
         </div>
       </div>
 
-      <ol className="hydrology-flow" aria-label="Caminho regional das águas até Pelotas">
+      <ol className="hydrology-flow" aria-label="Contribuições e escoamento relacionados a Pelotas">
         {HYDROLOGY_FLOW.map((step, index) => (
           <li key={step.title}>
             <span className="hydrology-flow-number">{String(index + 1).padStart(2, "0")}</span>
@@ -87,31 +80,7 @@ export function HydrologyOverview({ weather }: HydrologyOverviewProps) {
         <LagoonLevelHomeCard />
 
         <aside className="hydrology-context-column" aria-label="Contexto hidrológico regional e local">
-          <article className="hydrology-context-card hydrology-context-card--regional">
-            <div className="hydrology-context-icon">
-              <WaterIcon />
-            </div>
-            <span className="eyebrow">Indicador regional</span>
-            <h3>Guaíba em Porto Alegre</h3>
-            <p>
-              A estação {guaibaStation.name} ajuda a acompanhar o volume que seguirá para a Lagoa
-              dos Patos. O dado não permite prever sozinho o nível futuro em Pelotas.
-            </p>
-            <dl>
-              <div>
-                <dt>Estação ANA</dt>
-                <dd>{guaibaStation.code}</dd>
-              </div>
-              <div>
-                <dt>Corpo hídrico</dt>
-                <dd>{guaibaStation.waterBody}</dd>
-              </div>
-            </dl>
-            <a href={ANA_TELEMETRY_URL} target="_blank" rel="noreferrer">
-              Consultar telemetria oficial
-              <span aria-hidden="true">↗</span>
-            </a>
-          </article>
+          <GuaibaLevelCard data={guaiba} />
 
           <article className="hydrology-context-card hydrology-context-card--local">
             <span className="eyebrow">Referência local</span>
