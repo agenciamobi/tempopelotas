@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { GuaibaLevelCard } from "@/components/guaiba-level-card";
+import { LagoonMonitoringNetwork } from "@/components/lagoon-monitoring-network";
 import { PelotasHydrologyWidget } from "@/components/pelotas-hydrology-widget";
 import { HYDROLOGY_FLOW, SGB_SACE_URL } from "@/lib/hydrology";
 import type { GuaibaObservationData } from "@/lib/guaiba-monitor";
+import type { LagoonMonitoringNetworkData } from "@/lib/lagoon-monitoring-network";
 import type { LaranjalLevelData } from "@/lib/laranjal-level";
 import type { NivelGuaibaCityObservation } from "@/lib/nivel-guaiba-regional";
 import type { WeatherData } from "@/lib/weather-data";
@@ -11,6 +13,7 @@ type HydrologyOverviewProps = {
   weather: WeatherData;
   guaiba: GuaibaObservationData;
   guaibaRegional: NivelGuaibaCityObservation[];
+  lagoonMonitoring: LagoonMonitoringNetworkData;
   laranjal: LaranjalLevelData;
 };
 
@@ -26,6 +29,7 @@ export function HydrologyOverview({
   weather,
   guaiba,
   guaibaRegional,
+  lagoonMonitoring,
   laranjal,
 }: HydrologyOverviewProps) {
   const today = weather.daily[0];
@@ -104,6 +108,8 @@ export function HydrologyOverview({
           </a>
         </aside>
       </div>
+
+      <LagoonMonitoringNetwork data={lagoonMonitoring} variant="home" />
 
       <div className="hydrology-community-note">
         <strong>Acompanhe e prepare-se</strong>
