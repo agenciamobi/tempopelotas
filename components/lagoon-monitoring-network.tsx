@@ -141,6 +141,8 @@ export function LagoonMonitoringNetwork({
   data: LagoonMonitoringNetworkData;
   variant?: "home" | "full";
 }) {
+  const compact = variant === "home";
+
   return (
     <section
       className={`lagoon-monitoring-network lagoon-monitoring-network--${variant} is-${data.status}`}
@@ -150,11 +152,12 @@ export function LagoonMonitoringNetwork({
         <div>
           <span className="eyebrow">FURG & Portos RS</span>
           <h3 id={`lagoon-monitoring-title-${variant}`}>
-            Rede de Monitoramento da Lagoa dos Patos
+            {compact ? "Níveis ao longo da Lagoa dos Patos" : "Rede de Monitoramento da Lagoa dos Patos"}
           </h3>
           <p>
-            Leituras diretas da API pública dos linígrafos, com série recente,
-            tendência e comparação com a cota de inundação de cada local.
+            {compact
+              ? "Compare as leituras mais recentes de cinco pontos monitorados entre o norte e o sul da lagoa."
+              : "Leituras diretas da API pública dos linígrafos, com série recente, tendência e comparação com a cota de inundação de cada local."}
           </p>
         </div>
         <a href={data.source.url} target="_blank" rel="noreferrer">
@@ -183,7 +186,7 @@ export function LagoonMonitoringNetwork({
             Math.min(observation.floodThresholdPercentage ?? 0, 100),
           );
           const trend = getTrend(observation);
-          const chart = buildChart(observation);
+          const chart = compact ? null : buildChart(observation);
 
           return (
             <article
@@ -256,7 +259,7 @@ export function LagoonMonitoringNetwork({
                     </div>
                   ) : null}
 
-                  <dl className="lagoon-monitoring-metrics">
+                  <dl className={`lagoon-monitoring-metrics${compact ? " is-compact" : ""}`}>
                     <div>
                       <dt>Cota local</dt>
                       <dd>{formatLevel(observation.floodLevelCm)} cm</dd>
@@ -265,10 +268,12 @@ export function LagoonMonitoringNetwork({
                       <dt>Variação 24h</dt>
                       <dd>{formatSigned(observation.change24hCm)} cm</dd>
                     </div>
-                    <div>
-                      <dt>Máx. mai/2024</dt>
-                      <dd>{formatLevel(observation.may2024MaximumCm)} cm</dd>
-                    </div>
+                    {!compact ? (
+                      <div>
+                        <dt>Máx. mai/2024</dt>
+                        <dd>{formatLevel(observation.may2024MaximumCm)} cm</dd>
+                      </div>
+                    ) : null}
                   </dl>
                 </>
               ) : (
@@ -278,9 +283,11 @@ export function LagoonMonitoringNetwork({
                 </div>
               )}
 
-              <p className="lagoon-monitoring-role">
-                {observation.station.role}
-              </p>
+              {!compact ? (
+                <p className="lagoon-monitoring-role">
+                  {observation.station.role}
+                </p>
+              ) : null}
               <footer>
                 <small>
                   {observation.updatedAt
@@ -301,15 +308,17 @@ export function LagoonMonitoringNetwork({
         })}
       </div>
 
-      <div className="lagoon-monitoring-note">
-        <strong>Como interpretar</strong>
-        <p>
-          A tendência e a variação são calculadas a partir da série pública de
-          cinco dias. Cada município possui sua própria cota de inundação:
-          compare cada leitura somente com a cota exibida no mesmo card. Estes
-          dados não substituem avisos da Defesa Civil.
-        </p>
-      </div>
+      {!compact ? (
+        <div className="lagoon-monitoring-note">
+          <strong>Como interpretar</strong>
+          <p>
+            A tendência e a variação são calculadas a partir da série pública de
+            cinco dias. Cada município possui sua própria cota de inundação:
+            compare cada leitura somente com a cota exibida no mesmo card. Estes
+            dados não substituem avisos da Defesa Civil.
+          </p>
+        </div>
+      ) : null}
     </section>
   );
 }
