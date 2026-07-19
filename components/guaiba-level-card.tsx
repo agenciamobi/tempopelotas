@@ -1,3 +1,4 @@
+import { NIVEL_GUAIBA_CITIES } from "@/lib/nivel-guaiba-cities";
 import type { GuaibaObservationData } from "@/lib/guaiba-monitor";
 
 const CHART_WIDTH = 520;
@@ -221,6 +222,30 @@ export function GuaibaLevelCard({ data }: { data: GuaibaObservationData }) {
           e São José do Norte.
         </p>
       </div>
+
+      <nav className="guaiba-city-directory" aria-label="Outras cidades monitoradas pelo Nível Guaíba">
+        <div className="guaiba-city-directory-heading">
+          <div>
+            <span className="eyebrow">Monitoramento regional</span>
+            <strong>Consulte outros pontos do Rio Grande do Sul</strong>
+          </div>
+          <small>Links externos do Nível Guaíba</small>
+        </div>
+        <div className="guaiba-city-links">
+          {NIVEL_GUAIBA_CITIES.map((city) => (
+            <a
+              className={city.isPrimary ? "is-primary" : undefined}
+              href={city.url}
+              key={city.slug}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span>{city.name}</span>
+              <i aria-hidden="true">↗</i>
+            </a>
+          ))}
+        </div>
+      </nav>
 
       <div className="guaiba-source-links">
         <a href={data.source.url} target="_blank" rel="noreferrer">
