@@ -24,21 +24,21 @@ const metrics: Record<
     label: "Temperatura",
     shortLabel: "Temperatura",
     unit: "°C",
-    description: "Variação estimada da temperatura nas próximas horas.",
+    description: "Veja como a temperatura deve mudar ao longo das próximas horas.",
     getValue: (hour) => hour.temperature,
   },
   precipitation: {
-    label: "Probabilidade de chuva",
+    label: "Chance de chuva",
     shortLabel: "Chuva",
     unit: "%",
-    description: "Probabilidade estimada de precipitação por horário.",
+    description: "Veja em quais horários há maior chance de chuva.",
     getValue: (hour) => hour.precipitation,
   },
   windGust: {
     label: "Rajadas de vento",
     shortLabel: "Rajadas",
     unit: " km/h",
-    description: "Intensidade estimada das rajadas nas próximas horas.",
+    description: "Veja quando o vento pode ficar mais forte nas próximas horas.",
     getValue: (hour) => hour.windGust,
   },
 };
@@ -135,8 +135,8 @@ export function WeatherTrendChart({
     >
       <div className="trend-chart-heading">
         <div>
-          <span className="eyebrow">Evolução nas próximas horas</span>
-          <h2 id={headingId}>Tendência meteorológica</h2>
+          <span className="eyebrow">Próximas horas</span>
+          <h2 id={headingId}>Como o tempo deve mudar</h2>
           <p>{config.description}</p>
         </div>
 
@@ -149,7 +149,7 @@ export function WeatherTrendChart({
         </div>
       </div>
 
-      <div className="trend-chart-tabs" role="tablist" aria-label="Escolher dado do gráfico">
+      <div className="trend-chart-tabs" role="tablist" aria-label="Escolha o que deseja ver">
         {(Object.keys(metrics) as ChartMetric[]).map((item) => (
           <button
             className={metric === item ? "is-active" : undefined}
@@ -231,7 +231,7 @@ export function WeatherTrendChart({
         </svg>
       </div>
 
-      <div className="trend-chart-hours" aria-label="Selecionar horário do gráfico">
+      <div className="trend-chart-hours" aria-label="Escolha um horário">
         {hourly.map((hour, index) => (
           <button
             className={index === safeSelectedIndex ? "is-active" : undefined}
