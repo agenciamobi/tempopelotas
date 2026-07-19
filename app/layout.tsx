@@ -16,6 +16,7 @@ import "./lagoon-level.css";
 import "./lagoon-layout-refinement.css";
 import "./home-lagoon-card.css";
 import "./hydrology.css";
+import "./embrapa-observation.css";
 import "./footer.css";
 import "./footer-resources.css";
 
