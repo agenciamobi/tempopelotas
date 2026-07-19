@@ -8,6 +8,7 @@ import { WeatherNavigation } from "@/components/weather-navigation";
 import { getEmbrapaObservation } from "@/lib/embrapa-observation";
 import { getGuaibaObservation } from "@/lib/guaiba-monitor";
 import { absoluteUrl } from "@/lib/site";
+import { getWeatherAdvisory } from "@/lib/weather-insights";
 import { getPelotasWeather } from "@/lib/weather-service";
 
 export const revalidate = 300;
@@ -36,6 +37,7 @@ export default async function Home() {
     getEmbrapaObservation(),
     getGuaibaObservation(),
   ]);
+  const advisoryLevel = getWeatherAdvisory(weather).level;
 
   return (
     <>
@@ -47,7 +49,7 @@ export default async function Home() {
       />
 
       <div className="site-shell">
-        <SiteHeader />
+        <SiteHeader advisoryLevel={advisoryLevel} />
 
         <div className="dashboard-layout">
           <WeatherMap regionalWeather={weather.regional} />
