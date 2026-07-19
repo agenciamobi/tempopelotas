@@ -27,27 +27,45 @@ Essa sequência é usada como contexto, não como um modelo determinístico. O n
 
 ## Rede FURG e Portos RS
 
-O portal também consulta a Rede de Monitoramento do Nível da Lagoa dos Patos:
+O portal consulta a API pública utilizada pela Rede de Monitoramento do Nível da Lagoa dos Patos:
 
-- FURG CCMAR, em Rio Grande;
-- São Lourenço do Sul;
-- Arambaré;
-- São José do Norte;
-- Itapuã, em Viamão.
+- `sensor_1` — FURG CCMAR, em Rio Grande;
+- `sensor_2` — São Lourenço do Sul;
+- `sensor_3` — Arambaré;
+- `sensor_4` — São José do Norte;
+- `sensor_5` — Itapuã, em Viamão.
 
-A fonte pública informa cota atual, horário da leitura, cota local de inundação e máximo de maio de 2024. As medições são apresentadas em centímetros e reduzidas ao referencial vertical brasileiro, o Marégrafo de Imbituba/SC.
+Base da API:
 
-Como não há documentação pública de API identificada, a integração atual processa o HTML renderizado da página principal. O parser:
+```text
+https://api-medidas-porto-7bni.onrender.com
+```
 
-- aceita decimais com ponto ou vírgula;
-- valida nível e horário antes de publicar;
+Endpoints usados:
+
+```text
+GET /dados/{sensor_id}
+GET /dados/{sensor_id}/grafico
+```
+
+A leitura atual retorna `data_hora`, `valor`, `sensor_id` e `criado_em`. O endpoint de gráfico retorna a série recente em intervalos aproximados de 30 minutos. A fonte também disponibiliza histórico paginado em `/dados/{sensor_id}/ultimos-dias?page={pagina}`, mas esse endpoint não é necessário para o painel atual.
+
+A integração:
+
+- consulta leitura atual e série em paralelo;
 - usa cache de cinco minutos;
-- sinaliza leitura atrasada após três horas;
-- mantém cada estação isolada, sem derrubar a rede quando uma leitura falha;
-- não inventa tendência ou histórico que a página principal não forneça;
-- não usa os números encontrados em buscas como fallback de medição.
+- mantém falhas isoladas por estação;
+- utiliza a série como contingência quando a leitura atual falha;
+- calcula variações de 1, 6 e 24 horas;
+- calcula tendência em centímetros por hora;
+- publica mínimo e máximo do período disponível;
+- sinaliza leitura atrasada após duas horas;
+- compara cada leitura apenas com a cota de inundação da própria estação;
+- preserva a atribuição à FURG e Portos RS.
 
-A cota de inundação é local. Para avaliação de proximidade, cada leitura deve ser comparada somente com a cota exibida no mesmo card.
+A API da fonte registra o horário local em strings terminadas em `Z`. O frontend original remove esse sufixo antes de exibir. O normalizador do TEMPO Pelotas mantém o mesmo significado e interpreta o campo como horário de Brasília.
+
+As medições são apresentadas em centímetros e reduzidas ao referencial vertical brasileiro, o Marégrafo de Imbituba/SC.
 
 ## Situação das integrações
 
@@ -58,7 +76,7 @@ A cota de inundação é local. Para avaliação de proximidade, cada leitura de
 - OpenWeather para radar quando a chave do produto está habilitada;
 - LabHidroSens / UFPel para nível e série recente da Estação Laranjal;
 - Nível Guaíba para Porto Alegre e rede regional de cidades;
-- FURG & Portos RS para a rede de cotas da Lagoa dos Patos;
+- API da FURG & Portos RS para a rede de cotas da Lagoa dos Patos;
 - Esri World Imagery para visualização de satélite cartográfico.
 
 ### Consulta oficial externa
