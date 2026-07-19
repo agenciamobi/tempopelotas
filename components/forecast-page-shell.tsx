@@ -29,7 +29,7 @@ export function ForecastPageShell({
     <div className="site-shell site-shell--topic" data-topic={topicKey}>
       <SiteHeader advisoryLevel={advisoryLevel} />
 
-      <main className="topic-page">
+      <main className="topic-page" id="conteudo-principal" tabIndex={-1}>
         <section className="topic-hero">
           <div>
             <span className="eyebrow">{eyebrow}</span>
