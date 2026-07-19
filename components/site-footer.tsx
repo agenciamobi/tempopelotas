@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { WeatherData } from "@/lib/weather-data";
 
 const MOBI_SITE_URL =
@@ -21,6 +22,13 @@ function MobiMark() {
 export function SiteFooter({ source: _source }: SiteFooterProps) {
   return (
     <footer className="site-footer">
+      <nav className="footer-resource-links" aria-label="Transparência e recursos públicos">
+        <Link href="/situacao-hidrologica-pelotas">Situação das águas</Link>
+        <Link href="/metodologia">Metodologia e fontes</Link>
+        <a href="/pelotas.json">Dados JSON</a>
+        <a href="/feed">Feed público</a>
+      </nav>
+
       <a
         className="mobi-sites-banner"
         href={MOBI_SITE_URL}
