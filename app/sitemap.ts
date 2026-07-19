@@ -9,6 +9,11 @@ const baseRoutes = [
   { path: "/chuva-em-pelotas", priority: 0.85, changeFrequency: "hourly" },
   { path: "/vento-em-pelotas", priority: 0.85, changeFrequency: "hourly" },
   {
+    path: "/estacao-embrapa-pelotas",
+    priority: 0.93,
+    changeFrequency: "hourly",
+  },
+  {
     path: "/situacao-hidrologica-pelotas",
     priority: 0.94,
     changeFrequency: "hourly",
