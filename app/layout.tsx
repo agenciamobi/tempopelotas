@@ -41,6 +41,7 @@ import "./mobile-interaction-fixes.css";
 import "./theme-refinement.css";
 import "./home-first-fold-refinement.css";
 import "./home-flow-footer-refinement.css";
+import "./theme-polish.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
