@@ -22,6 +22,11 @@ const pages = [
     description: "Velocidade, direção e rajadas.",
   },
   {
+    href: "/situacao-hidrologica-pelotas",
+    title: "Situação das águas",
+    description: "Guaíba, Lagoa dos Patos e contexto local.",
+  },
+  {
     href: "/nivel-da-lagoa-dos-patos-laranjal",
     title: "Nível da Lagoa dos Patos",
     description: "Medidor da Estação Laranjal.",
@@ -35,6 +40,11 @@ const pages = [
     href: "/cameras-ao-vivo-pelotas",
     title: "Câmeras de Pelotas",
     description: "Observe Laranjal, Centro e São Gonçalo.",
+  },
+  {
+    href: "/metodologia",
+    title: "Metodologia e fontes",
+    description: "Proveniência, limitações e dados abertos.",
   },
   {
     href: "/alertas",
@@ -52,8 +62,8 @@ export function WeatherNavigation({ currentPath }: WeatherNavigationProps) {
     <section className="related-weather" aria-labelledby="related-title">
       <div className="section-heading">
         <div>
-          <span className="eyebrow">Explore a previsão</span>
-          <h2 id="related-title">Informações meteorológicas de Pelotas</h2>
+          <span className="eyebrow">Explore o portal</span>
+          <h2 id="related-title">Tempo, águas e preparação em Pelotas</h2>
         </div>
       </div>
       <div className="related-weather-grid">
