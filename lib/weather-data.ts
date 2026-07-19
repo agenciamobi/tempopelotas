@@ -28,6 +28,13 @@ export type DailyForecast = {
   icon: WeatherIconName;
 };
 
+export type CurrentWeatherSource = {
+  name: string;
+  url: string;
+  kind: "observation" | "forecast" | "fallback";
+  observedAt: string | null;
+};
+
 export type CurrentWeather = {
   city: string;
   state: string;
@@ -44,6 +51,7 @@ export type CurrentWeather = {
   sunset: string;
   updatedAt: string;
   icon: WeatherIconName;
+  source: CurrentWeatherSource;
 };
 
 export type RegionalWeather = {
@@ -63,6 +71,10 @@ export type WeatherData = {
     name: string;
     url: string;
     isFallback: boolean;
+    observationName?: string;
+    observationUrl?: string;
+    forecastName?: string;
+    forecastUrl?: string;
   };
 };
 
@@ -83,6 +95,12 @@ export const fallbackWeatherData: WeatherData = {
     sunset: "17:47",
     updatedAt: "Dados temporariamente indisponíveis",
     icon: "partly-cloudy",
+    source: {
+      name: "dados demonstrativos",
+      url: "",
+      kind: "fallback",
+      observedAt: null,
+    },
   },
   hourly: [
     { time: "Agora", temperature: 20, precipitation: 0, windSpeed: 12, windGust: 22, icon: "partly-cloudy" },
