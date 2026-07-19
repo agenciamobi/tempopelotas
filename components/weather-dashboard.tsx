@@ -34,12 +34,12 @@ export function WeatherDashboard({ weather }: WeatherDashboardProps) {
       <section className="current-weather" id="agora" aria-labelledby="current-title">
         <div className="current-topline">
           <div>
-            <span className="eyebrow">Agora em Pelotas</span>
+            <span className="eyebrow">Tempo agora</span>
             <h1 id="current-title">
               {current.city}, <span>{current.state}</span>
             </h1>
           </div>
-          <span className="demo-badge">{current.updatedAt}</span>
+          <span className="demo-badge">Atualizado em {current.updatedAt}</span>
         </div>
 
         <div className="current-main">
@@ -56,14 +56,14 @@ export function WeatherDashboard({ weather }: WeatherDashboardProps) {
           </div>
         </div>
 
-        <div className="metrics-grid" aria-label="Condições meteorológicas atuais">
+        <div className="metrics-grid" aria-label="Tempo agora em Pelotas">
           <article>
             <MetricIcon type="humidity" />
-            <div><span>Umidade</span><strong>{current.humidity}%</strong></div>
+            <div><span>Umidade do ar</span><strong>{current.humidity}%</strong></div>
           </article>
           <article>
             <MetricIcon type="pressure" />
-            <div><span>Pressão</span><strong>{current.pressure} hPa</strong></div>
+            <div><span>Pressão do ar</span><strong>{current.pressure} hPa</strong></div>
           </article>
           <article>
             <MetricIcon type="wind" />
@@ -71,7 +71,7 @@ export function WeatherDashboard({ weather }: WeatherDashboardProps) {
           </article>
           <article>
             <MetricIcon type="visibility" />
-            <div><span>Visibilidade</span><strong>{current.visibility} km</strong></div>
+            <div><span>Até onde é possível enxergar</span><strong>{current.visibility} km</strong></div>
           </article>
         </div>
       </section>
@@ -79,11 +79,11 @@ export function WeatherDashboard({ weather }: WeatherDashboardProps) {
       <section className="hourly-section" id="horas" aria-labelledby="hourly-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Previsão horária</span>
+            <span className="eyebrow">Hora por hora</span>
             <h2 id="hourly-title">Como fica o tempo hoje</h2>
           </div>
           <div className="sun-times" aria-label="Horários do nascer e pôr do sol">
-            <span>Nascer <strong>{current.sunrise}</strong></span>
+            <span>Nascer do sol <strong>{current.sunrise}</strong></span>
             <span>Pôr do sol <strong>{current.sunset}</strong></span>
           </div>
         </div>
@@ -94,7 +94,7 @@ export function WeatherDashboard({ weather }: WeatherDashboardProps) {
               <span>{hour.time}</span>
               <WeatherIcon name={hour.icon} title={`Condição às ${hour.time}`} />
               <strong>{hour.temperature}°</strong>
-              <small>{hour.precipitation}% chuva</small>
+              <small>{hour.precipitation}% de chuva</small>
             </article>
           ))}
         </div>
@@ -111,16 +111,16 @@ export function WeatherDashboard({ weather }: WeatherDashboardProps) {
           <h2 id="alert-title">{advisory.title}</h2>
           <p>{advisory.reasons[0] ?? advisory.description}</p>
         </div>
-        <Link href="/alertas">Ver análise</Link>
+        <Link href="/alertas">Ver condições de atenção</Link>
       </section>
 
       <section className="weekly-section" id="semana" aria-labelledby="weekly-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Tendência</span>
+            <span className="eyebrow">Durante a semana</span>
             <h2 id="weekly-title">Próximos 7 dias</h2>
           </div>
-          <p>Máximas, mínimas e probabilidade de chuva para Pelotas.</p>
+          <p>Veja as temperaturas mais altas e mais baixas e a chance de chuva em Pelotas.</p>
         </div>
 
         <div className="daily-list">
