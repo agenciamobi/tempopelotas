@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Tempo hoje em Pelotas, RS",
     description:
-      "Condição atual e previsão por hora para Pelotas, com chuva, vento e temperatura.",
+      "Veja como está o tempo agora e o que esperar ao longo do dia em Pelotas.",
     url: "/tempo-hoje-pelotas",
   },
 };
@@ -31,7 +31,7 @@ export default async function TempoHojePelotasPage() {
     },
     {
       question: "Vai chover hoje em Pelotas?",
-      answer: `A probabilidade máxima de chuva prevista para hoje é de ${today?.rainChance ?? 0}%, com acumulado estimado de ${formatMillimeters(today?.precipitation ?? 0)} mm.`,
+      answer: `A maior chance de chuva prevista para hoje é de ${today?.rainChance ?? 0}%, com volume previsto de ${formatMillimeters(today?.precipitation ?? 0)} mm.`,
     },
     {
       question: "Qual é a máxima e a mínima de hoje?",
@@ -54,9 +54,9 @@ export default async function TempoHojePelotasPage() {
   return (
     <ForecastPageShell
       weather={weather}
-      eyebrow="Condição atual"
+      eyebrow="Tempo em Pelotas agora"
       title="Tempo hoje em Pelotas"
-      description="Acompanhe a temperatura agora e a evolução da chuva, do vento e da sensação térmica ao longo do dia."
+      description="Veja a temperatura, a sensação térmica e como a chuva e o vento devem mudar ao longo do dia."
       currentPath="/tempo-hoje-pelotas"
     >
       <script
@@ -84,10 +84,10 @@ export default async function TempoHojePelotasPage() {
       </section>
 
       <section className="topic-metrics" aria-label="Resumo do tempo hoje">
-        <article><span>Umidade</span><strong>{current.humidity}%</strong><small>Umidade relativa do ar</small></article>
-        <article><span>Vento</span><strong>{current.windSpeed} km/h</strong><small>Direção {current.windDirection}</small></article>
-        <article><span>Rajadas</span><strong>{current.windGust} km/h</strong><small>Velocidade instantânea</small></article>
-        <article><span>Chuva prevista</span><strong>{formatMillimeters(today?.precipitation ?? 0)} mm</strong><small>{today?.rainChance ?? 0}% de probabilidade</small></article>
+        <article><span>Umidade do ar</span><strong>{current.humidity}%</strong><small>Quanto de umidade há no ar</small></article>
+        <article><span>Vento agora</span><strong>{current.windSpeed} km/h</strong><small>Direção {current.windDirection}</small></article>
+        <article><span>Rajadas</span><strong>{current.windGust} km/h</strong><small>Picos rápidos do vento</small></article>
+        <article><span>Chuva prevista</span><strong>{formatMillimeters(today?.precipitation ?? 0)} mm</strong><small>{today?.rainChance ?? 0}% de chance</small></article>
       </section>
 
       <WeatherTrendChart hourly={hourly} initialMetric="temperature" />
@@ -95,10 +95,10 @@ export default async function TempoHojePelotasPage() {
       <section className="topic-section" aria-labelledby="today-hours-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Próximas horas</span>
-            <h2 id="today-hours-title">Evolução do tempo em Pelotas</h2>
+            <span className="eyebrow">Hora por hora</span>
+            <h2 id="today-hours-title">O que esperar nas próximas horas</h2>
           </div>
-          <p>Previsão horária com temperatura, chuva e rajadas de vento.</p>
+          <p>Confira a temperatura, a chance de chuva e as rajadas previstas para cada horário.</p>
         </div>
         <div className="topic-hourly-table">
           {hourly.map((hour, index) => (
@@ -106,8 +106,8 @@ export default async function TempoHojePelotasPage() {
               <strong>{hour.time}</strong>
               <WeatherIcon name={hour.icon} title={`Condição às ${hour.time}`} />
               <span>{hour.temperature}°C</span>
-              <span>{hour.precipitation}% chuva</span>
-              <span>Rajadas {hour.windGust} km/h</span>
+              <span>{hour.precipitation}% de chuva</span>
+              <span>Rajadas de {hour.windGust} km/h</span>
             </article>
           ))}
         </div>
@@ -116,8 +116,8 @@ export default async function TempoHojePelotasPage() {
       <section className="topic-section topic-copy" aria-labelledby="today-faq-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Perguntas frequentes</span>
-            <h2 id="today-faq-title">Tempo em Pelotas hoje</h2>
+            <span className="eyebrow">Dúvidas comuns</span>
+            <h2 id="today-faq-title">Perguntas sobre o tempo de hoje</h2>
           </div>
         </div>
         <div className="faq-list">
@@ -129,7 +129,7 @@ export default async function TempoHojePelotasPage() {
           ))}
         </div>
         <p className="data-note">
-          Os dados são modelos meteorológicos e podem mudar. Para decisões de segurança, consulte avisos oficiais da Defesa Civil e do INMET.
+          A previsão pode mudar ao longo do dia. Em situações de risco, siga os avisos da Defesa Civil, do INMET e das autoridades locais.
         </p>
       </section>
     </ForecastPageShell>
