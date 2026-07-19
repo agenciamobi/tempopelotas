@@ -3,7 +3,6 @@ import { ForecastPageShell } from "@/components/forecast-page-shell";
 import { LagoonLevelDashboard } from "@/components/lagoon-level-dashboard";
 import { absoluteUrl } from "@/lib/site";
 import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
-import { formatMillimeters } from "@/lib/weather-insights";
 import { getPelotasWeather } from "@/lib/weather-service";
 
 export const revalidate = 600;
@@ -63,30 +62,14 @@ export default async function NivelDaLagoaPage() {
         }}
       />
 
-      <section className="lagoon-context" aria-label="Condições meteorológicas relacionadas">
-        <article>
-          <span>Estação monitorada</span>
-          <strong>Laranjal</strong>
-          <small>Praia do Laranjal, Pelotas / RS</small>
-        </article>
-        <article>
-          <span>Vento agora</span>
-          <strong>{weather.current.windSpeed} km/h</strong>
-          <small>{weather.current.windDirection}</small>
-        </article>
-        <article>
-          <span>Maior rajada próxima</span>
-          <strong>{maxHourlyGust} km/h</strong>
-          <small>Agora e próximas horas</small>
-        </article>
-        <article>
-          <span>Chuva estimada hoje</span>
-          <strong>{formatMillimeters(today?.precipitation ?? 0)} mm</strong>
-          <small>Previsão meteorológica, não medição da lagoa</small>
-        </article>
-      </section>
-
-      <LagoonLevelDashboard />
+      <LagoonLevelDashboard
+        windSpeed={weather.current.windSpeed}
+        windDirection={weather.current.windDirection}
+        windGust={maxHourlyGust}
+        precipitation={today?.precipitation ?? 0}
+        condition={weather.current.condition}
+        updatedAt={weather.current.updatedAt}
+      />
 
       <section className="topic-section lagoon-explanation" aria-labelledby="lagoon-explanation-title">
         <div className="section-heading">
