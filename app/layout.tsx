@@ -21,6 +21,7 @@ import "./guaiba-card-refinement.css";
 import "./embrapa-observation.css";
 import "./footer.css";
 import "./footer-resources.css";
+import "./interface-fixes.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
