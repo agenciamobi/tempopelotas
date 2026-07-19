@@ -23,9 +23,10 @@ export function ForecastPageShell({
   currentPath,
 }: ForecastPageShellProps) {
   const advisoryLevel = getWeatherAdvisory(weather).level;
+  const topicKey = currentPath.split("/").filter(Boolean)[0] ?? "geral";
 
   return (
-    <div className="site-shell">
+    <div className="site-shell site-shell--topic" data-topic={topicKey}>
       <SiteHeader advisoryLevel={advisoryLevel} />
 
       <main className="topic-page">
