@@ -6,11 +6,10 @@ import { WeatherDashboard } from "@/components/weather-dashboard";
 import { WeatherHero } from "@/components/weather-hero";
 import { WeatherMap } from "@/components/weather-map";
 import { WeatherNavigation } from "@/components/weather-navigation";
-import { getEmbrapaObservation } from "@/lib/embrapa-observation";
 import { getGuaibaObservation } from "@/lib/guaiba-monitor";
 import { absoluteUrl } from "@/lib/site";
 import { getWeatherAdvisory } from "@/lib/weather-insights";
-import { getPelotasWeather } from "@/lib/weather-service";
+import { getPelotasWeatherWithObservation } from "@/lib/weather-service";
 
 export const revalidate = 300;
 
@@ -33,11 +32,11 @@ const websiteSchema = {
 };
 
 export default async function Home() {
-  const [weather, embrapaObservation, guaibaObservation] = await Promise.all([
-    getPelotasWeather(),
-    getEmbrapaObservation(),
-    getGuaibaObservation(),
-  ]);
+  const [{ weather, observation: embrapaObservation }, guaibaObservation] =
+    await Promise.all([
+      getPelotasWeatherWithObservation(),
+      getGuaibaObservation(),
+    ]);
   const advisoryLevel = getWeatherAdvisory(weather).level;
 
   return (
@@ -45,7 +44,7 @@ export default async function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(websiteSchema).replace(/</g, "\\u003c"),
+          __html: JSON.stringify(websiteSchema).replace(/</g, "\u003c"),
         }}
       />
 
