@@ -1,7 +1,7 @@
 import { gunzipSync } from "node:zlib";
 
 export function createSvgAssetResponse(encodedGzip: string) {
-  const svg = gunzipSync(Buffer.from(encodedGzip, "base64"));
+  const svg = new Uint8Array(gunzipSync(Buffer.from(encodedGzip, "base64")));
 
   return new Response(svg, {
     headers: {
