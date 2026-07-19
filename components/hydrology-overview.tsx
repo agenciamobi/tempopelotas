@@ -1,11 +1,7 @@
 import Link from "next/link";
 import { GuaibaLevelCard } from "@/components/guaiba-level-card";
 import { LagoonLevelHomeCard } from "@/components/lagoon-level-home-card";
-import {
-  HYDROLOGY_FLOW,
-  HYDROLOGY_STATIONS,
-  SGB_SACE_URL,
-} from "@/lib/hydrology";
+import { HYDROLOGY_FLOW, SGB_SACE_URL } from "@/lib/hydrology";
 import type { GuaibaObservationData } from "@/lib/guaiba-monitor";
 import type { WeatherData } from "@/lib/weather-data";
 
@@ -23,9 +19,6 @@ function FlowArrow() {
 }
 
 export function HydrologyOverview({ weather, guaiba }: HydrologyOverviewProps) {
-  const laranjalStation =
-    HYDROLOGY_STATIONS.find((station) => station.code === "87955000") ??
-    HYDROLOGY_STATIONS[0];
   const today = weather.daily[0];
   const strongestUpcomingGust = Math.max(
     weather.current.windGust,
@@ -82,26 +75,6 @@ export function HydrologyOverview({ weather, guaiba }: HydrologyOverviewProps) {
 
         <aside className="hydrology-context-column" aria-label="Informações sobre o Guaíba e o Laranjal">
           <GuaibaLevelCard data={guaiba} />
-
-          <article className="hydrology-context-card hydrology-context-card--local">
-            <span className="eyebrow">Medição próxima de Pelotas</span>
-            <h3>Estação Laranjal</h3>
-            <p>{laranjalStation.role}</p>
-            <dl>
-              <div>
-                <dt>Identificação da estação</dt>
-                <dd>ANA {laranjalStation.code}</dd>
-              </div>
-              <div>
-                <dt>Local</dt>
-                <dd>Praia do Laranjal</dd>
-              </div>
-            </dl>
-            <Link href="/nivel-da-lagoa-dos-patos-laranjal">
-              Ver nível e orientações
-              <span aria-hidden="true">→</span>
-            </Link>
-          </article>
 
           <div className="hydrology-driver-grid" aria-label="Vento e chuva em Pelotas">
             <article>
