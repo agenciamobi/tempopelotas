@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getEmbrapaObservation } from "@/lib/embrapa-observation";
 import {
   HYDROLOGY_DATA_SOURCES,
   HYDROLOGY_STATIONS,
@@ -7,14 +8,17 @@ import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
 import { absoluteUrl } from "@/lib/site";
 import { getPelotasWeather } from "@/lib/weather-service";
 
-export const revalidate = 600;
+export const revalidate = 300;
 
 export async function GET() {
-  const weather = await getPelotasWeather();
+  const [weather, embrapaObservation] = await Promise.all([
+    getPelotasWeather(),
+    getEmbrapaObservation(),
+  ]);
 
   return NextResponse.json(
     {
-      schema_version: "1.0",
+      schema_version: "1.1",
       generated_at: new Date().toISOString(),
       location: {
         city: "Pelotas",
@@ -25,11 +29,16 @@ export async function GET() {
         timezone: "America/Sao_Paulo",
       },
       weather: {
-        current: weather.current,
-        hourly: weather.hourly,
-        daily: weather.daily,
-        regional: weather.regional,
-        source: weather.source,
+        forecast: {
+          current: weather.current,
+          hourly: weather.hourly,
+          daily: weather.daily,
+          regional: weather.regional,
+          source: weather.source,
+        },
+        observed: {
+          embrapa: embrapaObservation,
+        },
       },
       hydrology: {
         status: "contextual-monitoring",
@@ -47,17 +56,19 @@ export async function GET() {
       },
       links: {
         home: absoluteUrl("/"),
+        embrapa_station: absoluteUrl("/estacao-embrapa-pelotas"),
+        embrapa_api: absoluteUrl("/api/weather/embrapa"),
         hydrology: absoluteUrl("/situacao-hidrologica-pelotas"),
         methodology: absoluteUrl("/metodologia"),
         feed: absoluteUrl("/feed"),
       },
       disclaimer:
-        "Informação comunitária. Não substitui alertas, ordens de evacuação ou orientações da Defesa Civil e das autoridades competentes.",
+        "Informação comunitária. Leituras meteorológicas representam o ponto da estação e não substituem alertas ou orientações da Defesa Civil e das autoridades competentes.",
     },
     {
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Cache-Control": "public, max-age=300, s-maxage=600, stale-while-revalidate=600",
+        "Cache-Control": "public, max-age=120, s-maxage=300, stale-while-revalidate=600",
       },
     },
   );
