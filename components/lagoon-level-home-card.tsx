@@ -18,11 +18,11 @@ export function LagoonLevelHomeCard() {
     >
       <div className="home-lagoon-card-heading">
         <div>
-          <span className="eyebrow">Monitoramento no Laranjal</span>
+          <span className="eyebrow">Praia do Laranjal</span>
           <h2 id="home-lagoon-card-title">Nível da Lagoa dos Patos</h2>
         </div>
         <Link href="/nivel-da-lagoa-dos-patos-laranjal">
-          Ver análise completa
+          Entender a medição
           <span aria-hidden="true">→</span>
         </Link>
       </div>
@@ -54,8 +54,8 @@ export function LagoonLevelHomeCard() {
       </div>
 
       <p className="home-lagoon-note">
-        Painel externo do LabHidroSens / UFPel. A leitura deve ser acompanhada em conjunto com os
-        avisos dos órgãos responsáveis.
+        Acompanhe a evolução do nível e considere também vento, chuva e comunicados da Defesa Civil e
+        dos órgãos responsáveis. Fonte do medidor: LabHidroSens / UFPel.
       </p>
     </section>
   );
