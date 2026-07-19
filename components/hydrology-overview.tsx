@@ -6,11 +6,17 @@ import { HYDROLOGY_FLOW, SGB_SACE_URL } from "@/lib/hydrology";
 import type { GuaibaObservationData } from "@/lib/guaiba-monitor";
 import type { LagoonMonitoringNetworkData } from "@/lib/lagoon-monitoring-network";
 import type { LaranjalLevelData } from "@/lib/laranjal-level";
+import type { NivelGuaibaCityObservation } from "@/lib/nivel-guaiba-regional";
 import type { WeatherData } from "@/lib/weather-data";
 
 type HydrologyOverviewProps = {
   weather: WeatherData;
   guaiba: GuaibaObservationData;
+  /**
+   * Mantido como opcional para compatibilidade com versões anteriores.
+   * A homepage não renderiza o diretório regional; ele pertence à página interna.
+   */
+  guaibaRegional?: NivelGuaibaCityObservation[];
   lagoonMonitoring: LagoonMonitoringNetworkData;
   laranjal: LaranjalLevelData;
 };
