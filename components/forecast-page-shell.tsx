@@ -7,6 +7,9 @@ import { getWeatherAdvisory } from "@/lib/weather-insights";
 
 type HeroStatTone =
   | "weather"
+  | "forecast"
+  | "rain"
+  | "wind"
   | "water"
   | "alerts"
   | "camera"
