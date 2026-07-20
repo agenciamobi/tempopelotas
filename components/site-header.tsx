@@ -17,6 +17,12 @@ type SiteHeaderProps = {
   variant?: "default" | "hero";
 };
 
+type AlertActionCopy = {
+  eyebrow: string;
+  label: string;
+  ariaLabel: string;
+};
+
 const desktopNavItems: NavigationItem[] = [
   { label: "Agora", href: "/", icon: "home" },
   { label: "Hoje", href: "/tempo-hoje-pelotas", icon: "today" },
@@ -36,6 +42,24 @@ const mobileNavItems: NavigationItem[] = [
   { label: "Águas", href: "/situacao-hidrologica-pelotas", icon: "water" },
   { label: "Alertas", href: "/alertas", icon: "alert" },
 ];
+
+const alertActionCopy: Record<AdvisoryLevel, AlertActionCopy> = {
+  normal: {
+    eyebrow: "Monitoramento",
+    label: "Ver alertas",
+    ariaLabel: "Abrir monitoramento e alertas meteorológicos",
+  },
+  attention: {
+    eyebrow: "Atenção ativa",
+    label: "Ver condições",
+    ariaLabel: "Abrir condições de atenção meteorológica",
+  },
+  warning: {
+    eyebrow: "Aviso ativo",
+    label: "Ver alertas",
+    ariaLabel: "Abrir avisos meteorológicos ativos para Pelotas",
+  },
+};
 
 function NavigationIcon({ name }: { name: NavigationIconName }) {
   if (name === "home") {
@@ -112,6 +136,7 @@ export function SiteHeader({
   const pathname = usePathname();
   const alertsActive = isActivePath(pathname, "/alertas");
   const headerClassName = `site-header${variant === "hero" ? " site-header--hero" : ""}`;
+  const actionCopy = alertActionCopy[advisoryLevel];
 
   return (
     <>
@@ -120,16 +145,23 @@ export function SiteHeader({
       </a>
 
       <header className={headerClassName} data-advisory-level={advisoryLevel}>
-        <Link className="brand" href="/" aria-label="TEMPO Pelotas — página inicial">
-          <img
-            className="brand-logo"
-            src="/brand/tempo-pelotas-header"
-            alt=""
-            width={11349}
-            height={1552}
-            draggable={false}
-          />
-        </Link>
+        <div className="site-header-branding">
+          <Link className="brand" href="/" aria-label="TEMPO Pelotas — página inicial">
+            <img
+              className="brand-logo"
+              src="/brand/tempo-pelotas-header"
+              alt=""
+              width={11349}
+              height={1552}
+              draggable={false}
+            />
+          </Link>
+          <span className="site-header-brand-divider" aria-hidden="true" />
+          <span className="site-header-context">
+            <strong>Pelotas, RS</strong>
+            <small>Tempo e águas</small>
+          </span>
+        </div>
 
         <nav className="main-nav" aria-label="Navegação principal">
           {desktopNavItems.map((item) => {
@@ -142,7 +174,10 @@ export function SiteHeader({
                 key={item.href}
                 aria-current={isActive ? "page" : undefined}
               >
-                {item.label}
+                <span className="main-nav-icon">
+                  <NavigationIcon name={item.icon} />
+                </span>
+                <span className="main-nav-label">{item.label}</span>
               </Link>
             );
           })}
@@ -152,29 +187,46 @@ export function SiteHeader({
           className={`header-action header-action--${advisoryLevel}${alertsActive ? " is-active" : ""}`}
           href="/alertas"
           aria-current={alertsActive ? "page" : undefined}
-          aria-label="Abrir condições de atenção meteorológica"
+          aria-label={actionCopy.ariaLabel}
         >
-          <span className="header-action-dot" aria-hidden="true" />
           <span className="header-action-icon" aria-hidden="true">
             <NavigationIcon name="alert" />
           </span>
-          <span className="header-action-label">Alertas</span>
+          <span className="header-action-dot" aria-hidden="true" />
+          <span className="header-action-label">
+            <small>{actionCopy.eyebrow}</small>
+            <strong>{actionCopy.label}</strong>
+          </span>
+          <span className="header-action-arrow" aria-hidden="true">→</span>
         </Link>
       </header>
 
-      <nav className="mobile-tab-bar" aria-label="Navegação principal do aplicativo">
+      <nav
+        className="mobile-tab-bar"
+        data-advisory-level={advisoryLevel}
+        aria-label="Navegação principal do aplicativo"
+      >
         {mobileNavItems.map((item) => {
           const isActive = isActivePath(pathname, item.href);
+          const isAlertItem = item.href === "/alertas";
+          const className = [
+            isActive ? "is-active" : "",
+            isAlertItem ? "is-alert-item" : "",
+            isAlertItem && advisoryLevel !== "normal" ? "is-alerting" : "",
+          ].filter(Boolean).join(" ");
 
           return (
             <Link
-              className={isActive ? "is-active" : undefined}
+              className={className || undefined}
               href={item.href}
               key={item.href}
               aria-current={isActive ? "page" : undefined}
             >
               <span className="mobile-tab-icon">
                 <NavigationIcon name={item.icon} />
+                {isAlertItem && advisoryLevel !== "normal" ? (
+                  <i className="mobile-tab-alert-dot" aria-hidden="true" />
+                ) : null}
               </span>
               <span>{item.label}</span>
             </Link>
