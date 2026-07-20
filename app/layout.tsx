@@ -66,6 +66,7 @@ import "./editorial-readable-v2.css";
 import "./home-editorial-clarity-v3.css";
 import "./home-visitor-copy-v4.css";
 import "./home-journey-refinement-v5.css";
+import "./home-grid-alignment-v6.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
