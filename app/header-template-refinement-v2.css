@@ -1,83 +1,166 @@
 /*
- * Header editorial v5.
- * Corrige conflitos herdados, amplia a leitura e alinha o header à escala do hero.
+ * Header editorial v6.
+ * Estrutura de masthead para portal de conteúdo: marca em primeiro plano,
+ * editorias em uma faixa própria e alertas como utilidade prioritária.
  */
 
 @media (min-width: 901px) {
   .site-shell .site-header,
   .site-shell--home-editorial .site-header--hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "branding action"
+      "navigation navigation";
+    column-gap: 32px;
+    row-gap: 14px;
     width: min(100%, 1580px);
     max-width: 1580px;
-    min-height: 84px;
+    min-height: 128px;
     margin-inline: auto;
-    padding: 11px 13px 11px 22px;
-    grid-template-columns: minmax(285px, 1fr) auto minmax(285px, 1fr);
-    border-radius: 24px;
+    padding: 17px 24px 0;
+    overflow: hidden;
+    border: 1px solid rgba(7, 30, 47, 0.1);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 14px 40px rgba(7, 30, 47, 0.08);
+  }
+
+  .site-shell .site-header::before,
+  .site-shell--home-editorial .site-header--hero::before {
+    display: none;
+    content: none;
+  }
+
+  .site-header-branding {
+    grid-area: branding;
+    align-self: center;
+  }
+
+  .site-shell .site-header .brand,
+  .site-shell--home-editorial .site-header--hero .brand {
+    min-height: 48px;
   }
 
   .site-shell .site-header .brand-logo,
   .site-shell--home-editorial .site-header--hero .brand-logo {
-    width: clamp(172px, 11.6vw, 200px);
-    max-height: 29px;
+    width: clamp(190px, 13vw, 224px);
+    max-height: 32px;
   }
 
   .site-header-brand-divider {
-    height: 34px;
-    margin-inline: 17px;
+    height: 38px;
+    margin-inline: 20px;
   }
 
   .site-header-context {
-    gap: 3px;
+    gap: 4px;
   }
 
   .site-header-context strong {
-    font-size: 0.74rem;
+    color: #17394b;
+    font-size: 0.76rem;
     letter-spacing: 0.015em;
   }
 
   .site-header-context small {
-    font-size: 0.62rem;
+    color: #607985;
+    font-size: 0.66rem;
   }
 
   .site-shell .site-header .main-nav,
   .site-shell--home-editorial .site-header--hero .main-nav {
-    gap: 4px;
-    padding: 5px;
-    border-radius: 17px;
+    grid-area: navigation;
+    justify-self: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 51px;
+    gap: 0;
+    padding: 0;
+    border: 0;
+    border-top: 1px solid rgba(7, 30, 47, 0.11);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   .site-shell .site-header .main-nav a,
   .site-shell--home-editorial .site-header--hero .main-nav a {
-    min-height: 48px;
-    gap: 8px;
-    padding-inline: 15px;
-    border-radius: 12px;
+    min-height: 51px;
+    gap: 0;
+    padding: 0 22px;
+    border: 0;
+    border-right: 1px solid rgba(7, 30, 47, 0.08);
+    border-radius: 0;
+    color: #4f6976;
+    background: transparent;
     font-size: 0.8rem;
+    font-weight: 790;
+    letter-spacing: 0.005em;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .site-shell .site-header .main-nav a:first-child,
+  .site-shell--home-editorial .site-header--hero .main-nav a:first-child {
+    padding-left: 0;
+  }
+
+  .site-shell .site-header .main-nav a::after,
+  .site-shell--home-editorial .site-header--hero .main-nav a::after {
+    bottom: 0;
+    left: 20px;
+    right: 20px;
+    height: 3px;
+  }
+
+  .site-shell .site-header .main-nav a:first-child::after,
+  .site-shell--home-editorial .site-header--hero .main-nav a:first-child::after {
+    left: 0;
+  }
+
+  .site-shell .site-header .main-nav a:hover,
+  .site-shell .site-header .main-nav a:focus-visible,
+  .site-shell .site-header .main-nav a.is-active,
+  .site-shell--home-editorial .site-header--hero .main-nav a:hover,
+  .site-shell--home-editorial .site-header--hero .main-nav a:focus-visible,
+  .site-shell--home-editorial .site-header--hero .main-nav a.is-active {
+    color: #071e2f;
+    border-color: rgba(7, 30, 47, 0.08);
+    background: transparent;
+    box-shadow: none;
+    transform: none;
   }
 
   .site-shell .site-header .main-nav-icon,
-  .site-shell--home-editorial .site-header--hero .main-nav-icon,
-  .site-shell .site-header .main-nav-icon svg,
-  .site-shell--home-editorial .site-header--hero .main-nav-icon svg {
-    width: 18px;
-    height: 18px;
+  .site-shell--home-editorial .site-header--hero .main-nav-icon {
+    display: none;
   }
 
   .site-shell .site-header .header-action,
   .site-shell--home-editorial .site-header--hero .header-action {
+    grid-area: action;
     position: relative;
     display: grid;
-    grid-template-columns: 22px minmax(0, 1fr) 17px;
-    min-width: 194px;
-    min-height: 60px;
+    grid-template-columns: 20px minmax(0, 1fr) 15px;
+    align-self: center;
     align-items: center;
-    gap: 11px;
-    padding: 8px 14px 8px 15px;
+    justify-self: end;
+    min-width: 186px;
+    min-height: 48px;
+    gap: 10px;
+    padding: 7px 13px;
     overflow: hidden;
-    border-radius: 17px;
+    border-radius: 12px;
+    box-shadow: 0 8px 22px rgba(94, 44, 237, 0.2);
   }
 
-  /* Uma camada antiga adicionava outra seta como pseudo-elemento. */
+  .site-shell .site-header .header-action--attention,
+  .site-shell .site-header .header-action--warning,
+  .site-shell--home-editorial .site-header--hero .header-action--attention,
+  .site-shell--home-editorial .site-header--hero .header-action--warning {
+    box-shadow: 0 8px 22px rgba(190, 65, 24, 0.21);
+  }
+
   .site-shell .site-header .header-action::before,
   .site-shell .site-header .header-action::after,
   .site-shell--home-editorial .site-header--hero .header-action::before,
@@ -90,27 +173,13 @@
   .site-shell--home-editorial .site-header--hero .header-action-icon,
   .site-shell .site-header .header-action-icon svg,
   .site-shell--home-editorial .site-header--hero .header-action-icon svg {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
   }
 
   .site-shell .site-header .header-action-dot,
   .site-shell--home-editorial .site-header--hero .header-action-dot {
-    position: absolute;
-    top: 11px;
-    left: 32px;
-    width: 7px;
-    height: 7px;
-    border: 2px solid currentColor;
-    box-shadow: none;
-  }
-
-  .site-shell .site-header .header-action--attention .header-action-dot,
-  .site-shell .site-header .header-action--warning .header-action-dot,
-  .site-shell--home-editorial .site-header--hero .header-action--attention .header-action-dot,
-  .site-shell--home-editorial .site-header--hero .header-action--warning .header-action-dot {
-    border-color: #ffffff;
-    background: #ffffff;
+    display: none;
   }
 
   .site-shell .site-header .header-action-label,
@@ -120,7 +189,7 @@
 
   .site-shell .site-header .header-action-label small,
   .site-shell--home-editorial .site-header--hero .header-action-label small {
-    font-size: 0.57rem;
+    font-size: 0.56rem;
     letter-spacing: 0.075em;
   }
 
@@ -133,25 +202,29 @@
   .site-shell--home-editorial .site-header--hero .header-action-arrow {
     display: block;
     justify-self: end;
-    font-size: 1rem;
+    font-size: 0.94rem;
   }
 }
 
 @media (min-width: 901px) and (max-width: 1240px) {
   .site-shell .site-header,
   .site-shell--home-editorial .site-header--hero {
-    grid-template-columns: minmax(205px, 1fr) auto minmax(205px, 1fr);
-    padding-left: 18px;
+    column-gap: 22px;
+    padding-inline: 19px;
   }
 
   .site-shell .site-header .brand-logo,
   .site-shell--home-editorial .site-header--hero .brand-logo {
-    width: 160px;
+    width: 178px;
+  }
+
+  .site-header-brand-divider {
+    margin-inline: 15px;
   }
 
   .site-shell .site-header .main-nav a,
   .site-shell--home-editorial .site-header--hero .main-nav a {
-    padding-inline: 12px;
+    padding-inline: 18px;
   }
 
   .site-shell .site-header .header-action,
@@ -161,10 +234,21 @@
 }
 
 @media (min-width: 901px) and (max-width: 1060px) {
+  .site-header-context,
+  .site-header-brand-divider {
+    display: none;
+  }
+
+  .site-shell .site-header .main-nav a,
+  .site-shell--home-editorial .site-header--hero .main-nav a {
+    padding-inline: 15px;
+    font-size: 0.76rem;
+  }
+
   .site-shell .site-header .header-action,
   .site-shell--home-editorial .site-header--hero .header-action {
-    grid-template-columns: 21px minmax(0, 1fr);
-    min-width: 154px;
+    grid-template-columns: 20px minmax(0, 1fr);
+    min-width: 156px;
   }
 
   .site-shell .site-header .header-action-arrow,
