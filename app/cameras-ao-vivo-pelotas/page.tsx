@@ -67,6 +67,13 @@ export default async function CamerasAoVivoPelotasPage() {
           : "As câmeras ainda não estão disponíveis. Os locais previstos são Laranjal, Centro e Canal São Gonçalo."
       }
       currentPath="/cameras-ao-vivo-pelotas"
+      heroStat={{
+        label: "Câmeras disponíveis agora",
+        value: onlineCount,
+        detail: onlineCount === 1 ? "ponto transmitindo ao vivo" : "pontos transmitindo ao vivo",
+        ariaLabel: `${onlineCount} câmeras disponíveis ao vivo em Pelotas`,
+        tone: "camera",
+      }}
     >
       <script
         type="application/ld+json"
