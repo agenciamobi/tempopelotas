@@ -10,6 +10,8 @@ import {
 
 type WeatherHeroProps = {
   weather: WeatherData;
+  advisoryLevel?: AdvisoryLevel;
+  officialAlertCount?: number;
 };
 
 type HeroMetricIconName = "humidity" | "wind" | "gust" | "visibility";
@@ -34,19 +36,19 @@ type HeroPresentation = {
 
 const heroPresentationByLevel = {
   normal: {
-    badge: "Informações atualizadas",
-    kicker: "Agora em Pelotas",
-    title: "Entenda o tempo.",
-    highlightedTitle: "Planeje o seu dia.",
+    badge: "Dados locais atualizados",
+    kicker: "Tempo agora em Pelotas",
+    title: "Veja o tempo agora.",
+    highlightedTitle: "Planeje as próximas horas.",
     description:
-      "Veja como está o tempo agora, o que muda nas próximas horas e se há chuva, vento forte ou avisos para Pelotas.",
+      "Consulte a condição atual e os principais sinais de chuva, temperatura e vento para organizar o seu dia.",
     primaryAction: {
       href: "/tempo-hoje-pelotas",
-      label: "Ver o tempo de hoje",
+      label: "Ver previsão de hoje",
     },
     secondaryAction: {
-      href: "/alertas",
-      label: "Ver avisos oficiais",
+      href: "/previsao-7-dias-pelotas",
+      label: "Ver próximos 7 dias",
     },
     photoHref:
       "https://commons.wikimedia.org/wiki/File:Amanhecer_na_Praia_do_Laranjal.jpg",
@@ -55,17 +57,17 @@ const heroPresentationByLevel = {
   attention: {
     badge: "Atenção nas próximas horas",
     kicker: "Atenção em Pelotas",
-    title: "O tempo pode mudar.",
+    title: "Chuva e vento podem aumentar.",
     highlightedTitle: "Acompanhe as próximas horas.",
     description:
-      "A chuva e o vento podem aumentar. Veja quando isso pode acontecer e acompanhe os avisos oficiais.",
+      "Veja os períodos mais sensíveis da previsão e confira os avisos oficiais antes de sair ou programar atividades externas.",
     primaryAction: {
       href: "/alertas",
-      label: "Ver o que pode acontecer",
+      label: "Ver avisos oficiais",
     },
     secondaryAction: {
       href: "/tempo-hoje-pelotas",
-      label: "Ver previsão completa",
+      label: "Ver previsão hora a hora",
     },
     photoHref:
       "https://commons.wikimedia.org/wiki/File:Sunset_over_Calm_Lake.jpg",
@@ -74,27 +76,30 @@ const heroPresentationByLevel = {
   warning: {
     badge: "Atenção redobrada",
     kicker: "Atenção em Pelotas",
-    title: "O tempo exige cuidado.",
-    highlightedTitle: "Redobre a atenção.",
+    title: "Há risco de tempo forte.",
+    highlightedTitle: "Veja quando a atenção aumenta.",
     description:
-      "Há chance de temporal, chuva forte ou vento intenso. Confira os horários de maior risco e siga as orientações oficiais.",
+      "Consulte os avisos oficiais e os horários com maior possibilidade de chuva intensa, temporal ou rajadas fortes.",
     primaryAction: {
       href: "/alertas",
-      label: "Ver avisos e orientações",
+      label: "Ver avisos oficiais",
     },
     secondaryAction: {
       href: "/tempo-hoje-pelotas",
-      label: "Ver previsão completa",
+      label: "Ver previsão hora a hora",
     },
     photoHref: "https://commons.wikimedia.org/wiki/File:Heavy_Rain.jpg",
     photoCredit: "Foto: Pridatko Oleksandr / domínio público",
   },
 } satisfies Record<AdvisoryLevel, HeroPresentation>;
 
-function getHeroPresentation(advisory: WeatherAdvisory): HeroPresentation {
-  const presentation = heroPresentationByLevel[advisory.level];
+function getHeroPresentation(
+  advisory: WeatherAdvisory,
+  level: AdvisoryLevel,
+): HeroPresentation {
+  const presentation = heroPresentationByLevel[level];
 
-  if (advisory.level === "normal") return presentation;
+  if (level === "normal" || level !== advisory.level) return presentation;
 
   return {
     ...presentation,
@@ -116,6 +121,16 @@ function getCurrentSourceMeta(current: WeatherData["current"]) {
   }
 
   return `${current.updatedAt} · ${current.source.name}`;
+}
+
+function getOfficialAlertLabel(count: number) {
+  return count === 1 ? "1 aviso oficial ativo" : `${count} avisos oficiais ativos`;
+}
+
+function getOfficialAlertReason(count: number) {
+  return count === 1
+    ? "Pelotas está incluída em um aviso oficial do INMET"
+    : `Pelotas está incluída em ${count} avisos oficiais do INMET`;
 }
 
 function HeroMetricIcon({ name }: { name: HeroMetricIconName }) {
@@ -155,16 +170,34 @@ function HeroMetric({
   );
 }
 
-export function WeatherHero({ weather }: WeatherHeroProps) {
+export function WeatherHero({
+  weather,
+  advisoryLevel,
+  officialAlertCount = 0,
+}: WeatherHeroProps) {
   const { current } = weather;
   const advisory = getWeatherAdvisory(weather);
-  const presentation = getHeroPresentation(advisory);
-  const reasons = advisory.level === "normal" ? [] : advisory.reasons.slice(0, 2);
+  const resolvedLevel = advisoryLevel ?? advisory.level;
+  const presentation = getHeroPresentation(advisory, resolvedLevel);
+  const today = weather.daily[0];
+  const officialAlertReason = officialAlertCount > 0
+    ? getOfficialAlertReason(officialAlertCount)
+    : null;
+  const weatherReasons = advisory.level === "normal"
+    ? []
+    : advisory.reasons.map(capitalizeSentence);
+  const reasons = [officialAlertReason, ...weatherReasons]
+    .filter((reason): reason is string => Boolean(reason))
+    .slice(0, 2);
+  const statusLabel = officialAlertCount > 0
+    ? getOfficialAlertLabel(officialAlertCount)
+    : presentation.badge;
   const currentSourceMeta = getCurrentSourceMeta(current);
 
   return (
     <section
-      className={`weather-hero weather-hero--${advisory.level}`}
+      className={`weather-hero weather-hero--${resolvedLevel}`}
+      data-official-alerts={officialAlertCount > 0 ? "true" : "false"}
       aria-labelledby="weather-hero-title"
     >
       <div className="weather-hero-photo" aria-hidden="true" />
@@ -174,9 +207,11 @@ export function WeatherHero({ weather }: WeatherHeroProps) {
 
       <div className="weather-hero-content">
         <div className="weather-hero-copy">
-          <span className={`weather-hero-status weather-hero-status--${advisory.level}`}>
+          <span
+            className={`weather-hero-status weather-hero-status--${resolvedLevel}${officialAlertCount > 0 ? " weather-hero-status--official" : ""}`}
+          >
             <i aria-hidden="true" />
-            {presentation.badge}
+            {statusLabel}
           </span>
 
           <p className="weather-hero-kicker">{presentation.kicker}</p>
@@ -185,10 +220,27 @@ export function WeatherHero({ weather }: WeatherHeroProps) {
           </h1>
           <p className="weather-hero-description">{presentation.description}</p>
 
+          {today ? (
+            <dl className="weather-hero-daily-facts" aria-label="Resumo da previsão de hoje">
+              <div>
+                <dt>Máxima e mínima</dt>
+                <dd>{today.max}° <small>/ {today.min}°</small></dd>
+              </div>
+              <div>
+                <dt>Chance de chuva</dt>
+                <dd>{today.precipitation}%</dd>
+              </div>
+              <div>
+                <dt>Rajada mais forte</dt>
+                <dd>{today.windGust} <small>km/h</small></dd>
+              </div>
+            </dl>
+          ) : null}
+
           {reasons.length > 0 ? (
             <div className="weather-hero-reasons" aria-label="Por que é preciso atenção">
               {reasons.map((reason) => (
-                <span key={reason}>{capitalizeSentence(reason)}</span>
+                <span key={reason}>{reason}</span>
               ))}
             </div>
           ) : null}
@@ -230,8 +282,8 @@ export function WeatherHero({ weather }: WeatherHeroProps) {
           <div className="weather-hero-metrics">
             <HeroMetric icon="humidity" label="Umidade" value={`${current.humidity}%`} />
             <HeroMetric icon="wind" label="Vento" value={`${current.windSpeed} km/h`} />
-            <HeroMetric icon="gust" label="Vento mais forte" value={`${current.windGust} km/h`} />
-            <HeroMetric icon="visibility" label="Até onde se vê" value={`${current.visibility} km`} />
+            <HeroMetric icon="gust" label="Rajada" value={`${current.windGust} km/h`} />
+            <HeroMetric icon="visibility" label="Visibilidade" value={`${current.visibility} km`} />
           </div>
         </div>
       </div>
