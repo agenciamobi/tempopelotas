@@ -56,6 +56,7 @@ import "./home-editorial-theme.css";
 import "./home-editorial-refinement-v2.css";
 import "./home-editorial-responsive-fix.css";
 import "./home-first-fold-editorial-light.css";
+import "./home-first-fold-editorial-light-refinement.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
