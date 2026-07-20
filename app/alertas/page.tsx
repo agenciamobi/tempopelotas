@@ -36,6 +36,8 @@ export default async function AlertasPage() {
     weather.current.windGust,
     ...weather.hourly.map((hour) => hour.windGust),
   );
+  const inmetAvailable = inmetAlerts.status === "live";
+  const officialAlertCount = inmetAvailable ? inmetAlerts.counts.total : null;
 
   return (
     <ForecastPageShell
@@ -44,6 +46,19 @@ export default async function AlertasPage() {
       title="O que exige atenção em Pelotas e no RS"
       description="Primeiro, consulte os avisos oficiais do INMET. Depois, veja a leitura calculada pelo TEMPO Pelotas para chuva, vento e temporais previstos na cidade."
       currentPath="/alertas"
+      heroStat={{
+        label: inmetAvailable ? "Avisos oficiais encontrados" : "Consulta oficial",
+        value: officialAlertCount ?? "—",
+        detail: inmetAvailable
+          ? officialAlertCount === 1
+            ? "aviso no Rio Grande do Sul"
+            : "avisos no Rio Grande do Sul"
+          : "INMET temporariamente indisponível",
+        ariaLabel: inmetAvailable
+          ? `${officialAlertCount} avisos oficiais encontrados no Rio Grande do Sul`
+          : "Consulta aos avisos oficiais do INMET temporariamente indisponível",
+        tone: "alerts",
+      }}
     >
       <InmetAlertsPanel data={inmetAlerts} />
 
