@@ -228,7 +228,7 @@ export function WeatherHero({
               </div>
               <div>
                 <dt>Chance de chuva</dt>
-                <dd>{today.precipitation}%</dd>
+                <dd>{today.rainChance}%</dd>
               </div>
               <div>
                 <dt>Rajada mais forte</dt>
