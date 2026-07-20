@@ -54,6 +54,7 @@ import "./home-page-reorganization.css";
 import "./project-refinement.css";
 import "./home-editorial-theme.css";
 import "./home-editorial-refinement-v2.css";
+import "./home-editorial-responsive-fix.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
