@@ -34,19 +34,19 @@ type HeroPresentation = {
 
 const heroPresentationByLevel = {
   normal: {
-    badge: "Condições monitoradas",
-    kicker: "Tempo agora em Pelotas",
-    title: "O tempo de Pelotas.",
-    highlightedTitle: "Clareza para se preparar.",
+    badge: "Informações atualizadas",
+    kicker: "Agora em Pelotas",
+    title: "Entenda o tempo.",
+    highlightedTitle: "Planeje o seu dia.",
     description:
-      "Previsão, chuva, vento e situação das águas em uma leitura local, objetiva e atualizada para Pelotas e a Zona Sul.",
+      "Veja como está o tempo agora, o que muda nas próximas horas e se há chuva, vento forte ou avisos para Pelotas.",
     primaryAction: {
       href: "/tempo-hoje-pelotas",
-      label: "Ver previsão completa",
+      label: "Ver o tempo de hoje",
     },
     secondaryAction: {
       href: "/alertas",
-      label: "Consultar monitoramento",
+      label: "Ver avisos oficiais",
     },
     photoHref:
       "https://commons.wikimedia.org/wiki/File:Amanhecer_na_Praia_do_Laranjal.jpg",
@@ -54,18 +54,18 @@ const heroPresentationByLevel = {
   },
   attention: {
     badge: "Atenção nas próximas horas",
-    kicker: "Condições de atenção em Pelotas",
-    title: "Chuva e vento.",
+    kicker: "Atenção em Pelotas",
+    title: "O tempo pode mudar.",
     highlightedTitle: "Acompanhe as próximas horas.",
     description:
-      "A previsão indica condições que merecem acompanhamento. Verifique a evolução da chuva, das rajadas e das informações oficiais.",
+      "A chuva e o vento podem aumentar. Veja quando isso pode acontecer e acompanhe os avisos oficiais.",
     primaryAction: {
       href: "/alertas",
-      label: "Ver condições de atenção",
+      label: "Ver o que pode acontecer",
     },
     secondaryAction: {
       href: "/tempo-hoje-pelotas",
-      label: "Abrir previsão completa",
+      label: "Ver previsão completa",
     },
     photoHref:
       "https://commons.wikimedia.org/wiki/File:Sunset_over_Calm_Lake.jpg",
@@ -73,18 +73,18 @@ const heroPresentationByLevel = {
   },
   warning: {
     badge: "Atenção redobrada",
-    kicker: "Condições relevantes em Pelotas",
-    title: "Atenção ao tempo.",
-    highlightedTitle: "Redobre os cuidados.",
+    kicker: "Atenção em Pelotas",
+    title: "O tempo exige cuidado.",
+    highlightedTitle: "Redobre a atenção.",
     description:
-      "Há possibilidade de temporal, chuva volumosa ou vento forte. Acompanhe a previsão e consulte os avisos da Defesa Civil e do INMET.",
+      "Há chance de temporal, chuva forte ou vento intenso. Confira os horários de maior risco e siga as orientações oficiais.",
     primaryAction: {
       href: "/alertas",
-      label: "Ver alerta e orientações",
+      label: "Ver avisos e orientações",
     },
     secondaryAction: {
       href: "/tempo-hoje-pelotas",
-      label: "Abrir previsão detalhada",
+      label: "Ver previsão completa",
     },
     photoHref: "https://commons.wikimedia.org/wiki/File:Heavy_Rain.jpg",
     photoCredit: "Foto: Pridatko Oleksandr / domínio público",
@@ -99,7 +99,6 @@ function getHeroPresentation(advisory: WeatherAdvisory): HeroPresentation {
   return {
     ...presentation,
     badge: advisory.eyebrow,
-    description: advisory.description,
   };
 }
 
@@ -109,11 +108,11 @@ function capitalizeSentence(value: string) {
 
 function getCurrentSourceMeta(current: WeatherData["current"]) {
   if (current.source.kind === "observation") {
-    const observationTime = current.source.observedAt
-      ? `Observado às ${current.source.observedAt}`
-      : "Medição observada";
+    const updateTime = current.source.observedAt
+      ? `Atualizado às ${current.source.observedAt}`
+      : "Dados atualizados";
 
-    return `${observationTime} · ${current.source.name}`;
+    return `${updateTime} · ${current.source.name}`;
   }
 
   return `${current.updatedAt} · ${current.source.name}`;
@@ -187,7 +186,7 @@ export function WeatherHero({ weather }: WeatherHeroProps) {
           <p className="weather-hero-description">{presentation.description}</p>
 
           {reasons.length > 0 ? (
-            <div className="weather-hero-reasons" aria-label="Motivos para atenção">
+            <div className="weather-hero-reasons" aria-label="Por que é preciso atenção">
               {reasons.map((reason) => (
                 <span key={reason}>{capitalizeSentence(reason)}</span>
               ))}
@@ -205,7 +204,7 @@ export function WeatherHero({ weather }: WeatherHeroProps) {
           </div>
         </div>
 
-        <div className="weather-hero-now" aria-label="Condição meteorológica atual em Pelotas">
+        <div className="weather-hero-now" aria-label="Tempo agora em Pelotas">
           <div className="weather-hero-now-heading">
             <div>
               <span>Pelotas, RS</span>
@@ -231,14 +230,14 @@ export function WeatherHero({ weather }: WeatherHeroProps) {
           <div className="weather-hero-metrics">
             <HeroMetric icon="humidity" label="Umidade" value={`${current.humidity}%`} />
             <HeroMetric icon="wind" label="Vento" value={`${current.windSpeed} km/h`} />
-            <HeroMetric icon="gust" label="Rajadas" value={`${current.windGust} km/h`} />
-            <HeroMetric icon="visibility" label="Visibilidade" value={`${current.visibility} km`} />
+            <HeroMetric icon="gust" label="Vento mais forte" value={`${current.windGust} km/h`} />
+            <HeroMetric icon="visibility" label="Até onde se vê" value={`${current.visibility} km`} />
           </div>
         </div>
       </div>
 
       <div className="weather-hero-scroll">
-        <span>Continue para acompanhar</span>
+        <span>Veja a previsão abaixo</span>
         <i aria-hidden="true">↓</i>
       </div>
 
