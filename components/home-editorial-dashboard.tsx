@@ -9,10 +9,11 @@ import type {
 } from "@/lib/lagoon-monitoring-network";
 import type { LaranjalLevelData } from "@/lib/laranjal-level";
 import type { WeatherData } from "@/lib/weather-data";
-import { getWeatherAdvisory } from "@/lib/weather-insights";
+import { getWeatherAdvisory, type AdvisoryLevel } from "@/lib/weather-insights";
 
 type HomeEditorialDashboardProps = {
   weather: WeatherData;
+  advisoryLevel?: AdvisoryLevel;
   observation: EmbrapaObservationData;
   laranjal: LaranjalLevelData;
   guaiba: GuaibaObservationData;
@@ -22,57 +23,57 @@ type HomeEditorialDashboardProps = {
 const exploreGroups = [
   {
     title: "Planejar o dia",
-    description: "Temperaturas, chuva e horários para organizar sua rotina.",
+    description: "Veja a previsão por hora e para os próximos dias.",
     links: [
-      ["/tempo-hoje-pelotas", "Ver o tempo de hoje"],
-      ["/previsao-7-dias-pelotas", "Ver os próximos 7 dias"],
+      ["/tempo-hoje-pelotas", "Previsão de hoje"],
+      ["/previsao-7-dias-pelotas", "Previsão para 7 dias"],
     ],
   },
   {
     title: "Acompanhar chuva e vento",
-    description: "Veja quando a chuva ou o vento podem aumentar.",
+    description: "Consulte os horários com maior chance de chuva e as rajadas previstas.",
     links: [
-      ["/chuva-em-pelotas", "Chance de chuva"],
-      ["/vento-em-pelotas", "Vento em Pelotas"],
-      ["/alertas", "Avisos e cuidados"],
+      ["/chuva-em-pelotas", "Chuva por horário"],
+      ["/vento-em-pelotas", "Vento e rajadas"],
+      ["/alertas", "Avisos oficiais"],
     ],
   },
   {
     title: "Acompanhar as águas",
-    description: "Consulte o Laranjal e outros pontos da Lagoa dos Patos.",
+    description: "Acompanhe o nível no Laranjal e em outros pontos da Lagoa dos Patos.",
     links: [
-      ["/situacao-hidrologica-pelotas", "Ver como estão as águas"],
-      ["/nivel-da-lagoa-dos-patos-laranjal", "Ver o nível no Laranjal"],
+      ["/situacao-hidrologica-pelotas", "Situação das águas"],
+      ["/nivel-da-lagoa-dos-patos-laranjal", "Nível no Laranjal"],
     ],
   },
   {
-    title: "Conferir outras informações",
-    description: "Acesse imagens ao vivo e saiba de onde vêm os dados.",
+    title: "Câmeras e fontes",
+    description: "Veja imagens ao vivo e consulte as fontes usadas pelo portal.",
     links: [
-      ["/cameras-ao-vivo-pelotas", "Abrir câmeras ao vivo"],
-      ["/metodologia", "Conhecer as fontes"],
+      ["/cameras-ao-vivo-pelotas", "Câmeras ao vivo"],
+      ["/metodologia", "Fontes e metodologia"],
     ],
   },
 ] as const;
 
 const advisoryCopy = {
   normal: {
-    eyebrow: "Sem alerta importante agora",
-    title: "O tempo segue sem sinal de maior risco",
-    description: "Continue acompanhando, porque a previsão pode mudar ao longo do dia.",
-    action: "Ver avisos oficiais",
+    eyebrow: "Sem agravamento previsto",
+    title: "Não há sinal de chuva ou vento fortes nas próximas horas",
+    description: "Acompanhe as atualizações e consulte os avisos oficiais antes de atividades ao ar livre.",
+    action: "Consultar avisos oficiais",
   },
   attention: {
-    eyebrow: "Atenção nas próximas horas",
-    title: "Chuva ou vento podem aumentar",
-    description: "Veja os horários abaixo e acompanhe os avisos oficiais.",
-    action: "Entender os cuidados",
+    eyebrow: "Mudança importante na previsão",
+    title: "Chuva e rajadas podem ganhar intensidade",
+    description: "Confira os horários com maior risco e verifique os avisos oficiais para Pelotas.",
+    action: "Consultar avisos oficiais",
   },
   warning: {
-    eyebrow: "Atenção redobrada",
-    title: "Há chance de tempo forte",
-    description: "Confira quando o risco aumenta e siga as orientações oficiais.",
-    action: "Ver avisos e orientações",
+    eyebrow: "Risco elevado nas próximas horas",
+    title: "Há risco de chuva intensa, temporal ou rajadas fortes",
+    description: "Consulte os períodos de maior risco e as orientações antes de sair.",
+    action: "Consultar avisos oficiais",
   },
 } as const;
 
@@ -120,13 +121,15 @@ function stationState(observation: LagoonMonitoringObservation) {
 
 export function HomeEditorialDashboard({
   weather,
+  advisoryLevel,
   observation,
   laranjal,
   guaiba,
   lagoon,
 }: HomeEditorialDashboardProps) {
   const advisory = getWeatherAdvisory(weather);
-  const advisoryText = advisoryCopy[advisory.level];
+  const resolvedAdvisoryLevel = advisoryLevel ?? advisory.level;
+  const advisoryText = advisoryCopy[resolvedAdvisoryLevel];
   const today = weather.daily[0];
   const hourly = weather.hourly.slice(0, 7);
   const nextDays = weather.daily.slice(1, 5);
@@ -139,8 +142,8 @@ export function HomeEditorialDashboard({
       <section className="home-story home-story--forecast" id="previsao-hoje" aria-labelledby="home-story-forecast-title">
         <header className="home-story-heading">
           <div>
-            <span className="eyebrow">Previsão de hoje</span>
-            <h2 id="home-story-forecast-title">O que esperar nas próximas horas</h2>
+            <span className="eyebrow">Previsão hora a hora</span>
+            <h2 id="home-story-forecast-title">Veja como o tempo deve mudar ao longo do dia</h2>
           </div>
           <dl className="home-today-facts" aria-label="Resumo do tempo de hoje">
             <div><dt>Temperatura máxima</dt><dd>{today?.max ?? weather.current.temperature}°</dd></div>
@@ -150,7 +153,7 @@ export function HomeEditorialDashboard({
           </dl>
         </header>
 
-        <div className={`home-advisory-strip is-${advisory.level}`}>
+        <div className={`home-advisory-strip is-${resolvedAdvisoryLevel}`}>
           <span aria-hidden="true" />
           <div>
             <small>{advisoryText.eyebrow}</small>
@@ -174,7 +177,7 @@ export function HomeEditorialDashboard({
         <div className="home-next-days">
           <div className="home-next-days__heading">
             <span className="eyebrow">Próximos dias</span>
-            <strong>Como fica o tempo depois de hoje</strong>
+            <strong>Previsão para os próximos dias</strong>
           </div>
           <div className="home-next-days__list">
             {nextDays.map((day) => (
@@ -187,18 +190,18 @@ export function HomeEditorialDashboard({
             ))}
           </div>
           <div className="home-inline-links">
-            <Link href="/tempo-hoje-pelotas">Ver detalhes de hoje <span aria-hidden="true">→</span></Link>
-            <Link href="/previsao-7-dias-pelotas">Ver a previsão dos próximos 7 dias</Link>
+            <Link href="/tempo-hoje-pelotas">Ver previsão completa de hoje <span aria-hidden="true">→</span></Link>
+            <Link href="/previsao-7-dias-pelotas">Ver previsão para 7 dias</Link>
           </div>
         </div>
       </section>
 
       <section className="home-map-story" aria-labelledby="home-map-story-title">
         <div className="home-map-story__copy">
-          <span className="eyebrow">Mapa do tempo</span>
-          <h2 id="home-map-story-title">Veja chuva e nuvens chegando à região</h2>
-          <p>Use o mapa para acompanhar o que se aproxima. Para saber o que esperar em Pelotas, confira a previsão acima.</p>
-          <p className="home-map-story__hint">Escolha <strong>Chuva</strong> para acompanhar a animação ou <strong>Satélite</strong> para observar as nuvens.</p>
+          <span className="eyebrow">Radar e satélite</span>
+          <h2 id="home-map-story-title">Acompanhe a chuva e as nuvens na região</h2>
+          <p>Use o mapa para observar o que se aproxima de Pelotas e das cidades da Zona Sul.</p>
+          <p className="home-map-story__hint">Selecione <strong>Chuva</strong> para ver a animação da precipitação ou <strong>Satélite</strong> para acompanhar as nuvens.</p>
         </div>
         <div className="home-map-story__frame">
           <WeatherMap regionalWeather={weather.regional} />
@@ -207,10 +210,10 @@ export function HomeEditorialDashboard({
 
       <section className="home-observation-story" id="observacao-embrapa" aria-labelledby="home-observation-story-title">
         <div className="home-observation-story__intro">
-          <span className="eyebrow">Tempo registrado em Pelotas · Embrapa</span>
-          <h2 id="home-observation-story-title">O que está acontecendo agora</h2>
-          <p>A previsão mostra o que pode acontecer. A Embrapa mostra o que já está sendo registrado em Pelotas.</p>
-          <Link href="/estacao-embrapa-pelotas">Ver todos os dados da Embrapa <span aria-hidden="true">→</span></Link>
+          <span className="eyebrow">Medições da Embrapa em Pelotas</span>
+          <h2 id="home-observation-story-title">Condições registradas agora</h2>
+          <p>A previsão indica o que pode acontecer. A estação da Embrapa mostra as condições medidas neste momento.</p>
+          <Link href="/estacao-embrapa-pelotas">Ver dados completos da estação <span aria-hidden="true">→</span></Link>
         </div>
 
         {observationAvailable ? (
@@ -238,10 +241,10 @@ export function HomeEditorialDashboard({
       <section className="home-story home-story--water" id="situacao-das-aguas" aria-labelledby="home-water-story-title">
         <header className="home-story-heading">
           <div>
-            <span className="eyebrow">Nível das águas</span>
-            <h2 id="home-water-story-title">Como estão as águas no Laranjal</h2>
+            <span className="eyebrow">Lagoa dos Patos</span>
+            <h2 id="home-water-story-title">Acompanhe o nível da água no Laranjal</h2>
           </div>
-          <p>O Laranjal é a principal referência para Pelotas. As outras cidades ajudam a mostrar como a Lagoa dos Patos está se comportando.</p>
+          <p>O Laranjal é a referência local para Pelotas. As estações de outras cidades ajudam a entender a variação da Lagoa dos Patos.</p>
         </header>
 
         <div className="home-water-story__layout">
@@ -262,14 +265,14 @@ export function HomeEditorialDashboard({
 
           <div className="home-water-table">
             <div className="home-water-table__heading">
-              <div><span className="eyebrow">Dados da FURG e Portos RS</span><strong>Acompanhe outros pontos da Lagoa</strong></div>
+              <div><span className="eyebrow">Dados da FURG e Portos RS</span><strong>Outras estações da Lagoa dos Patos</strong></div>
               <small>{lagoon.available} de {lagoon.total} locais com dados</small>
             </div>
 
             <div className="home-water-table__columns" aria-hidden="true">
               <span>Local</span>
               <span>Nível agora</span>
-              <span>Está mudando</span>
+              <span>Variação</span>
               <span>Situação</span>
             </div>
 
@@ -288,7 +291,7 @@ export function HomeEditorialDashboard({
             </div>
 
             <div className="home-water-context">
-              <div><span>Outra referência do estado</span><strong>Guaíba em Porto Alegre</strong></div>
+              <div><span>Referência adicional</span><strong>Guaíba em Porto Alegre</strong></div>
               <b>{formatNumber(guaiba.currentLevel, 2)} m</b>
               <span className={`is-${guaibaTrend.direction}`}>{guaibaTrend.symbol} {guaibaTrend.label}</span>
               <small>{formatUpdatedAt(guaiba.updatedAt)}</small>
@@ -297,16 +300,16 @@ export function HomeEditorialDashboard({
         </div>
 
         <footer className="home-water-story__footer">
-          <p>Observe principalmente se a água está subindo, baixando ou estável. Cada local usa uma régua diferente.</p>
+          <p>Compare a tendência de cada estação — subida, queda ou estabilidade — porque cada local usa uma régua própria.</p>
           <Link href="/situacao-hidrologica-pelotas">Ver a situação completa das águas <span aria-hidden="true">→</span></Link>
         </footer>
       </section>
 
       <section className="home-explore-story" id="explorar-portal" aria-labelledby="home-explore-story-title">
         <header>
-          <span className="eyebrow">Continue pelo que importa</span>
-          <h2 id="home-explore-story-title">O que você quer acompanhar?</h2>
-          <p>Escolha um caminho para encontrar a informação sem precisar procurar pelo portal inteiro.</p>
+          <span className="eyebrow">Principais informações do portal</span>
+          <h2 id="home-explore-story-title">Encontre o que precisa acompanhar</h2>
+          <p>Escolha uma categoria para acessar diretamente a previsão, os avisos, as águas ou as fontes dos dados.</p>
         </header>
         <div className="home-explore-groups">
           {exploreGroups.map((group) => (

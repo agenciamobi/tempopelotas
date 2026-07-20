@@ -19,7 +19,7 @@ const websiteSchema = {
   name: "TEMPO Pelotas",
   url: absoluteUrl("/"),
   description:
-    "Portal meteorológico e hidrológico local para preparação comunitária em Pelotas e na Zona Sul do Rio Grande do Sul.",
+    "Portal local com previsão do tempo, avisos meteorológicos e níveis das águas em Pelotas e na Zona Sul do Rio Grande do Sul.",
   inLanguage: "pt-BR",
   areaServed: {
     "@type": "City",
@@ -85,6 +85,7 @@ export default async function Home() {
           <InmetAlertsPanel data={inmetAlerts} variant="home" />
           <HomeEditorialDashboard
             weather={weather}
+            advisoryLevel={headerLevel}
             observation={embrapaObservation}
             laranjal={laranjalObservation}
             guaiba={guaibaObservation}

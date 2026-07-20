@@ -16,11 +16,11 @@ const footerGroups = [
     ],
   },
   {
-    title: "Águas e atenção",
+    title: "Águas e alertas",
     links: [
       { label: "Situação hidrológica", href: "/situacao-hidrologica-pelotas" },
       { label: "Nível da Lagoa dos Patos", href: "/nivel-da-lagoa-dos-patos-laranjal" },
-      { label: "Condições de atenção", href: "/alertas" },
+      { label: "Avisos meteorológicos", href: "/alertas" },
       { label: "Câmeras de Pelotas", href: "/cameras-ao-vivo-pelotas" },
     ],
   },
@@ -97,7 +97,7 @@ export function SiteFooter({ source }: SiteFooterProps) {
             </Link>
 
             <p>
-              Informação meteorológica e hidrológica organizada para Pelotas e a Zona Sul do Rio
+              Previsão do tempo, medições locais e níveis das águas para Pelotas e a Zona Sul do Rio
               Grande do Sul.
             </p>
 
@@ -108,20 +108,20 @@ export function SiteFooter({ source }: SiteFooterProps) {
           </div>
 
           <div className="portal-footer-message">
-            <span className="portal-footer-kicker">Informação local para agir melhor</span>
-            <h2 id="portal-footer-title">Entenda o tempo. Acompanhe as águas. Prepare-se.</h2>
+            <span className="portal-footer-kicker">Informação local sobre tempo e águas</span>
+            <h2 id="portal-footer-title">Consulte a previsão, os avisos e o nível das águas.</h2>
             <p>
-              Consulte condições observadas, previsão, chuva, vento e níveis das águas em uma visão
-              integrada da região.
+              Veja as condições atuais, a previsão, a chuva, o vento e os níveis da Lagoa dos Patos
+              em um só lugar.
             </p>
 
             <div className="portal-footer-main-actions">
               <Link className="portal-footer-primary-action" href="/alertas">
-                Ver condições de atenção
+                Ver avisos meteorológicos
                 <ArrowIcon />
               </Link>
               <Link className="portal-footer-secondary-action" href="/tempo-hoje-pelotas">
-                Consultar previsão de hoje
+                Ver previsão de hoje
               </Link>
             </div>
           </div>
@@ -142,7 +142,7 @@ export function SiteFooter({ source }: SiteFooterProps) {
             </ul>
 
             <Link href="/metodologia">
-              Como os dados são utilizados
+              Entenda as fontes e a metodologia
               <ArrowIcon />
             </Link>
           </aside>
@@ -170,15 +170,15 @@ export function SiteFooter({ source }: SiteFooterProps) {
           </div>
 
           <aside className="portal-footer-priority">
-            <span className="portal-footer-kicker">Acessos prioritários</span>
+            <span className="portal-footer-kicker">Acesso rápido</span>
 
             <Link className="portal-footer-priority-card portal-footer-priority-card--alert" href="/alertas">
               <span className="portal-footer-priority-icon">
                 <AlertIcon />
               </span>
               <span>
-                <small>Chuva, vento e temporal</small>
-                <strong>Condições de atenção</strong>
+                <small>Chuva, vento e temporais</small>
+                <strong>Avisos meteorológicos</strong>
               </span>
               <ArrowIcon />
             </Link>
@@ -202,16 +202,16 @@ export function SiteFooter({ source }: SiteFooterProps) {
         <section className="portal-footer-guidance" aria-label="Orientação de segurança">
           <span aria-hidden="true">i</span>
           <p>
-            O TEMPO Pelotas organiza informações para acompanhamento. Em situações de risco, siga os
+            O TEMPO Pelotas reúne dados para acompanhamento. Em situações de risco, siga sempre os
             comunicados da Defesa Civil, do INMET e das autoridades locais.
           </p>
-          <Link href="/metodologia">Entenda os limites e as fontes</Link>
+          <Link href="/metodologia">Ver fontes e limitações</Link>
         </section>
 
         <div className="portal-footer-bottom">
           <div className="portal-footer-copyright">
             <strong>TEMPO Pelotas</strong>
-            <span>© {currentYear} · Informação meteorológica local.</span>
+            <span>© {currentYear} · Informação meteorológica e hidrológica local.</span>
           </div>
 
           <nav className="portal-footer-legal" aria-label="Links institucionais">

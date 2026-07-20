@@ -45,19 +45,19 @@ const mobileNavItems: NavigationItem[] = [
 
 const alertActionCopy: Record<AdvisoryLevel, AlertActionCopy> = {
   normal: {
-    eyebrow: "Monitoramento",
-    label: "Alertas",
-    ariaLabel: "Abrir monitoramento e alertas meteorológicos",
+    eyebrow: "Avisos oficiais",
+    label: "Consultar",
+    ariaLabel: "Consultar avisos meteorológicos para Pelotas",
   },
   attention: {
-    eyebrow: "Atenção ativa",
-    label: "Ver condições",
-    ariaLabel: "Abrir condições de atenção meteorológica",
+    eyebrow: "Atenção prevista",
+    label: "Ver alertas",
+    ariaLabel: "Ver alertas e condições de atenção para Pelotas",
   },
   warning: {
-    eyebrow: "Aviso ativo",
+    eyebrow: "Risco elevado",
     label: "Ver alertas",
-    ariaLabel: "Abrir avisos meteorológicos ativos para Pelotas",
+    ariaLabel: "Ver alertas meteorológicos e orientações para Pelotas",
   },
 };
 
@@ -160,7 +160,7 @@ export function SiteHeader({
           <span className="site-header-brand-divider" aria-hidden="true" />
           <span className="site-header-context">
             <strong>Pelotas, RS</strong>
-            <small>Clima e águas</small>
+            <small>Tempo e águas</small>
           </span>
         </div>
 

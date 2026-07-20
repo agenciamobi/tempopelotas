@@ -36,57 +36,57 @@ type HeroPresentation = {
 
 const heroPresentationByLevel = {
   normal: {
-    badge: "Dados locais atualizados",
-    kicker: "Tempo agora em Pelotas",
-    title: "Veja o tempo agora.",
-    highlightedTitle: "Planeje as próximas horas.",
+    badge: "Condições atualizadas",
+    kicker: "Tempo em Pelotas agora",
+    title: "Veja como está o tempo.",
+    highlightedTitle: "Planeje o restante do dia.",
     description:
-      "Consulte a condição atual e os principais sinais de chuva, temperatura e vento para organizar o seu dia.",
+      "Consulte a temperatura, a chuva e o vento agora e veja a previsão para as próximas horas.",
     primaryAction: {
       href: "/tempo-hoje-pelotas",
       label: "Ver previsão de hoje",
     },
     secondaryAction: {
       href: "/previsao-7-dias-pelotas",
-      label: "Ver próximos 7 dias",
+      label: "Ver previsão para 7 dias",
     },
     photoHref:
       "https://commons.wikimedia.org/wiki/File:Amanhecer_na_Praia_do_Laranjal.jpg",
     photoCredit: "Foto: Sebastian2112 / CC BY-SA 4.0",
   },
   attention: {
-    badge: "Atenção nas próximas horas",
-    kicker: "Atenção em Pelotas",
-    title: "Chuva e vento podem aumentar.",
-    highlightedTitle: "Acompanhe as próximas horas.",
+    badge: "Mudança importante na previsão",
+    kicker: "Atenção nas próximas horas",
+    title: "Chuva e vento podem se intensificar.",
+    highlightedTitle: "Confira os horários de maior risco.",
     description:
-      "Veja os períodos mais sensíveis da previsão e confira os avisos oficiais antes de sair ou programar atividades externas.",
+      "Veja quando a chance de chuva e de rajadas aumenta e consulte os avisos oficiais antes de sair.",
     primaryAction: {
       href: "/alertas",
-      label: "Ver avisos oficiais",
+      label: "Consultar avisos oficiais",
     },
     secondaryAction: {
       href: "/tempo-hoje-pelotas",
-      label: "Ver previsão hora a hora",
+      label: "Ver previsão por hora",
     },
     photoHref:
       "https://commons.wikimedia.org/wiki/File:Sunset_over_Calm_Lake.jpg",
     photoCredit: "Foto: Kane Morley / CC BY-SA 4.0",
   },
   warning: {
-    badge: "Atenção redobrada",
-    kicker: "Atenção em Pelotas",
+    badge: "Risco elevado nas próximas horas",
+    kicker: "Risco de tempo forte em Pelotas",
     title: "Há risco de tempo forte.",
-    highlightedTitle: "Veja os períodos de maior risco.",
+    highlightedTitle: "Confira os períodos de maior risco.",
     description:
-      "Confira os avisos oficiais e identifique os horários com maior risco de chuva intensa, temporal ou rajadas fortes.",
+      "Consulte os avisos oficiais e os horários com maior risco de chuva intensa, temporal ou rajadas fortes.",
     primaryAction: {
       href: "/alertas",
-      label: "Ver avisos oficiais",
+      label: "Consultar avisos oficiais",
     },
     secondaryAction: {
       href: "/tempo-hoje-pelotas",
-      label: "Ver previsão hora a hora",
+      label: "Ver previsão por hora",
     },
     photoHref: "https://commons.wikimedia.org/wiki/File:Heavy_Rain.jpg",
     photoCredit: "Foto: Pridatko Oleksandr / domínio público",
@@ -238,7 +238,7 @@ export function WeatherHero({
           ) : null}
 
           {reasons.length > 0 ? (
-            <div className="weather-hero-reasons" aria-label="Por que é preciso atenção">
+            <div className="weather-hero-reasons" aria-label="Fatores considerados na avaliação">
               {reasons.map((reason) => (
                 <span key={reason}>{reason}</span>
               ))}
@@ -289,7 +289,7 @@ export function WeatherHero({
       </div>
 
       <div className="weather-hero-scroll">
-        <span>Veja a previsão abaixo</span>
+        <span>Continue para a previsão detalhada</span>
         <i aria-hidden="true">↓</i>
       </div>
 
