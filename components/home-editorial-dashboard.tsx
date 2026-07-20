@@ -142,7 +142,7 @@ export function HomeEditorialDashboard({
         <div className="home-next-days">
           <div className="home-next-days__heading">
             <span className="eyebrow">Depois de hoje</span>
-            <strong>Quatro dias em uma linha</strong>
+            <strong>Próximos quatro dias</strong>
           </div>
           <div className="home-next-days__list">
             {nextDays.map((day) => (
@@ -231,6 +231,13 @@ export function HomeEditorialDashboard({
             <div className="home-water-table__heading">
               <div><span className="eyebrow">FURG & Portos RS</span><strong>Lagoa dos Patos, de norte a sul</strong></div>
               <small>{lagoon.available}/{lagoon.total} estações com leitura</small>
+            </div>
+
+            <div className="home-water-table__columns" aria-hidden="true">
+              <span>Estação</span>
+              <span>Nível</span>
+              <span>Tendência</span>
+              <span>Situação</span>
             </div>
 
             <div className="home-water-table__rows">
