@@ -21,32 +21,36 @@ type HomeEditorialDashboardProps = {
 
 const exploreGroups = [
   {
-    title: "Tempo",
+    title: "Planejar o dia",
+    description: "Temperaturas, chuva e horários para organizar sua rotina.",
     links: [
-      ["/tempo-hoje-pelotas", "Tempo de hoje"],
-      ["/previsao-7-dias-pelotas", "Previsão dos próximos 7 dias"],
+      ["/tempo-hoje-pelotas", "Ver o tempo de hoje"],
+      ["/previsao-7-dias-pelotas", "Ver os próximos 7 dias"],
     ],
   },
   {
-    title: "Chuva e vento",
+    title: "Acompanhar chuva e vento",
+    description: "Veja quando a chuva ou o vento podem aumentar.",
     links: [
       ["/chuva-em-pelotas", "Chance de chuva"],
       ["/vento-em-pelotas", "Vento em Pelotas"],
-      ["/alertas", "Avisos e orientações"],
+      ["/alertas", "Avisos e cuidados"],
     ],
   },
   {
-    title: "Águas",
+    title: "Acompanhar as águas",
+    description: "Consulte o Laranjal e outros pontos da Lagoa dos Patos.",
     links: [
-      ["/situacao-hidrologica-pelotas", "Como estão as águas"],
-      ["/nivel-da-lagoa-dos-patos-laranjal", "Nível no Laranjal"],
+      ["/situacao-hidrologica-pelotas", "Ver como estão as águas"],
+      ["/nivel-da-lagoa-dos-patos-laranjal", "Ver o nível no Laranjal"],
     ],
   },
   {
-    title: "Mais informações",
+    title: "Conferir outras informações",
+    description: "Acesse imagens ao vivo e saiba de onde vêm os dados.",
     links: [
-      ["/cameras-ao-vivo-pelotas", "Câmeras ao vivo"],
-      ["/metodologia", "De onde vêm os dados"],
+      ["/cameras-ao-vivo-pelotas", "Abrir câmeras ao vivo"],
+      ["/metodologia", "Conhecer as fontes"],
     ],
   },
 ] as const;
@@ -93,6 +97,12 @@ function formatUpdatedAt(value: string | null) {
   }).format(new Date(value));
 }
 
+function observationStatusLabel(observation: EmbrapaObservationData) {
+  if (observation.status === "partial") return "Alguns dados ainda não foram atualizados";
+  if (observation.source.observationTime) return `Atualizado às ${observation.source.observationTime}`;
+  return "Dados atualizados";
+}
+
 function trendLabel(value: number | null) {
   if (value === null) return { symbol: "·", label: "Sem mudança clara", direction: "unknown" };
   if (Math.abs(value) < 0.1) return { symbol: "→", label: "Praticamente estável", direction: "stable" };
@@ -105,7 +115,7 @@ function stationState(observation: LagoonMonitoringObservation) {
   if (observation.status === "stale") return "Dados atrasados";
   if (observation.risk === "flooding") return "Acima do nível de atenção";
   if (observation.risk === "attention") return "Perto do nível de atenção";
-  return "Abaixo do nível de atenção";
+  return "Sem sinal de atenção";
 }
 
 export function HomeEditorialDashboard({
@@ -188,6 +198,7 @@ export function HomeEditorialDashboard({
           <span className="eyebrow">Mapa do tempo</span>
           <h2 id="home-map-story-title">Veja chuva e nuvens chegando à região</h2>
           <p>Use o mapa para acompanhar o que se aproxima. Para saber o que esperar em Pelotas, confira a previsão acima.</p>
+          <p className="home-map-story__hint">Escolha <strong>Chuva</strong> para acompanhar a animação ou <strong>Satélite</strong> para observar as nuvens.</p>
         </div>
         <div className="home-map-story__frame">
           <WeatherMap regionalWeather={weather.regional} />
@@ -205,15 +216,15 @@ export function HomeEditorialDashboard({
         {observationAvailable ? (
           <div className="home-observation-story__reading">
             <div className="home-observation-temperature">
-              <small>{observation.status === "live" ? "Dados atualizados" : "Alguns dados estão indisponíveis"}</small>
+              <small>{observationStatusLabel(observation)}</small>
               <strong>{formatNumber(observation.current.temperature)}°</strong>
               <span>Sensação de {formatNumber(observation.current.feelsLike)} °C</span>
             </div>
             <dl>
               <div><dt>Umidade</dt><dd>{formatNumber(observation.current.humidity, 0)}%</dd></div>
-              <div><dt>Vento</dt><dd>{formatNumber(observation.current.windSpeed)} km/h</dd></div>
-              <div><dt>Chuva acumulada hoje</dt><dd>{formatNumber(observation.accumulated.rainDaily)} mm</dd></div>
-              <div><dt>Pressão do ar</dt><dd>{formatNumber(observation.current.pressure)} hPa</dd></div>
+              <div><dt>Vento agora</dt><dd>{formatNumber(observation.current.windSpeed)} km/h</dd></div>
+              <div><dt>Chuva registrada hoje</dt><dd>{formatNumber(observation.accumulated.rainDaily)} mm</dd></div>
+              <div><dt>Vento mais forte hoje</dt><dd>{formatNumber(observation.extremes.windSpeedMax.value)} km/h</dd></div>
             </dl>
           </div>
         ) : (
@@ -251,15 +262,15 @@ export function HomeEditorialDashboard({
 
           <div className="home-water-table">
             <div className="home-water-table__heading">
-              <div><span className="eyebrow">Dados da FURG e Portos RS</span><strong>Como estão as águas em outras cidades</strong></div>
+              <div><span className="eyebrow">Dados da FURG e Portos RS</span><strong>Acompanhe outros pontos da Lagoa</strong></div>
               <small>{lagoon.available} de {lagoon.total} locais com dados</small>
             </div>
 
             <div className="home-water-table__columns" aria-hidden="true">
               <span>Local</span>
-              <span>Nível</span>
-              <span>Mudança</span>
-              <span>Atenção</span>
+              <span>Nível agora</span>
+              <span>Está mudando</span>
+              <span>Situação</span>
             </div>
 
             <div className="home-water-table__rows">
@@ -277,7 +288,7 @@ export function HomeEditorialDashboard({
             </div>
 
             <div className="home-water-context">
-              <div><span>Para comparação</span><strong>Guaíba em Porto Alegre</strong></div>
+              <div><span>Outra referência do estado</span><strong>Guaíba em Porto Alegre</strong></div>
               <b>{formatNumber(guaiba.currentLevel, 2)} m</b>
               <span className={`is-${guaibaTrend.direction}`}>{guaibaTrend.symbol} {guaibaTrend.label}</span>
               <small>{formatUpdatedAt(guaiba.updatedAt)}</small>
@@ -286,20 +297,22 @@ export function HomeEditorialDashboard({
         </div>
 
         <footer className="home-water-story__footer">
-          <p>Os números de cada local usam referências diferentes. Compare se a água está subindo ou baixando, não apenas o valor.</p>
+          <p>Observe principalmente se a água está subindo, baixando ou estável. Cada local usa uma régua diferente.</p>
           <Link href="/situacao-hidrologica-pelotas">Ver a situação completa das águas <span aria-hidden="true">→</span></Link>
         </footer>
       </section>
 
       <section className="home-explore-story" id="explorar-portal" aria-labelledby="home-explore-story-title">
         <header>
-          <span className="eyebrow">Encontre rapidamente</span>
-          <h2 id="home-explore-story-title">Vá direto ao que precisa</h2>
+          <span className="eyebrow">Continue pelo que importa</span>
+          <h2 id="home-explore-story-title">O que você quer acompanhar?</h2>
+          <p>Escolha um caminho para encontrar a informação sem precisar procurar pelo portal inteiro.</p>
         </header>
         <div className="home-explore-groups">
           {exploreGroups.map((group) => (
             <section key={group.title}>
               <h3>{group.title}</h3>
+              <p>{group.description}</p>
               <div>
                 {group.links.map(([href, label]) => (
                   <Link href={href} key={href}>{label}<span aria-hidden="true">→</span></Link>
