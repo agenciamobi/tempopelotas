@@ -59,6 +59,7 @@ import "./home-first-fold-editorial-light.css";
 import "./home-first-fold-editorial-light-refinement.css";
 import "./home-first-fold-editorial-light-v2.css";
 import "./home-first-fold-editorial-light-v2-responsive.css";
+import "./inmet-alerts.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
