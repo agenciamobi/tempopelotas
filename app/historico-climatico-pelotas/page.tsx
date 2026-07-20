@@ -26,6 +26,7 @@ export default async function HistoricoClimaticoPelotasPage() {
     getPelotasWeatherHistory(),
   ]);
   const { summary } = history;
+  const analyzedDays = history.days.length;
 
   const datasetSchema = {
     "@context": "https://schema.org",
@@ -58,6 +59,13 @@ export default async function HistoricoClimaticoPelotasPage() {
       title="Como foi o tempo em Pelotas"
       description="Compare temperatura, chuva e vento para entender como o tempo mudou durante o último mês."
       currentPath="/historico-climatico-pelotas"
+      heroStat={{
+        label: summary.periodLabel,
+        value: analyzedDays,
+        detail: analyzedDays === 1 ? "dia analisado" : "dias analisados",
+        ariaLabel: `${analyzedDays} dias analisados no histórico climático recente de Pelotas`,
+        tone: "history",
+      }}
     >
       <script
         type="application/ld+json"
