@@ -40,13 +40,13 @@ const mobileNavItems: NavigationItem[] = [
   { label: "Hoje", href: "/tempo-hoje-pelotas", icon: "today" },
   { label: "7 dias", href: "/previsao-7-dias-pelotas", icon: "week" },
   { label: "Águas", href: "/situacao-hidrologica-pelotas", icon: "water" },
-  { label: "Consultar", href: "/alertas", icon: "alert" },
+  { label: "Alertas", href: "/alertas", icon: "alert" },
 ];
 
 const alertActionCopy: Record<AdvisoryLevel, AlertActionCopy> = {
   normal: {
     eyebrow: "Avisos oficiais",
-    label: "Alertas",
+    label: "Consultar",
     ariaLabel: "Consultar avisos meteorológicos para Pelotas",
   },
   attention: {
