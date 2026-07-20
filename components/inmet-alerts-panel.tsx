@@ -12,7 +12,7 @@ type InmetAlertsPanelProps = {
 
 const relevanceLabels: Record<InmetAlertRelevance, string> = {
   pelotas: "Inclui Pelotas",
-  regional: "Possível interesse regional",
+  regional: "Pode interessar à Zona Sul",
   state: "Outras áreas do RS",
 };
 
@@ -32,8 +32,8 @@ function periodLabel(alert: InmetAlert) {
   const start = formatDateTime(alert.startsAt);
   const end = formatDateTime(alert.expiresAt);
 
-  if (!alert.expiresAt) return alert.period === "upcoming" ? `Previsto a partir de ${start}` : `Em vigor desde ${start}`;
-  return alert.period === "upcoming" ? `Previsto de ${start} até ${end}` : `Vigente até ${end}`;
+  if (!alert.expiresAt) return alert.period === "upcoming" ? `Começa em ${start}` : `Em vigor desde ${start}`;
+  return alert.period === "upcoming" ? `Previsto de ${start} até ${end}` : `Válido até ${end}`;
 }
 
 function relevanceSummary(data: InmetAlertsData) {
@@ -43,16 +43,26 @@ function relevanceSummary(data: InmetAlertsData) {
       : `Pelotas está incluída em ${data.counts.pelotas} avisos oficiais.`;
   }
   if (data.counts.regional > 0) {
-    return "Há aviso para uma região próxima ou relacionada à Zona Sul.";
+    return "Há aviso para uma região próxima ou ligada à Zona Sul.";
   }
   return data.counts.total === 1
-    ? "Há um aviso oficial vigente no Rio Grande do Sul."
-    : `Há ${data.counts.total} avisos oficiais vigentes no Rio Grande do Sul.`;
+    ? "Há um aviso oficial no Rio Grande do Sul."
+    : `Há ${data.counts.total} avisos oficiais no Rio Grande do Sul.`;
+}
+
+function displayHeadline(alert: InmetAlert) {
+  const headline = alert.headline?.trim();
+
+  if (!headline || /severidade|severity|grau|grade/i.test(headline)) {
+    return `Aviso de ${alert.event}`;
+  }
+
+  return headline;
 }
 
 function AlertRow({ alert }: { alert: InmetAlert }) {
   const areaText = alert.areas[0] ||
-    (alert.municipalities.length ? `${alert.municipalities.length} municípios informados` : "Consulte a área oficial");
+    (alert.municipalities.length ? `${alert.municipalities.length} municípios informados` : "Confira a área no aviso original");
 
   return (
     <article className={`inmet-alert-card severity-${alert.severity} relevance-${alert.relevance}`}>
@@ -62,21 +72,21 @@ function AlertRow({ alert }: { alert: InmetAlert }) {
       </div>
       <div className="inmet-alert-card__heading">
         <div>
-          <h3>{alert.headline || alert.event}</h3>
+          <h3>{displayHeadline(alert)}</h3>
           <p>{periodLabel(alert)}</p>
         </div>
         <span className="inmet-alert-event">{alert.event}</span>
       </div>
-      <p className="inmet-alert-area"><strong>Área:</strong> {areaText}</p>
+      <p className="inmet-alert-area"><strong>Onde vale:</strong> {areaText}</p>
       {alert.description ? <p className="inmet-alert-description">{alert.description}</p> : null}
       {alert.instruction ? (
         <details>
-          <summary>Orientações oficiais</summary>
+          <summary>Como se proteger</summary>
           <p>{alert.instruction}</p>
         </details>
       ) : null}
       <a href={alert.officialUrl} target="_blank" rel="noreferrer">
-        Conferir aviso no INMET <span aria-hidden="true">↗</span>
+        Ver aviso original no INMET <span aria-hidden="true">↗</span>
       </a>
     </article>
   );
@@ -91,11 +101,11 @@ function HomePanel({ data }: { data: InmetAlertsData }) {
     <section className={`home-inmet-alerts severity-${primary.severity}`} aria-labelledby="home-inmet-title">
       <div className="home-inmet-alerts__mark" aria-hidden="true">!</div>
       <div className="home-inmet-alerts__copy">
-        <span>Informação oficial · INMET</span>
+        <span>Aviso oficial do INMET</span>
         <h2 id="home-inmet-title">{relevanceSummary(data)}</h2>
         <p>{primary.event} · {periodLabel(primary)}</p>
       </div>
-      <Link href="/alertas">Ver avisos e áreas <span aria-hidden="true">→</span></Link>
+      <Link href="/alertas">Ver onde o aviso vale <span aria-hidden="true">→</span></Link>
     </section>
   );
 }
@@ -108,15 +118,15 @@ export function InmetAlertsPanel({ data, variant = "page" }: InmetAlertsPanelPro
       <section className="inmet-alerts-section is-unavailable" aria-labelledby="inmet-alerts-title">
         <header className="inmet-alerts-heading">
           <div>
-            <span className="eyebrow">Fonte oficial · INMET</span>
-            <h2 id="inmet-alerts-title">Avisos meteorológicos no Rio Grande do Sul</h2>
+            <span className="eyebrow">Avisos oficiais do INMET</span>
+            <h2 id="inmet-alerts-title">Avisos de tempo no Rio Grande do Sul</h2>
           </div>
-          <span className="inmet-source-status">Consulta indisponível</span>
+          <span className="inmet-source-status">Não foi possível atualizar</span>
         </header>
         <div className="inmet-alerts-empty">
-          <strong>Não foi possível consultar o feed oficial agora.</strong>
-          <p>Isso não significa ausência de avisos. Consulte diretamente o portal do INMET.</p>
-          <a href={data.source.portalUrl} target="_blank" rel="noreferrer">Abrir avisos do INMET <span aria-hidden="true">↗</span></a>
+          <strong>Não conseguimos consultar os avisos agora.</strong>
+          <p>Isso não significa que não existam avisos. Confira diretamente no site do INMET.</p>
+          <a href={data.source.portalUrl} target="_blank" rel="noreferrer">Abrir site do INMET <span aria-hidden="true">↗</span></a>
         </div>
       </section>
     );
@@ -127,15 +137,15 @@ export function InmetAlertsPanel({ data, variant = "page" }: InmetAlertsPanelPro
       <section className="inmet-alerts-section is-clear" aria-labelledby="inmet-alerts-title">
         <header className="inmet-alerts-heading">
           <div>
-            <span className="eyebrow">Fonte oficial · INMET</span>
-            <h2 id="inmet-alerts-title">Avisos meteorológicos no Rio Grande do Sul</h2>
+            <span className="eyebrow">Avisos oficiais do INMET</span>
+            <h2 id="inmet-alerts-title">Avisos de tempo no Rio Grande do Sul</h2>
           </div>
-          <span className="inmet-source-status">Consulta atualizada</span>
+          <span className="inmet-source-status">Atualizado</span>
         </header>
         <div className="inmet-alerts-empty">
-          <strong>Nenhum aviso vigente para o RS foi encontrado no feed consultado.</strong>
-          <p>A situação pode mudar. O portal verifica novamente o serviço oficial a cada poucos minutos.</p>
-          <a href={data.source.portalUrl} target="_blank" rel="noreferrer">Conferir diretamente no INMET <span aria-hidden="true">↗</span></a>
+          <strong>Nenhum aviso para o RS foi encontrado agora.</strong>
+          <p>A situação pode mudar. O portal volta a verificar o INMET regularmente.</p>
+          <a href={data.source.portalUrl} target="_blank" rel="noreferrer">Conferir no site do INMET <span aria-hidden="true">↗</span></a>
         </div>
       </section>
     );
@@ -145,23 +155,23 @@ export function InmetAlertsPanel({ data, variant = "page" }: InmetAlertsPanelPro
   const regional = data.alerts.filter((alert) => alert.relevance === "regional");
   const state = data.alerts.filter((alert) => alert.relevance === "state");
   const groups = [
-    { id: "pelotas", title: "Avisos que incluem Pelotas", description: "Correspondência pelo código municipal ou menção explícita à cidade.", alerts: pelotas },
-    { id: "regional", title: "Possível interesse para a Zona Sul", description: "Avisos que mencionam áreas regionais relacionadas, sem confirmação municipal explícita.", alerts: regional },
-    { id: "estado", title: "Demais avisos no Rio Grande do Sul", description: "Contexto estadual para deslocamentos, viagens e acompanhamento geral.", alerts: state },
+    { id: "pelotas", title: "Avisos que incluem Pelotas", description: "O aviso cita Pelotas diretamente.", alerts: pelotas },
+    { id: "regional", title: "Avisos que podem interessar à Zona Sul", description: "Confira as áreas porque o aviso pode atingir cidades próximas.", alerts: regional },
+    { id: "estado", title: "Avisos em outras partes do Rio Grande do Sul", description: "Útil para quem vai viajar ou acompanhar outras regiões do estado.", alerts: state },
   ].filter((group) => group.alerts.length > 0);
 
   return (
     <section className="inmet-alerts-section" aria-labelledby="inmet-alerts-title">
       <header className="inmet-alerts-heading">
         <div>
-          <span className="eyebrow">Fonte oficial · INMET</span>
-          <h2 id="inmet-alerts-title">Avisos meteorológicos no Rio Grande do Sul</h2>
-          <p>{relevanceSummary(data)} Os avisos abaixo são emitidos pelo INMET e não pela classificação automática do TEMPO Pelotas.</p>
+          <span className="eyebrow">Avisos oficiais do INMET</span>
+          <h2 id="inmet-alerts-title">Avisos de tempo no Rio Grande do Sul</h2>
+          <p>{relevanceSummary(data)} Organizamos primeiro os avisos que citam Pelotas e a Zona Sul.</p>
         </div>
-        <div className="inmet-alerts-counts" aria-label="Resumo dos avisos">
+        <div className="inmet-alerts-counts" aria-label="Quantidade de avisos por área">
           <div><strong>{data.counts.pelotas}</strong><span>Pelotas</span></div>
           <div><strong>{data.counts.regional}</strong><span>Zona Sul</span></div>
-          <div><strong>{data.counts.state}</strong><span>Estado</span></div>
+          <div><strong>{data.counts.state}</strong><span>Outras áreas</span></div>
         </div>
       </header>
 
@@ -183,8 +193,8 @@ export function InmetAlertsPanel({ data, variant = "page" }: InmetAlertsPanelPro
       </div>
 
       <footer className="inmet-alerts-footer">
-        <p>Última consulta: {formatDateTime(data.source.fetchedAt)}. A área informada pelo INMET deve ser conferida no aviso original.</p>
-        <a href={data.source.portalUrl} target="_blank" rel="noreferrer">Portal oficial do INMET <span aria-hidden="true">↗</span></a>
+        <p>Última atualização: {formatDateTime(data.source.fetchedAt)}. Confira a área completa no aviso original.</p>
+        <a href={data.source.portalUrl} target="_blank" rel="noreferrer">Abrir site oficial do INMET <span aria-hidden="true">↗</span></a>
       </footer>
     </section>
   );
