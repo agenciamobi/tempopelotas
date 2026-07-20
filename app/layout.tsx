@@ -68,6 +68,7 @@ import "./home-visitor-copy-v4.css";
 import "./home-journey-refinement-v5.css";
 import "./home-grid-alignment-v6.css";
 import "./topic-editorial-home-visual.css";
+import "./topic-special-pages-refinement.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -108,11 +109,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    siteName: "TEMPO Pelotas",
-    title: "TEMPO Pelotas | Tempo, águas e segurança",
-    description:
-      "Acompanhe o tempo e a situação das águas em Pelotas e na Zona Sul do Rio Grande do Sul.",
     url: "/",
+    siteName: "TEMPO Pelotas",
+    title: "TEMPO Pelotas | Tempo e situação das águas em Pelotas, RS",
+    description:
+      "Previsão do tempo, chuva, vento, radar e nível da Lagoa dos Patos para Pelotas, RS.",
   },
   twitter: {
     card: "summary_large_image",
@@ -125,8 +126,8 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      "max-image-preview": "large",
       "max-snippet": -1,
+      "max-image-preview": "large",
       "max-video-preview": -1,
     },
   },
