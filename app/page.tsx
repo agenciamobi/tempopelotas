@@ -75,7 +75,11 @@ export default async function Home() {
 
       <div className="site-shell site-shell--home site-shell--home-editorial">
         <SiteHeader advisoryLevel={headerLevel} variant="hero" />
-        <WeatherHero weather={weather} />
+        <WeatherHero
+          weather={weather}
+          advisoryLevel={headerLevel}
+          officialAlertCount={pelotasOfficialAlerts.length}
+        />
 
         <main className="home-editorial-main" id="conteudo-principal" tabIndex={-1}>
           <InmetAlertsPanel data={inmetAlerts} variant="home" />
