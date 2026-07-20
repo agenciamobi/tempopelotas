@@ -1,322 +1,43 @@
 name: Refine portal copy once
 
 on:
-  push:
+  pull_request:
     branches: [main]
-    paths:
-      - ".github/workflows/refine-copy-once.yml"
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
 
 jobs:
   refine-copy:
-    if: github.actor != 'github-actions[bot]'
+    if: github.head_ref == 'refine-site-copy'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Refine copy and synchronize risk state
+      - name: Skip automated follow-up run
+        id: guard
         shell: bash
         run: |
-          python - <<'PY'
-          from pathlib import Path
+          if git log -1 --pretty=%B | grep -q "Refina copys e unifica mensagens do portal"; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
 
-          changes = {
-              "app/page.tsx": [
-                  (
-                      '"Portal meteorológico e hidrológico local para preparação comunitária em Pelotas e na Zona Sul do Rio Grande do Sul."',
-                      '"Portal local com previsão do tempo, avisos meteorológicos e níveis das águas em Pelotas e na Zona Sul do Rio Grande do Sul."',
-                  ),
-                  (
-                      '          <HomeEditorialDashboard\n            weather={weather}\n',
-                      '          <HomeEditorialDashboard\n            weather={weather}\n            advisoryLevel={headerLevel}\n',
-                  ),
-              ],
-              "components/weather-hero.tsx": [
-                  (
-                      '''const heroPresentationByLevel = {
-  normal: {
-    badge: "Dados locais atualizados",
-    kicker: "Tempo agora em Pelotas",
-    title: "Veja o tempo agora.",
-    highlightedTitle: "Planeje as próximas horas.",
-    description:
-      "Consulte a condição atual e os principais sinais de chuva, temperatura e vento para organizar o seu dia.",
-    primaryAction: {
-      href: "/tempo-hoje-pelotas",
-      label: "Ver previsão de hoje",
-    },
-    secondaryAction: {
-      href: "/previsao-7-dias-pelotas",
-      label: "Ver próximos 7 dias",
-    },
-    photoHref:
-      "https://commons.wikimedia.org/wiki/File:Amanhecer_na_Praia_do_Laranjal.jpg",
-    photoCredit: "Foto: Sebastian2112 / CC BY-SA 4.0",
-  },
-  attention: {
-    badge: "Atenção nas próximas horas",
-    kicker: "Atenção em Pelotas",
-    title: "Chuva e vento podem aumentar.",
-    highlightedTitle: "Acompanhe as próximas horas.",
-    description:
-      "Veja os períodos mais sensíveis da previsão e confira os avisos oficiais antes de sair ou programar atividades externas.",
-    primaryAction: {
-      href: "/alertas",
-      label: "Ver avisos oficiais",
-    },
-    secondaryAction: {
-      href: "/tempo-hoje-pelotas",
-      label: "Ver previsão hora a hora",
-    },
-    photoHref:
-      "https://commons.wikimedia.org/wiki/File:Sunset_over_Calm_Lake.jpg",
-    photoCredit: "Foto: Kane Morley / CC BY-SA 4.0",
-  },
-  warning: {
-    badge: "Atenção redobrada",
-    kicker: "Atenção em Pelotas",
-    title: "Há risco de tempo forte.",
-    highlightedTitle: "Veja os períodos de maior risco.",
-    description:
-      "Confira os avisos oficiais e identifique os horários com maior risco de chuva intensa, temporal ou rajadas fortes.",
-    primaryAction: {
-      href: "/alertas",
-      label: "Ver avisos oficiais",
-    },
-    secondaryAction: {
-      href: "/tempo-hoje-pelotas",
-      label: "Ver previsão hora a hora",
-    },
-    photoHref: "https://commons.wikimedia.org/wiki/File:Heavy_Rain.jpg",
-    photoCredit: "Foto: Pridatko Oleksandr / domínio público",
-  },
-} satisfies Record<AdvisoryLevel, HeroPresentation>;''',
-                      '''const heroPresentationByLevel = {
-  normal: {
-    badge: "Condições atualizadas",
-    kicker: "Tempo em Pelotas agora",
-    title: "Veja como está o tempo.",
-    highlightedTitle: "Planeje o restante do dia.",
-    description:
-      "Consulte a temperatura, a chuva e o vento agora e veja a previsão para as próximas horas.",
-    primaryAction: {
-      href: "/tempo-hoje-pelotas",
-      label: "Ver previsão de hoje",
-    },
-    secondaryAction: {
-      href: "/previsao-7-dias-pelotas",
-      label: "Ver previsão para 7 dias",
-    },
-    photoHref:
-      "https://commons.wikimedia.org/wiki/File:Amanhecer_na_Praia_do_Laranjal.jpg",
-    photoCredit: "Foto: Sebastian2112 / CC BY-SA 4.0",
-  },
-  attention: {
-    badge: "Mudança importante na previsão",
-    kicker: "Atenção nas próximas horas",
-    title: "Chuva e vento podem se intensificar.",
-    highlightedTitle: "Confira os horários de maior risco.",
-    description:
-      "Veja quando a chance de chuva e de rajadas aumenta e consulte os avisos oficiais antes de sair.",
-    primaryAction: {
-      href: "/alertas",
-      label: "Consultar avisos oficiais",
-    },
-    secondaryAction: {
-      href: "/tempo-hoje-pelotas",
-      label: "Ver previsão por hora",
-    },
-    photoHref:
-      "https://commons.wikimedia.org/wiki/File:Sunset_over_Calm_Lake.jpg",
-    photoCredit: "Foto: Kane Morley / CC BY-SA 4.0",
-  },
-  warning: {
-    badge: "Risco elevado nas próximas horas",
-    kicker: "Risco de tempo forte em Pelotas",
-    title: "Há risco de tempo forte.",
-    highlightedTitle: "Confira os períodos de maior risco.",
-    description:
-      "Consulte os avisos oficiais e os horários com maior risco de chuva intensa, temporal ou rajadas fortes.",
-    primaryAction: {
-      href: "/alertas",
-      label: "Consultar avisos oficiais",
-    },
-    secondaryAction: {
-      href: "/tempo-hoje-pelotas",
-      label: "Ver previsão por hora",
-    },
-    photoHref: "https://commons.wikimedia.org/wiki/File:Heavy_Rain.jpg",
-    photoCredit: "Foto: Pridatko Oleksandr / domínio público",
-  },
-} satisfies Record<AdvisoryLevel, HeroPresentation>;''',
-                  ),
-                  ('aria-label="Por que é preciso atenção"', 'aria-label="Fatores considerados na avaliação"'),
-                  ('<span>Veja a previsão abaixo</span>', '<span>Continue para a previsão detalhada</span>'),
-              ],
-              "components/site-header.tsx": [
-                  (
-                      '''const alertActionCopy: Record<AdvisoryLevel, AlertActionCopy> = {
-  normal: {
-    eyebrow: "Monitoramento",
-    label: "Alertas",
-    ariaLabel: "Abrir monitoramento e alertas meteorológicos",
-  },
-  attention: {
-    eyebrow: "Atenção ativa",
-    label: "Ver condições",
-    ariaLabel: "Abrir condições de atenção meteorológica",
-  },
-  warning: {
-    eyebrow: "Aviso ativo",
-    label: "Ver alertas",
-    ariaLabel: "Abrir avisos meteorológicos ativos para Pelotas",
-  },
-};''',
-                      '''const alertActionCopy: Record<AdvisoryLevel, AlertActionCopy> = {
-  normal: {
-    eyebrow: "Avisos oficiais",
-    label: "Consultar",
-    ariaLabel: "Consultar avisos meteorológicos para Pelotas",
-  },
-  attention: {
-    eyebrow: "Atenção prevista",
-    label: "Ver alertas",
-    ariaLabel: "Ver alertas e condições de atenção para Pelotas",
-  },
-  warning: {
-    eyebrow: "Risco elevado",
-    label: "Ver alertas",
-    ariaLabel: "Ver alertas meteorológicos e orientações para Pelotas",
-  },
-};''',
-                  ),
-                  ('<small>Clima e águas</small>', '<small>Tempo e águas</small>'),
-              ],
-              "components/home-editorial-dashboard.tsx": [
-                  ('import { getWeatherAdvisory } from "@/lib/weather-insights";', 'import { getWeatherAdvisory, type AdvisoryLevel } from "@/lib/weather-insights";'),
-                  ('  weather: WeatherData;\n  observation:', '  weather: WeatherData;\n  advisoryLevel?: AdvisoryLevel;\n  observation:'),
-                  ('description: "Temperaturas, chuva e horários para organizar sua rotina."', 'description: "Veja a previsão por hora e para os próximos dias."'),
-                  ('["/tempo-hoje-pelotas", "Ver o tempo de hoje"]', '["/tempo-hoje-pelotas", "Previsão de hoje"]'),
-                  ('["/previsao-7-dias-pelotas", "Ver os próximos 7 dias"]', '["/previsao-7-dias-pelotas", "Previsão para 7 dias"]'),
-                  ('description: "Veja quando a chuva ou o vento podem aumentar."', 'description: "Consulte os horários com maior chance de chuva e as rajadas previstas."'),
-                  ('["/chuva-em-pelotas", "Chance de chuva"]', '["/chuva-em-pelotas", "Chuva por horário"]'),
-                  ('["/vento-em-pelotas", "Vento em Pelotas"]', '["/vento-em-pelotas", "Vento e rajadas"]'),
-                  ('["/alertas", "Avisos e cuidados"]', '["/alertas", "Avisos oficiais"]'),
-                  ('description: "Consulte o Laranjal e outros pontos da Lagoa dos Patos."', 'description: "Acompanhe o nível no Laranjal e em outros pontos da Lagoa dos Patos."'),
-                  ('["/situacao-hidrologica-pelotas", "Ver como estão as águas"]', '["/situacao-hidrologica-pelotas", "Situação das águas"]'),
-                  ('["/nivel-da-lagoa-dos-patos-laranjal", "Ver o nível no Laranjal"]', '["/nivel-da-lagoa-dos-patos-laranjal", "Nível no Laranjal"]'),
-                  ('title: "Conferir outras informações"', 'title: "Câmeras e fontes"'),
-                  ('description: "Acesse imagens ao vivo e saiba de onde vêm os dados."', 'description: "Veja imagens ao vivo e consulte as fontes usadas pelo portal."'),
-                  ('["/cameras-ao-vivo-pelotas", "Abrir câmeras ao vivo"]', '["/cameras-ao-vivo-pelotas", "Câmeras ao vivo"]'),
-                  ('["/metodologia", "Conhecer as fontes"]', '["/metodologia", "Fontes e metodologia"]'),
-                  (
-                      '''const advisoryCopy = {
-  normal: {
-    eyebrow: "Sem alerta importante agora",
-    title: "O tempo segue sem sinal de maior risco",
-    description: "Continue acompanhando, porque a previsão pode mudar ao longo do dia.",
-    action: "Ver avisos oficiais",
-  },
-  attention: {
-    eyebrow: "Atenção nas próximas horas",
-    title: "Chuva ou vento podem aumentar",
-    description: "Veja os horários abaixo e acompanhe os avisos oficiais.",
-    action: "Entender os cuidados",
-  },
-  warning: {
-    eyebrow: "Atenção redobrada",
-    title: "Há chance de tempo forte",
-    description: "Confira quando o risco aumenta e siga as orientações oficiais.",
-    action: "Ver avisos e orientações",
-  },
-} as const;''',
-                      '''const advisoryCopy = {
-  normal: {
-    eyebrow: "Sem agravamento previsto",
-    title: "Não há sinal de chuva ou vento fortes nas próximas horas",
-    description: "Acompanhe as atualizações e consulte os avisos oficiais antes de atividades ao ar livre.",
-    action: "Consultar avisos oficiais",
-  },
-  attention: {
-    eyebrow: "Mudança importante na previsão",
-    title: "Chuva e rajadas podem ganhar intensidade",
-    description: "Confira os horários com maior risco e verifique os avisos oficiais para Pelotas.",
-    action: "Consultar avisos oficiais",
-  },
-  warning: {
-    eyebrow: "Risco elevado nas próximas horas",
-    title: "Há risco de chuva intensa, temporal ou rajadas fortes",
-    description: "Consulte os períodos de maior risco e as orientações antes de sair.",
-    action: "Consultar avisos oficiais",
-  },
-} as const;''',
-                  ),
-                  ('  weather,\n  observation,', '  weather,\n  advisoryLevel,\n  observation,'),
-                  ('  const advisoryText = advisoryCopy[advisory.level];', '  const resolvedAdvisoryLevel = advisoryLevel ?? advisory.level;\n  const advisoryText = advisoryCopy[resolvedAdvisoryLevel];'),
-                  ('className={`home-advisory-strip is-${advisory.level}`}', 'className={`home-advisory-strip is-${resolvedAdvisoryLevel}`}'),
-                  ('<span className="eyebrow">Previsão de hoje</span>\n            <h2 id="home-story-forecast-title">O que esperar nas próximas horas</h2>', '<span className="eyebrow">Previsão hora a hora</span>\n            <h2 id="home-story-forecast-title">Veja como o tempo deve mudar ao longo do dia</h2>'),
-                  ('<strong>Como fica o tempo depois de hoje</strong>', '<strong>Previsão para os próximos dias</strong>'),
-                  ('Ver detalhes de hoje', 'Ver previsão completa de hoje'),
-                  ('Ver a previsão dos próximos 7 dias', 'Ver previsão para 7 dias'),
-                  ('<span className="eyebrow">Mapa do tempo</span>\n          <h2 id="home-map-story-title">Veja chuva e nuvens chegando à região</h2>\n          <p>Use o mapa para acompanhar o que se aproxima. Para saber o que esperar em Pelotas, confira a previsão acima.</p>\n          <p className="home-map-story__hint">Escolha <strong>Chuva</strong> para acompanhar a animação ou <strong>Satélite</strong> para observar as nuvens.</p>', '<span className="eyebrow">Radar e satélite</span>\n          <h2 id="home-map-story-title">Acompanhe a chuva e as nuvens na região</h2>\n          <p>Use o mapa para observar o que se aproxima de Pelotas e das cidades da Zona Sul.</p>\n          <p className="home-map-story__hint">Selecione <strong>Chuva</strong> para ver a animação da precipitação ou <strong>Satélite</strong> para acompanhar as nuvens.</p>'),
-                  ('<span className="eyebrow">Tempo registrado em Pelotas · Embrapa</span>\n          <h2 id="home-observation-story-title">O que está acontecendo agora</h2>\n          <p>A previsão mostra o que pode acontecer. A Embrapa mostra o que já está sendo registrado em Pelotas.</p>\n          <Link href="/estacao-embrapa-pelotas">Ver todos os dados da Embrapa', '<span className="eyebrow">Medições da Embrapa em Pelotas</span>\n          <h2 id="home-observation-story-title">Condições registradas agora</h2>\n          <p>A previsão indica o que pode acontecer. A estação da Embrapa mostra as condições medidas neste momento.</p>\n          <Link href="/estacao-embrapa-pelotas">Ver dados completos da estação'),
-                  ('<span className="eyebrow">Nível das águas</span>\n            <h2 id="home-water-story-title">Como estão as águas no Laranjal</h2>', '<span className="eyebrow">Lagoa dos Patos</span>\n            <h2 id="home-water-story-title">Acompanhe o nível da água no Laranjal</h2>'),
-                  ('<p>O Laranjal é a principal referência para Pelotas. As outras cidades ajudam a mostrar como a Lagoa dos Patos está se comportando.</p>', '<p>O Laranjal é a referência local para Pelotas. As estações de outras cidades ajudam a entender a variação da Lagoa dos Patos.</p>'),
-                  ('<strong>Acompanhe outros pontos da Lagoa</strong>', '<strong>Outras estações da Lagoa dos Patos</strong>'),
-                  ('<span>Está mudando</span>', '<span>Variação</span>'),
-                  ('<div><span>Outra referência do estado</span><strong>Guaíba em Porto Alegre</strong></div>', '<div><span>Referência adicional</span><strong>Guaíba em Porto Alegre</strong></div>'),
-                  ('<p>Observe principalmente se a água está subindo, baixando ou estável. Cada local usa uma régua diferente.</p>', '<p>Compare a tendência de cada estação — subida, queda ou estabilidade — porque cada local usa uma régua própria.</p>'),
-                  ('<span className="eyebrow">Continue pelo que importa</span>\n          <h2 id="home-explore-story-title">O que você quer acompanhar?</h2>\n          <p>Escolha um caminho para encontrar a informação sem precisar procurar pelo portal inteiro.</p>', '<span className="eyebrow">Principais informações do portal</span>\n          <h2 id="home-explore-story-title">Encontre o que precisa acompanhar</h2>\n          <p>Escolha uma categoria para acessar diretamente a previsão, os avisos, as águas ou as fontes dos dados.</p>'),
-              ],
-              "components/site-footer.tsx": [
-                  ('title: "Águas e atenção"', 'title: "Águas e alertas"'),
-                  ('{ label: "Condições de atenção", href: "/alertas" }', '{ label: "Avisos meteorológicos", href: "/alertas" }'),
-                  ('Informação meteorológica e hidrológica organizada para Pelotas e a Zona Sul do Rio\n              Grande do Sul.', 'Previsão do tempo, medições locais e níveis das águas para Pelotas e a Zona Sul do Rio\n              Grande do Sul.'),
-                  ('<span className="portal-footer-kicker">Informação local para agir melhor</span>', '<span className="portal-footer-kicker">Informação local sobre tempo e águas</span>'),
-                  ('<h2 id="portal-footer-title">Entenda o tempo. Acompanhe as águas. Prepare-se.</h2>', '<h2 id="portal-footer-title">Consulte a previsão, os avisos e o nível das águas.</h2>'),
-                  ('Consulte condições observadas, previsão, chuva, vento e níveis das águas em uma visão\n              integrada da região.', 'Veja as condições atuais, a previsão, a chuva, o vento e os níveis da Lagoa dos Patos\n              em um só lugar.'),
-                  ('Ver condições de atenção', 'Ver avisos meteorológicos'),
-                  ('Consultar previsão de hoje', 'Ver previsão de hoje'),
-                  ('Como os dados são utilizados', 'Entenda as fontes e a metodologia'),
-                  ('<span className="portal-footer-kicker">Acessos prioritários</span>', '<span className="portal-footer-kicker">Acesso rápido</span>'),
-                  ('<small>Chuva, vento e temporal</small>\n                <strong>Condições de atenção</strong>', '<small>Chuva, vento e temporais</small>\n                <strong>Avisos meteorológicos</strong>'),
-                  ('O TEMPO Pelotas organiza informações para acompanhamento. Em situações de risco, siga os\n            comunicados da Defesa Civil, do INMET e das autoridades locais.', 'O TEMPO Pelotas reúne dados para acompanhamento. Em situações de risco, siga sempre os\n            comunicados da Defesa Civil, do INMET e das autoridades locais.'),
-                  ('Entenda os limites e as fontes', 'Ver fontes e limitações'),
-                  ('Informação meteorológica local.', 'Informação meteorológica e hidrológica local.'),
-              ],
-              "components/inmet-alerts-panel.tsx": [
-                  ('regional: "Pode interessar à Zona Sul"', 'regional: "Áreas próximas à Zona Sul"'),
-                  ('if (!alert.expiresAt) return alert.period === "upcoming" ? `Começa em ${start}` : `Em vigor desde ${start}`;\n  return alert.period === "upcoming" ? `Previsto de ${start} até ${end}` : `Válido até ${end}`;', 'if (!alert.expiresAt) return alert.period === "upcoming" ? `Previsto para começar em ${start}` : `Em vigor desde ${start}`;\n  return alert.period === "upcoming" ? `Previsto entre ${start} e ${end}` : `Em vigor até ${end}`;'),
-                  ('return "Há aviso para uma região próxima ou ligada à Zona Sul.";', 'return "Há aviso para áreas próximas ou relacionadas à Zona Sul.";'),
-                  ('Ver onde o aviso vale', 'Ver detalhes e área afetada'),
-                  ('<h2 id="inmet-alerts-title">Avisos de tempo no Rio Grande do Sul</h2>', '<h2 id="inmet-alerts-title">Avisos meteorológicos no Rio Grande do Sul</h2>'),
-                  ('<strong>Nenhum aviso para o RS foi encontrado agora.</strong>\n          <p>A situação pode mudar. O portal volta a verificar o INMET regularmente.</p>', '<strong>O INMET não informa avisos ativos para o Rio Grande do Sul neste momento.</strong>\n          <p>A situação pode mudar. O portal consulta novamente os dados em intervalos regulares.</p>'),
-                  ('{ id: "regional", title: "Avisos que podem interessar à Zona Sul", description: "Confira as áreas porque o aviso pode atingir cidades próximas.", alerts: regional }', '{ id: "regional", title: "Avisos para áreas próximas à Zona Sul", description: "Confira os municípios incluídos e o período de validade de cada aviso.", alerts: regional }'),
-                  ('{ id: "estado", title: "Avisos em outras partes do Rio Grande do Sul", description: "Útil para quem vai viajar ou acompanhar outras regiões do estado.", alerts: state }', '{ id: "estado", title: "Avisos para outras áreas do Rio Grande do Sul", description: "Consulte estes avisos ao viajar ou acompanhar outras regiões do estado.", alerts: state }'),
-                  ('Organizamos primeiro os avisos que citam Pelotas e a Zona Sul.', 'Os avisos que incluem Pelotas e a Zona Sul aparecem primeiro.'),
-                  ('Confira a área completa no aviso original.', 'Consulte a área completa e as orientações no aviso original.'),
-              ],
-          }
-
-          for filename, replacements in changes.items():
-              path = Path(filename)
-              text = path.read_text(encoding="utf-8")
-              for old, new in replacements:
-                  if old not in text:
-                      raise SystemExit(f"Trecho não encontrado em {filename}: {old[:100]!r}")
-                  text = text.replace(old, new, 1)
-              path.write_text(text, encoding="utf-8")
-          PY
+      - name: Apply editorial revision
+        if: steps.guard.outputs.skip != 'true'
+        run: python .github/scripts/refine_copy.py
 
       - name: Commit refined copy
+        if: steps.guard.outputs.skip != 'true'
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add app/page.tsx components/weather-hero.tsx components/site-header.tsx components/home-editorial-dashboard.tsx components/site-footer.tsx components/inmet-alerts-panel.tsx
           git commit -m "Refina copys e unifica mensagens do portal"
-          git push
+          git push origin HEAD:${{ github.head_ref }}
