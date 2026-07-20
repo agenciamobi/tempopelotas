@@ -1,0 +1,174 @@
+/*
+ * Header editorial v5.
+ * Corrige conflitos herdados, amplia a leitura e alinha o header à escala do hero.
+ */
+
+@media (min-width: 901px) {
+  .site-shell .site-header,
+  .site-shell--home-editorial .site-header--hero {
+    width: min(100%, 1580px);
+    max-width: 1580px;
+    min-height: 84px;
+    margin-inline: auto;
+    padding: 11px 13px 11px 22px;
+    grid-template-columns: minmax(285px, 1fr) auto minmax(285px, 1fr);
+    border-radius: 24px;
+  }
+
+  .site-shell .site-header .brand-logo,
+  .site-shell--home-editorial .site-header--hero .brand-logo {
+    width: clamp(172px, 11.6vw, 200px);
+    max-height: 29px;
+  }
+
+  .site-header-brand-divider {
+    height: 34px;
+    margin-inline: 17px;
+  }
+
+  .site-header-context {
+    gap: 3px;
+  }
+
+  .site-header-context strong {
+    font-size: 0.74rem;
+    letter-spacing: 0.015em;
+  }
+
+  .site-header-context small {
+    font-size: 0.62rem;
+  }
+
+  .site-shell .site-header .main-nav,
+  .site-shell--home-editorial .site-header--hero .main-nav {
+    gap: 4px;
+    padding: 5px;
+    border-radius: 17px;
+  }
+
+  .site-shell .site-header .main-nav a,
+  .site-shell--home-editorial .site-header--hero .main-nav a {
+    min-height: 48px;
+    gap: 8px;
+    padding-inline: 15px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+  }
+
+  .site-shell .site-header .main-nav-icon,
+  .site-shell--home-editorial .site-header--hero .main-nav-icon,
+  .site-shell .site-header .main-nav-icon svg,
+  .site-shell--home-editorial .site-header--hero .main-nav-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .site-shell .site-header .header-action,
+  .site-shell--home-editorial .site-header--hero .header-action {
+    position: relative;
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr) 17px;
+    min-width: 194px;
+    min-height: 60px;
+    align-items: center;
+    gap: 11px;
+    padding: 8px 14px 8px 15px;
+    overflow: hidden;
+    border-radius: 17px;
+  }
+
+  /* Uma camada antiga adicionava outra seta como pseudo-elemento. */
+  .site-shell .site-header .header-action::before,
+  .site-shell .site-header .header-action::after,
+  .site-shell--home-editorial .site-header--hero .header-action::before,
+  .site-shell--home-editorial .site-header--hero .header-action::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .site-shell .site-header .header-action-icon,
+  .site-shell--home-editorial .site-header--hero .header-action-icon,
+  .site-shell .site-header .header-action-icon svg,
+  .site-shell--home-editorial .site-header--hero .header-action-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .site-shell .site-header .header-action-dot,
+  .site-shell--home-editorial .site-header--hero .header-action-dot {
+    position: absolute;
+    top: 11px;
+    left: 32px;
+    width: 7px;
+    height: 7px;
+    border: 2px solid currentColor;
+    box-shadow: none;
+  }
+
+  .site-shell .site-header .header-action--attention .header-action-dot,
+  .site-shell .site-header .header-action--warning .header-action-dot,
+  .site-shell--home-editorial .site-header--hero .header-action--attention .header-action-dot,
+  .site-shell--home-editorial .site-header--hero .header-action--warning .header-action-dot {
+    border-color: #ffffff;
+    background: #ffffff;
+  }
+
+  .site-shell .site-header .header-action-label,
+  .site-shell--home-editorial .site-header--hero .header-action-label {
+    gap: 3px;
+  }
+
+  .site-shell .site-header .header-action-label small,
+  .site-shell--home-editorial .site-header--hero .header-action-label small {
+    font-size: 0.57rem;
+    letter-spacing: 0.075em;
+  }
+
+  .site-shell .site-header .header-action-label strong,
+  .site-shell--home-editorial .site-header--hero .header-action-label strong {
+    font-size: 0.78rem;
+  }
+
+  .site-shell .site-header .header-action-arrow,
+  .site-shell--home-editorial .site-header--hero .header-action-arrow {
+    display: block;
+    justify-self: end;
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1240px) {
+  .site-shell .site-header,
+  .site-shell--home-editorial .site-header--hero {
+    grid-template-columns: minmax(205px, 1fr) auto minmax(205px, 1fr);
+    padding-left: 18px;
+  }
+
+  .site-shell .site-header .brand-logo,
+  .site-shell--home-editorial .site-header--hero .brand-logo {
+    width: 160px;
+  }
+
+  .site-shell .site-header .main-nav a,
+  .site-shell--home-editorial .site-header--hero .main-nav a {
+    padding-inline: 12px;
+  }
+
+  .site-shell .site-header .header-action,
+  .site-shell--home-editorial .site-header--hero .header-action {
+    min-width: 174px;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1060px) {
+  .site-shell .site-header .header-action,
+  .site-shell--home-editorial .site-header--hero .header-action {
+    grid-template-columns: 21px minmax(0, 1fr);
+    min-width: 154px;
+  }
+
+  .site-shell .site-header .header-action-arrow,
+  .site-shell--home-editorial .site-header--hero .header-action-arrow {
+    display: none;
+  }
+}
