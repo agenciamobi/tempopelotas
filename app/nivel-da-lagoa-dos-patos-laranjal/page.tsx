@@ -21,6 +21,24 @@ export const metadata: Metadata = {
   },
 };
 
+function formatLevel(value: number | null) {
+  if (value === null) return "—";
+
+  return `${new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value)} m`;
+}
+
+function describeLevelTrend(status: string, trendCmPerHour: number | null) {
+  if (status === "unavailable") return "medição temporariamente indisponível";
+  if (status === "stale") return "última leitura está atrasada";
+  if (trendCmPerHour === null) return "tendência ainda não calculada";
+  if (trendCmPerHour > 0.2) return "nível com tendência de alta";
+  if (trendCmPerHour < -0.2) return "nível com tendência de baixa";
+  return "nível relativamente estável";
+}
+
 export default async function NivelDaLagoaPage() {
   const [weather, laranjalLevel] = await Promise.all([
     getPelotasWeather(),
@@ -30,6 +48,11 @@ export default async function NivelDaLagoaPage() {
   const maxHourlyGust = Math.max(
     weather.current.windGust,
     ...weather.hourly.map((hour) => hour.windGust),
+  );
+  const levelValue = formatLevel(laranjalLevel.currentLevel);
+  const levelTrend = describeLevelTrend(
+    laranjalLevel.status,
+    laranjalLevel.trendCmPerHour,
   );
 
   const webpageSchema = {
@@ -58,6 +81,13 @@ export default async function NivelDaLagoaPage() {
       title="Nível da Lagoa dos Patos"
       description="Veja a medição atual, acompanhe se o nível está subindo ou baixando e confira também o vento, a chuva e os avisos oficiais."
       currentPath="/nivel-da-lagoa-dos-patos-laranjal"
+      heroStat={{
+        label: "Estação Laranjal",
+        value: levelValue,
+        detail: levelTrend,
+        ariaLabel: `Nível atual da Lagoa dos Patos no Laranjal: ${levelValue}; ${levelTrend}`,
+        tone: "water",
+      }}
     >
       <script
         type="application/ld+json"
