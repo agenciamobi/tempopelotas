@@ -40,24 +40,24 @@ const mobileNavItems: NavigationItem[] = [
   { label: "Hoje", href: "/tempo-hoje-pelotas", icon: "today" },
   { label: "7 dias", href: "/previsao-7-dias-pelotas", icon: "week" },
   { label: "Águas", href: "/situacao-hidrologica-pelotas", icon: "water" },
-  { label: "Alertas", href: "/alertas", icon: "alert" },
+  { label: "Consultar", href: "/alertas", icon: "alert" },
 ];
 
 const alertActionCopy: Record<AdvisoryLevel, AlertActionCopy> = {
   normal: {
-    eyebrow: "Monitoramento",
+    eyebrow: "Avisos oficiais",
     label: "Alertas",
-    ariaLabel: "Abrir monitoramento e alertas meteorológicos",
+    ariaLabel: "Consultar avisos meteorológicos para Pelotas",
   },
   attention: {
-    eyebrow: "Atenção ativa",
-    label: "Ver condições",
-    ariaLabel: "Abrir condições de atenção meteorológica",
+    eyebrow: "Atenção prevista",
+    label: "Ver alertas",
+    ariaLabel: "Ver alertas e condições de atenção para Pelotas",
   },
   warning: {
-    eyebrow: "Aviso ativo",
+    eyebrow: "Risco elevado",
     label: "Ver alertas",
-    ariaLabel: "Abrir avisos meteorológicos ativos para Pelotas",
+    ariaLabel: "Ver alertas meteorológicos e orientações para Pelotas",
   },
 };
 
@@ -160,7 +160,7 @@ export function SiteHeader({
           <span className="site-header-brand-divider" aria-hidden="true" />
           <span className="site-header-context">
             <strong>Pelotas, RS</strong>
-            <small>Clima e águas</small>
+            <small>Tempo e águas</small>
           </span>
         </div>
 
