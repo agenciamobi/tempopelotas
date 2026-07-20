@@ -1,26 +1,31 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ForecastPageShell } from "@/components/forecast-page-shell";
+import { InmetAlertsPanel } from "@/components/inmet-alerts-panel";
+import { getInmetAlerts } from "@/lib/inmet-alerts";
 import { formatMillimeters, getWeatherAdvisory } from "@/lib/weather-insights";
 import { getPelotasWeather } from "@/lib/weather-service";
 
 export const revalidate = 600;
 
 export const metadata: Metadata = {
-  title: "Condições de atenção para chuva e vento em Pelotas",
+  title: "Avisos do INMET e condições de atenção em Pelotas",
   description:
-    "Veja sinais de chuva forte, temporal e rajadas em Pelotas e consulte orientações de segurança.",
+    "Consulte avisos meteorológicos oficiais do INMET para Pelotas e o Rio Grande do Sul, além da leitura de chuva e vento prevista para a cidade.",
   alternates: { canonical: "/alertas" },
   openGraph: {
-    title: "Condições de atenção em Pelotas",
+    title: "Avisos meteorológicos para Pelotas e o Rio Grande do Sul",
     description:
-      "Acompanhe chuva, vento e temporais previstos para Pelotas, RS.",
+      "Acompanhe avisos oficiais do INMET e condições previstas de chuva, vento e temporais em Pelotas, RS.",
     url: "/alertas",
   },
 };
 
 export default async function AlertasPage() {
-  const weather = await getPelotasWeather();
+  const [weather, inmetAlerts] = await Promise.all([
+    getPelotasWeather(),
+    getInmetAlerts(),
+  ]);
   const advisory = getWeatherAdvisory(weather);
   const today = weather.daily[0];
   const maxHourlyRain = Math.max(
@@ -35,17 +40,19 @@ export default async function AlertasPage() {
   return (
     <ForecastPageShell
       weather={weather}
-      eyebrow="Atenção ao tempo"
-      title="Condições de atenção em Pelotas"
-      description="Veja quando a previsão indica chuva forte, temporal ou vento intenso. Esta página ajuda no acompanhamento, mas não substitui os avisos oficiais."
+      eyebrow="Avisos e atenção meteorológica"
+      title="O que exige atenção em Pelotas e no RS"
+      description="Primeiro, consulte os avisos oficiais do INMET. Depois, veja a leitura calculada pelo TEMPO Pelotas para chuva, vento e temporais previstos na cidade."
       currentPath="/alertas"
     >
+      <InmetAlertsPanel data={inmetAlerts} />
+
       <section className={`advisory-panel advisory-panel--${advisory.level}`} aria-labelledby="advisory-title">
         <div className="advisory-symbol" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3Zm0 6v5m0 3v.01" /></svg>
         </div>
         <div>
-          <span className="eyebrow">{advisory.eyebrow}</span>
+          <span className="eyebrow">Leitura calculada pelo TEMPO Pelotas</span>
           <h2 id="advisory-title">{advisory.title}</h2>
           <p>{advisory.description}</p>
           {advisory.reasons.length ? (
@@ -56,7 +63,7 @@ export default async function AlertasPage() {
         </div>
       </section>
 
-      <section className="topic-metrics" aria-label="Informações usadas nesta avaliação">
+      <section className="topic-metrics" aria-label="Informações usadas na avaliação local">
         <article>
           <span>Maior chance de chuva</span>
           <strong>{maxHourlyRain}%</strong>
@@ -93,10 +100,10 @@ export default async function AlertasPage() {
       <section className="topic-section" aria-labelledby="monitoring-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Como classificamos a atenção</span>
+            <span className="eyebrow">Como calculamos a atenção local</span>
             <h2 id="monitoring-title">O que significa cada situação</h2>
           </div>
-          <p>Esta classificação organiza as informações da previsão. Ela não é um alerta emitido pela Defesa Civil ou pelo INMET.</p>
+          <p>Esta classificação organiza dados da previsão para Pelotas. Ela é independente dos avisos oficiais emitidos pelo INMET ou pela Defesa Civil.</p>
         </div>
         <div className="threshold-grid">
           <article>
@@ -121,7 +128,7 @@ export default async function AlertasPage() {
         <div className="section-heading">
           <div>
             <span className="eyebrow">Segurança</span>
-            <h2 id="official-alerts-title">Siga sempre os avisos oficiais</h2>
+            <h2 id="official-alerts-title">Siga sempre as orientações oficiais</h2>
           </div>
         </div>
         <div className="copy-columns">
@@ -131,11 +138,11 @@ export default async function AlertasPage() {
           </div>
           <div>
             <h3>INMET e autoridades locais</h3>
-            <p>Consulte os avisos oficiais e evite deslocamentos ou atividades externas quando houver recomendação de segurança.</p>
+            <p>Confirme a área abrangida no aviso original e evite deslocamentos ou atividades externas quando houver recomendação de segurança.</p>
           </div>
         </div>
         <p className="data-note">
-          A ausência de aviso nesta página não garante ausência de risco. Confira os canais oficiais sempre que o tempo estiver instável.
+          A ausência de aviso nesta página não garante ausência de risco. O serviço oficial pode ficar indisponível ou ser atualizado a qualquer momento.
         </p>
       </section>
     </ForecastPageShell>
