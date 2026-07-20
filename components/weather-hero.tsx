@@ -77,9 +77,9 @@ const heroPresentationByLevel = {
     badge: "Atenção redobrada",
     kicker: "Atenção em Pelotas",
     title: "Há risco de tempo forte.",
-    highlightedTitle: "Veja quando a atenção aumenta.",
+    highlightedTitle: "Veja os períodos de maior risco.",
     description:
-      "Consulte os avisos oficiais e os horários com maior possibilidade de chuva intensa, temporal ou rajadas fortes.",
+      "Confira os avisos oficiais e identifique os horários com maior risco de chuva intensa, temporal ou rajadas fortes.",
     primaryAction: {
       href: "/alertas",
       label: "Ver avisos oficiais",
