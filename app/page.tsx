@@ -8,7 +8,7 @@ import { getInmetAlerts } from "@/lib/inmet-alerts";
 import { getLagoonMonitoringNetwork } from "@/lib/lagoon-monitoring-network";
 import { getLaranjalLevelData } from "@/lib/laranjal-level";
 import { absoluteUrl } from "@/lib/site";
-import { getWeatherAdvisory } from "@/lib/weather-insights";
+import { getWeatherAdvisory, type AdvisoryLevel } from "@/lib/weather-insights";
 import { getPelotasWeatherWithObservation } from "@/lib/weather-service";
 
 export const revalidate = 300;
@@ -31,6 +31,12 @@ const websiteSchema = {
   },
 };
 
+const advisoryRank: Record<AdvisoryLevel, number> = {
+  normal: 0,
+  attention: 1,
+  warning: 2,
+};
+
 export default async function Home() {
   const [
     { weather, observation: embrapaObservation },
@@ -46,6 +52,17 @@ export default async function Home() {
     getInmetAlerts(),
   ]);
   const advisory = getWeatherAdvisory(weather);
+  const pelotasOfficialAlerts = inmetAlerts.alerts.filter((alert) => alert.relevance === "pelotas");
+  const officialLevel: AdvisoryLevel = pelotasOfficialAlerts.some(
+    (alert) => alert.severity === "danger" || alert.severity === "great-danger",
+  )
+    ? "warning"
+    : pelotasOfficialAlerts.some((alert) => alert.severity === "potential")
+      ? "attention"
+      : "normal";
+  const headerLevel = advisoryRank[officialLevel] > advisoryRank[advisory.level]
+    ? officialLevel
+    : advisory.level;
 
   return (
     <>
@@ -57,7 +74,7 @@ export default async function Home() {
       />
 
       <div className="site-shell site-shell--home site-shell--home-editorial">
-        <SiteHeader advisoryLevel={advisory.level} variant="hero" />
+        <SiteHeader advisoryLevel={headerLevel} variant="hero" />
         <WeatherHero weather={weather} />
 
         <main className="home-editorial-main" id="conteudo-principal" tabIndex={-1}>
