@@ -55,6 +55,7 @@ import "./project-refinement.css";
 import "./home-editorial-theme.css";
 import "./home-editorial-refinement-v2.css";
 import "./home-editorial-responsive-fix.css";
+import "./home-first-fold-editorial-light.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -123,7 +124,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#071e2f",
+  themeColor: "#f7f9f7",
   colorScheme: "light",
 };
 
