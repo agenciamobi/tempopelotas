@@ -21,35 +21,56 @@ type HomeEditorialDashboardProps = {
 
 const exploreGroups = [
   {
-    title: "Previsão",
+    title: "Tempo",
     links: [
-      ["/tempo-hoje-pelotas", "Tempo hoje"],
-      ["/previsao-7-dias-pelotas", "Próximos 7 dias"],
+      ["/tempo-hoje-pelotas", "Tempo de hoje"],
+      ["/previsao-7-dias-pelotas", "Previsão dos próximos 7 dias"],
     ],
   },
   {
-    title: "Condições",
+    title: "Chuva e vento",
     links: [
-      ["/chuva-em-pelotas", "Chuva"],
-      ["/vento-em-pelotas", "Vento"],
-      ["/alertas", "Atenção meteorológica"],
+      ["/chuva-em-pelotas", "Chance de chuva"],
+      ["/vento-em-pelotas", "Vento em Pelotas"],
+      ["/alertas", "Avisos e orientações"],
     ],
   },
   {
     title: "Águas",
     links: [
-      ["/situacao-hidrologica-pelotas", "Situação hidrológica"],
+      ["/situacao-hidrologica-pelotas", "Como estão as águas"],
       ["/nivel-da-lagoa-dos-patos-laranjal", "Nível no Laranjal"],
     ],
   },
   {
-    title: "Portal",
+    title: "Mais informações",
     links: [
-      ["/cameras-ao-vivo-pelotas", "Câmeras"],
-      ["/metodologia", "Fontes e metodologia"],
+      ["/cameras-ao-vivo-pelotas", "Câmeras ao vivo"],
+      ["/metodologia", "De onde vêm os dados"],
     ],
   },
 ] as const;
+
+const advisoryCopy = {
+  normal: {
+    eyebrow: "Sem alerta importante agora",
+    title: "O tempo segue sem sinal de maior risco",
+    description: "Continue acompanhando, porque a previsão pode mudar ao longo do dia.",
+    action: "Ver avisos oficiais",
+  },
+  attention: {
+    eyebrow: "Atenção nas próximas horas",
+    title: "Chuva ou vento podem aumentar",
+    description: "Veja os horários abaixo e acompanhe os avisos oficiais.",
+    action: "Entender os cuidados",
+  },
+  warning: {
+    eyebrow: "Atenção redobrada",
+    title: "Há chance de tempo forte",
+    description: "Confira quando o risco aumenta e siga as orientações oficiais.",
+    action: "Ver avisos e orientações",
+  },
+} as const;
 
 function formatNumber(value: number | null, maximumFractionDigits = 1) {
   if (value === null) return "—";
@@ -73,18 +94,18 @@ function formatUpdatedAt(value: string | null) {
 }
 
 function trendLabel(value: number | null) {
-  if (value === null) return { symbol: "·", label: "Sem tendência", direction: "unknown" };
-  if (Math.abs(value) < 0.1) return { symbol: "→", label: "Estável", direction: "stable" };
-  if (value > 0) return { symbol: "↑", label: `Subindo ${formatNumber(value)} cm/h`, direction: "rising" };
-  return { symbol: "↓", label: `Baixando ${formatNumber(Math.abs(value))} cm/h`, direction: "falling" };
+  if (value === null) return { symbol: "·", label: "Sem mudança clara", direction: "unknown" };
+  if (Math.abs(value) < 0.1) return { symbol: "→", label: "Praticamente estável", direction: "stable" };
+  if (value > 0) return { symbol: "↑", label: `Subindo ${formatNumber(value)} cm por hora`, direction: "rising" };
+  return { symbol: "↓", label: `Baixando ${formatNumber(Math.abs(value))} cm por hora`, direction: "falling" };
 }
 
 function stationState(observation: LagoonMonitoringObservation) {
-  if (observation.status === "unavailable") return "Indisponível";
-  if (observation.status === "stale") return "Atrasada";
-  if (observation.risk === "flooding") return "Acima da cota";
-  if (observation.risk === "attention") return "Próximo da cota";
-  return "Abaixo da cota";
+  if (observation.status === "unavailable") return "Sem dados";
+  if (observation.status === "stale") return "Dados atrasados";
+  if (observation.risk === "flooding") return "Acima do nível de atenção";
+  if (observation.risk === "attention") return "Perto do nível de atenção";
+  return "Abaixo do nível de atenção";
 }
 
 export function HomeEditorialDashboard({
@@ -95,6 +116,7 @@ export function HomeEditorialDashboard({
   lagoon,
 }: HomeEditorialDashboardProps) {
   const advisory = getWeatherAdvisory(weather);
+  const advisoryText = advisoryCopy[advisory.level];
   const today = weather.daily[0];
   const hourly = weather.hourly.slice(0, 7);
   const nextDays = weather.daily.slice(1, 5);
@@ -107,65 +129,65 @@ export function HomeEditorialDashboard({
       <section className="home-story home-story--forecast" id="previsao-hoje" aria-labelledby="home-story-forecast-title">
         <header className="home-story-heading">
           <div>
-            <span className="eyebrow">Hoje em Pelotas</span>
-            <h2 id="home-story-forecast-title">O essencial para as próximas horas</h2>
+            <span className="eyebrow">Previsão de hoje</span>
+            <h2 id="home-story-forecast-title">O que esperar nas próximas horas</h2>
           </div>
-          <dl className="home-today-facts" aria-label="Resumo da previsão de hoje">
-            <div><dt>Máxima</dt><dd>{today?.max ?? weather.current.temperature}°</dd></div>
-            <div><dt>Mínima</dt><dd>{today?.min ?? weather.current.temperature}°</dd></div>
-            <div><dt>Chuva</dt><dd>{today?.rainChance ?? 0}%</dd></div>
-            <div><dt>Rajadas</dt><dd>{today?.windGust ?? weather.current.windGust} km/h</dd></div>
+          <dl className="home-today-facts" aria-label="Resumo do tempo de hoje">
+            <div><dt>Temperatura máxima</dt><dd>{today?.max ?? weather.current.temperature}°</dd></div>
+            <div><dt>Temperatura mínima</dt><dd>{today?.min ?? weather.current.temperature}°</dd></div>
+            <div><dt>Chance de chuva</dt><dd>{today?.rainChance ?? 0}%</dd></div>
+            <div><dt>Vento mais forte</dt><dd>{today?.windGust ?? weather.current.windGust} km/h</dd></div>
           </dl>
         </header>
 
         <div className={`home-advisory-strip is-${advisory.level}`}>
           <span aria-hidden="true" />
           <div>
-            <small>{advisory.eyebrow}</small>
-            <strong>{advisory.title}</strong>
+            <small>{advisoryText.eyebrow}</small>
+            <strong>{advisoryText.title}</strong>
           </div>
-          <p>{advisory.reasons[0] ?? advisory.description}</p>
-          <Link href="/alertas">Ver orientação</Link>
+          <p>{advisoryText.description}</p>
+          <Link href="/alertas">{advisoryText.action}</Link>
         </div>
 
-        <div className="home-hourly-story" aria-label="Previsão para as próximas horas">
+        <div className="home-hourly-story" aria-label="Tempo nas próximas horas">
           {hourly.map((hour, index) => (
             <article className={index === 0 ? "is-current" : undefined} key={`${hour.time}-${index}`}>
               <span>{hour.time}</span>
-              <WeatherIcon name={hour.icon} title={`Condição às ${hour.time}`} />
+              <WeatherIcon name={hour.icon} title={`Tempo às ${hour.time}`} />
               <strong>{hour.temperature}°</strong>
-              <small>{hour.precipitation}% chuva</small>
+              <small>{hour.precipitation}% de chance de chuva</small>
             </article>
           ))}
         </div>
 
         <div className="home-next-days">
           <div className="home-next-days__heading">
-            <span className="eyebrow">Depois de hoje</span>
-            <strong>Próximos quatro dias</strong>
+            <span className="eyebrow">Próximos dias</span>
+            <strong>Como fica o tempo depois de hoje</strong>
           </div>
           <div className="home-next-days__list">
             {nextDays.map((day) => (
               <article key={`${day.weekday}-${day.date}`}>
                 <div><strong>{day.weekday}</strong><span>{day.date}</span></div>
-                <WeatherIcon name={day.icon} title={`Previsão para ${day.weekday}`} />
-                <span>{day.rainChance}% chuva</span>
+                <WeatherIcon name={day.icon} title={`Tempo previsto para ${day.weekday}`} />
+                <span>{day.rainChance}% de chance de chuva</span>
                 <b>{day.max}° <small>{day.min}°</small></b>
               </article>
             ))}
           </div>
           <div className="home-inline-links">
-            <Link href="/tempo-hoje-pelotas">Previsão detalhada de hoje <span aria-hidden="true">→</span></Link>
-            <Link href="/previsao-7-dias-pelotas">Ver os 7 dias</Link>
+            <Link href="/tempo-hoje-pelotas">Ver detalhes de hoje <span aria-hidden="true">→</span></Link>
+            <Link href="/previsao-7-dias-pelotas">Ver a previsão dos próximos 7 dias</Link>
           </div>
         </div>
       </section>
 
       <section className="home-map-story" aria-labelledby="home-map-story-title">
         <div className="home-map-story__copy">
-          <span className="eyebrow">Contexto regional</span>
-          <h2 id="home-map-story-title">Veja o tempo se aproximando</h2>
-          <p>O mapa ajuda a enxergar a Zona Sul. Para decisões locais, priorize a previsão e as medições de Pelotas.</p>
+          <span className="eyebrow">Mapa do tempo</span>
+          <h2 id="home-map-story-title">Veja chuva e nuvens chegando à região</h2>
+          <p>Use o mapa para acompanhar o que se aproxima. Para saber o que esperar em Pelotas, confira a previsão acima.</p>
         </div>
         <div className="home-map-story__frame">
           <WeatherMap regionalWeather={weather.regional} />
@@ -174,30 +196,30 @@ export function HomeEditorialDashboard({
 
       <section className="home-observation-story" id="observacao-embrapa" aria-labelledby="home-observation-story-title">
         <div className="home-observation-story__intro">
-          <span className="eyebrow">Medição local · Embrapa</span>
-          <h2 id="home-observation-story-title">O que foi realmente observado</h2>
-          <p>A previsão aponta possibilidades. A estação mostra o que foi medido em um ponto de Pelotas.</p>
-          <Link href="/estacao-embrapa-pelotas">Abrir estação completa <span aria-hidden="true">→</span></Link>
+          <span className="eyebrow">Tempo registrado em Pelotas · Embrapa</span>
+          <h2 id="home-observation-story-title">O que está acontecendo agora</h2>
+          <p>A previsão mostra o que pode acontecer. A Embrapa mostra o que já está sendo registrado em Pelotas.</p>
+          <Link href="/estacao-embrapa-pelotas">Ver todos os dados da Embrapa <span aria-hidden="true">→</span></Link>
         </div>
 
         {observationAvailable ? (
           <div className="home-observation-story__reading">
             <div className="home-observation-temperature">
-              <small>{observation.status === "live" ? "Medição disponível" : "Dados parciais"}</small>
+              <small>{observation.status === "live" ? "Dados atualizados" : "Alguns dados estão indisponíveis"}</small>
               <strong>{formatNumber(observation.current.temperature)}°</strong>
               <span>Sensação de {formatNumber(observation.current.feelsLike)} °C</span>
             </div>
             <dl>
               <div><dt>Umidade</dt><dd>{formatNumber(observation.current.humidity, 0)}%</dd></div>
               <div><dt>Vento</dt><dd>{formatNumber(observation.current.windSpeed)} km/h</dd></div>
-              <div><dt>Chuva hoje</dt><dd>{formatNumber(observation.accumulated.rainDaily)} mm</dd></div>
-              <div><dt>Pressão</dt><dd>{formatNumber(observation.current.pressure)} hPa</dd></div>
+              <div><dt>Chuva acumulada hoje</dt><dd>{formatNumber(observation.accumulated.rainDaily)} mm</dd></div>
+              <div><dt>Pressão do ar</dt><dd>{formatNumber(observation.current.pressure)} hPa</dd></div>
             </dl>
           </div>
         ) : (
           <div className="home-observation-story__unavailable">
-            <strong>Medição temporariamente indisponível</strong>
-            <span>{observation.error}</span>
+            <strong>Os dados da Embrapa estão indisponíveis agora</strong>
+            <span>Tente novamente em alguns minutos.</span>
           </div>
         )}
       </section>
@@ -205,39 +227,39 @@ export function HomeEditorialDashboard({
       <section className="home-story home-story--water" id="situacao-das-aguas" aria-labelledby="home-water-story-title">
         <header className="home-story-heading">
           <div>
-            <span className="eyebrow">Situação das águas</span>
-            <h2 id="home-water-story-title">Comece pelo Laranjal</h2>
+            <span className="eyebrow">Nível das águas</span>
+            <h2 id="home-water-story-title">Como estão as águas no Laranjal</h2>
           </div>
-          <p>A medição local é a referência principal. Os outros pontos ajudam a entender o comportamento da Lagoa dos Patos.</p>
+          <p>O Laranjal é a principal referência para Pelotas. As outras cidades ajudam a mostrar como a Lagoa dos Patos está se comportando.</p>
         </header>
 
         <div className="home-water-story__layout">
           <article className={`home-water-focus is-${laranjal.status}`}>
             <div className="home-water-focus__topline">
               <div><span>Praia do Laranjal</span><small>{laranjal.source.station}</small></div>
-              <b>{laranjal.status === "live" ? "Atualizado" : laranjal.status === "stale" ? "Leitura atrasada" : "Indisponível"}</b>
+              <b>{laranjal.status === "live" ? "Dados atualizados" : laranjal.status === "stale" ? "Dados atrasados" : "Sem dados"}</b>
             </div>
             <div className="home-water-focus__reading"><strong>{formatNumber(laranjal.currentLevel, 2)}</strong><span>m</span></div>
             <p className={`home-water-trend is-${laranjalTrend.direction}`}><b aria-hidden="true">{laranjalTrend.symbol}</b>{laranjalTrend.label}</p>
             <dl>
-              <div><dt>Variação 6h</dt><dd>{formatNumber(laranjal.change6hCm)} cm</dd></div>
-              <div><dt>Variação 24h</dt><dd>{formatNumber(laranjal.change24hCm)} cm</dd></div>
-              <div><dt>Atualização</dt><dd>{formatUpdatedAt(laranjal.updatedAt)}</dd></div>
+              <div><dt>Mudança nas últimas 6 horas</dt><dd>{formatNumber(laranjal.change6hCm)} cm</dd></div>
+              <div><dt>Mudança nas últimas 24 horas</dt><dd>{formatNumber(laranjal.change24hCm)} cm</dd></div>
+              <div><dt>Última leitura</dt><dd>{formatUpdatedAt(laranjal.updatedAt)}</dd></div>
             </dl>
-            <Link href="/nivel-da-lagoa-dos-patos-laranjal">Ver histórico do Laranjal <span aria-hidden="true">→</span></Link>
+            <Link href="/nivel-da-lagoa-dos-patos-laranjal">Ver nível e histórico do Laranjal <span aria-hidden="true">→</span></Link>
           </article>
 
           <div className="home-water-table">
             <div className="home-water-table__heading">
-              <div><span className="eyebrow">FURG & Portos RS</span><strong>Lagoa dos Patos, de norte a sul</strong></div>
-              <small>{lagoon.available}/{lagoon.total} estações com leitura</small>
+              <div><span className="eyebrow">Dados da FURG e Portos RS</span><strong>Como estão as águas em outras cidades</strong></div>
+              <small>{lagoon.available} de {lagoon.total} locais com dados</small>
             </div>
 
             <div className="home-water-table__columns" aria-hidden="true">
-              <span>Estação</span>
+              <span>Local</span>
               <span>Nível</span>
-              <span>Tendência</span>
-              <span>Situação</span>
+              <span>Mudança</span>
+              <span>Atenção</span>
             </div>
 
             <div className="home-water-table__rows">
@@ -255,7 +277,7 @@ export function HomeEditorialDashboard({
             </div>
 
             <div className="home-water-context">
-              <div><span>Contexto regional</span><strong>Guaíba em Porto Alegre</strong></div>
+              <div><span>Para comparação</span><strong>Guaíba em Porto Alegre</strong></div>
               <b>{formatNumber(guaiba.currentLevel, 2)} m</b>
               <span className={`is-${guaibaTrend.direction}`}>{guaibaTrend.symbol} {guaibaTrend.label}</span>
               <small>{formatUpdatedAt(guaiba.updatedAt)}</small>
@@ -264,15 +286,15 @@ export function HomeEditorialDashboard({
         </div>
 
         <footer className="home-water-story__footer">
-          <p>Cada régua possui referência própria. Não compare diretamente os valores absolutos entre estações.</p>
-          <Link href="/situacao-hidrologica-pelotas">Abrir monitoramento completo <span aria-hidden="true">→</span></Link>
+          <p>Os números de cada local usam referências diferentes. Compare se a água está subindo ou baixando, não apenas o valor.</p>
+          <Link href="/situacao-hidrologica-pelotas">Ver a situação completa das águas <span aria-hidden="true">→</span></Link>
         </footer>
       </section>
 
       <section className="home-explore-story" id="explorar-portal" aria-labelledby="home-explore-story-title">
         <header>
-          <span className="eyebrow">Explore o portal</span>
-          <h2 id="home-explore-story-title">Vá direto ao assunto</h2>
+          <span className="eyebrow">Encontre rapidamente</span>
+          <h2 id="home-explore-story-title">Vá direto ao que precisa</h2>
         </header>
         <div className="home-explore-groups">
           {exploreGroups.map((group) => (
