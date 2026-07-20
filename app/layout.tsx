@@ -72,9 +72,10 @@ import "./topic-special-pages-refinement.css";
 import "./topic-special-pages-mobile-fix.css";
 import "./topic-weather-pages-refinement.css";
 import "./home-first-fold-operational-v3.css";
-// Camadas finais de interface do header.
+// Camadas finais de interface do header e da primeira dobra.
 import "./header-template-refinement.css";
 import "./header-template-refinement-v2.css";
+import "./home-hero-stripe-adaptation.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
