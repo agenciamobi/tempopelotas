@@ -71,6 +71,7 @@ import "./topic-editorial-home-visual.css";
 import "./topic-special-pages-refinement.css";
 import "./topic-special-pages-mobile-fix.css";
 import "./topic-weather-pages-refinement.css";
+import "./home-first-fold-operational-v3.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
