@@ -69,6 +69,7 @@ import "./home-journey-refinement-v5.css";
 import "./home-grid-alignment-v6.css";
 import "./topic-editorial-home-visual.css";
 import "./topic-special-pages-refinement.css";
+import "./topic-special-pages-mobile-fix.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
