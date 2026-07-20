@@ -46,7 +46,7 @@ const mobileNavItems: NavigationItem[] = [
 const alertActionCopy: Record<AdvisoryLevel, AlertActionCopy> = {
   normal: {
     eyebrow: "Monitoramento",
-    label: "Ver alertas",
+    label: "Alertas",
     ariaLabel: "Abrir monitoramento e alertas meteorológicos",
   },
   attention: {
@@ -135,6 +135,7 @@ export function SiteHeader({
 }: SiteHeaderProps) {
   const pathname = usePathname();
   const alertsActive = isActivePath(pathname, "/alertas");
+  const camerasActive = isActivePath(pathname, "/cameras-ao-vivo-pelotas");
   const headerClassName = `site-header${variant === "hero" ? " site-header--hero" : ""}`;
   const actionCopy = alertActionCopy[advisoryLevel];
 
@@ -159,7 +160,7 @@ export function SiteHeader({
           <span className="site-header-brand-divider" aria-hidden="true" />
           <span className="site-header-context">
             <strong>Pelotas, RS</strong>
-            <small>Tempo e águas</small>
+            <small>Clima e águas</small>
           </span>
         </div>
 
@@ -183,28 +184,38 @@ export function SiteHeader({
           })}
         </nav>
 
-        <Link
-          className={`header-action header-action--${advisoryLevel}${alertsActive ? " is-active" : ""}`}
-          href="/alertas"
-          aria-current={alertsActive ? "page" : undefined}
-          aria-label={actionCopy.ariaLabel}
-        >
-          <span className="header-action-icon" aria-hidden="true">
-            <NavigationIcon name="alert" />
-          </span>
-          <span className="header-action-dot" aria-hidden="true" />
-          <span className="header-action-label">
-            <small>{actionCopy.eyebrow}</small>
-            <strong>{actionCopy.label}</strong>
-          </span>
-          <span className="header-action-arrow" aria-hidden="true">→</span>
-        </Link>
+        <div className="site-header-actions">
+          <Link
+            className={`header-utility-link${camerasActive ? " is-active" : ""}`}
+            href="/cameras-ao-vivo-pelotas"
+            aria-current={camerasActive ? "page" : undefined}
+          >
+            Câmeras ao vivo
+          </Link>
+
+          <Link
+            className={`header-action header-action--${advisoryLevel}${alertsActive ? " is-active" : ""}`}
+            href="/alertas"
+            aria-current={alertsActive ? "page" : undefined}
+            aria-label={actionCopy.ariaLabel}
+          >
+            <span className="header-action-icon" aria-hidden="true">
+              <NavigationIcon name="alert" />
+            </span>
+            <span className="header-action-dot" aria-hidden="true" />
+            <span className="header-action-label">
+              <small>{actionCopy.eyebrow}</small>
+              <strong>{actionCopy.label}</strong>
+            </span>
+            <span className="header-action-arrow" aria-hidden="true">→</span>
+          </Link>
+        </div>
       </header>
 
       <nav
         className="mobile-tab-bar"
         data-advisory-level={advisoryLevel}
-        aria-label="Navegação principal do aplicativo"
+        aria-label="Navegação principal do portal"
       >
         {mobileNavItems.map((item) => {
           const isActive = isActivePath(pathname, item.href);
