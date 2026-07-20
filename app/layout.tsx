@@ -63,6 +63,7 @@ import "./inmet-alerts.css";
 import "./home-editorial-alignment-readable.css";
 import "./editorial-readable-final.css";
 import "./editorial-readable-v2.css";
+import "./home-editorial-clarity-v3.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
