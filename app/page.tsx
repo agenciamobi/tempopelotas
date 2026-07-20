@@ -1,8 +1,10 @@
 import { HomeEditorialDashboard } from "@/components/home-editorial-dashboard";
+import { InmetAlertsPanel } from "@/components/inmet-alerts-panel";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WeatherHero } from "@/components/weather-hero";
 import { getGuaibaObservation } from "@/lib/guaiba-monitor";
+import { getInmetAlerts } from "@/lib/inmet-alerts";
 import { getLagoonMonitoringNetwork } from "@/lib/lagoon-monitoring-network";
 import { getLaranjalLevelData } from "@/lib/laranjal-level";
 import { absoluteUrl } from "@/lib/site";
@@ -35,11 +37,13 @@ export default async function Home() {
     guaibaObservation,
     lagoonMonitoring,
     laranjalObservation,
+    inmetAlerts,
   ] = await Promise.all([
     getPelotasWeatherWithObservation(),
     getGuaibaObservation(),
     getLagoonMonitoringNetwork(),
     getLaranjalLevelData(),
+    getInmetAlerts(),
   ]);
   const advisory = getWeatherAdvisory(weather);
 
@@ -57,6 +61,7 @@ export default async function Home() {
         <WeatherHero weather={weather} />
 
         <main className="home-editorial-main" id="conteudo-principal" tabIndex={-1}>
+          <InmetAlertsPanel data={inmetAlerts} variant="home" />
           <HomeEditorialDashboard
             weather={weather}
             observation={embrapaObservation}
