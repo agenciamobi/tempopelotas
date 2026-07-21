@@ -30,14 +30,17 @@ export function getWaterLevelVisualState({
   threshold = null,
   stableThreshold = 0.1,
 }: WaterLevelVisualStateInput): WaterLevelVisualState {
-  const hasKnownThreshold =
-    currentLevel !== null &&
-    Number.isFinite(currentLevel) &&
-    threshold !== null &&
-    Number.isFinite(threshold);
-
   // A cota tem prioridade visual sobre a tendência momentânea.
-  if (hasKnownThreshold && currentLevel >= threshold) return "flood";
+  if (
+    currentLevel !== null &&
+    threshold !== null &&
+    Number.isFinite(currentLevel) &&
+    Number.isFinite(threshold) &&
+    currentLevel >= threshold
+  ) {
+    return "flood";
+  }
+
   if (!available) return "unavailable";
 
   return getWaterLevelTrendDirection(rate, stableThreshold);
