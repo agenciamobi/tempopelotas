@@ -8,7 +8,7 @@ export const LAGOON_MONITORING_API_URL =
 const REVALIDATE_SECONDS = 300;
 const REQUEST_TIMEOUT_MS = 12_000;
 const STALE_AFTER_MINUTES = 120;
-const MAX_SERIES_POINTS = 280;
+const MAX_SERIES_POINTS = 600;
 
 export type LagoonMonitoringStationDefinition = {
   id: string;
@@ -42,6 +42,7 @@ export type LagoonMonitoringObservation = {
   risk: LagoonMonitoringRisk;
   currentLevelCm: number | null;
   updatedAt: string | null;
+  ageMinutes: number | null;
   trendCmPerHour: number | null;
   change1hCm: number | null;
   change6hCm: number | null;
@@ -59,6 +60,8 @@ export type LagoonMonitoringObservation = {
 export type LagoonMonitoringNetworkData = {
   status: "live" | "partial" | "stale" | "unavailable";
   available: number;
+  live: number;
+  stale: number;
   total: number;
   latestUpdatedAt: string | null;
   observations: LagoonMonitoringObservation[];
@@ -145,7 +148,9 @@ function round(value: number, digits = 1) {
 }
 
 function parseLevel(value: unknown) {
-  const parsed = typeof value === "number" ? value : Number(value);
+  const normalized =
+    typeof value === "string" ? value.trim().replace(",", ".") : value;
+  const parsed = typeof normalized === "number" ? normalized : Number(normalized);
   return Number.isFinite(parsed) && parsed > -500 && parsed < 5_000
     ? parsed
     : null;
@@ -243,8 +248,18 @@ function calculateChange(
   if (!baseline || baseline.epoch >= current.epoch) return null;
 
   const elapsedHours = (current.epoch - baseline.epoch) / 3_600_000;
-  const minimumUsefulWindow = hours === 1 ? 0.4 : hours * 0.45;
-  if (elapsedHours < minimumUsefulWindow) return null;
+  const minimumUsefulWindow = hours === 1 ? 0.4 : hours * 0.6;
+  const maximumUsefulWindow = hours === 1 ? 1.75 : hours * 1.35;
+  const driftFromTargetHours = Math.abs(baseline.epoch - targetEpoch) / 3_600_000;
+  const maximumTargetDriftHours = hours === 1 ? 0.75 : hours * 0.35;
+
+  if (
+    elapsedHours < minimumUsefulWindow ||
+    elapsedHours > maximumUsefulWindow ||
+    driftFromTargetHours > maximumTargetDriftHours
+  ) {
+    return null;
+  }
 
   return {
     centimeters: current.levelCm - baseline.levelCm,
@@ -262,6 +277,7 @@ function stationUnavailable(
     risk: "unavailable",
     currentLevelCm: null,
     updatedAt: null,
+    ageMinutes: null,
     trendCmPerHour: null,
     change1hCm: null,
     change6hCm: null,
@@ -281,8 +297,7 @@ async function fetchApiJson(path: string) {
   const response = await fetch(`${LAGOON_MONITORING_API_URL}${path}`, {
     headers: {
       Accept: "application/json",
-      "User-Agent":
-        "TEMPO-Pelotas/1.0 (+https://tempopelotas.agenciamobi.com.br)",
+      "User-Agent": "TEMPO-Pelotas/1.0 (+https://tempopelotas.com.br)",
     },
     next: { revalidate: REVALIDATE_SECONDS },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
@@ -355,12 +370,14 @@ async function getStationObservation(
   const floodThresholdPercentage = round(
     (current.levelCm / station.floodLevelCm) * 100,
   );
-  const risk: LagoonMonitoringRisk =
+  const currentRisk: LagoonMonitoringRisk =
     current.levelCm >= station.floodLevelCm
       ? "flooding"
       : current.levelCm >= station.floodLevelCm * 0.85
         ? "attention"
         : "normal";
+  const risk: LagoonMonitoringRisk =
+    status === "live" ? currentRisk : "unavailable";
   const values = calculationPoints.map((point) => point.levelCm);
   const series = calculationPoints.map(({ timestamp, levelCm }) => ({
     timestamp,
@@ -373,12 +390,15 @@ async function getStationObservation(
     risk,
     currentLevelCm: current.levelCm,
     updatedAt: current.timestamp,
-    trendCmPerHour: trendSource
-      ? round(trendSource.centimeters / trendSource.elapsedHours)
-      : null,
-    change1hCm: change1h ? round(change1h.centimeters) : null,
-    change6hCm: change6h ? round(change6h.centimeters) : null,
-    change24hCm: change24h ? round(change24h.centimeters) : null,
+    ageMinutes: round(ageMinutes),
+    trendCmPerHour:
+      status === "live" && trendSource
+        ? round(trendSource.centimeters / trendSource.elapsedHours)
+        : null,
+    change1hCm: status === "live" && change1h ? round(change1h.centimeters) : null,
+    change6hCm: status === "live" && change6h ? round(change6h.centimeters) : null,
+    change24hCm:
+      status === "live" && change24h ? round(change24h.centimeters) : null,
     periodMinimumCm: values.length ? round(Math.min(...values)) : null,
     periodMaximumCm: values.length ? round(Math.max(...values)) : null,
     series,
@@ -388,7 +408,7 @@ async function getStationObservation(
     floodThresholdPercentage,
     error:
       status === "stale"
-        ? "A última leitura publicada está atrasada."
+        ? "A última leitura publicada está atrasada e não deve ser interpretada como condição atual."
         : graphResult.status === "rejected"
           ? "A leitura atual está disponível, mas a série histórica não pôde ser carregada."
           : null,
@@ -405,6 +425,9 @@ function buildNetwork(
   const live = availableObservations.filter(
     (observation) => observation.status === "live",
   ).length;
+  const stale = availableObservations.filter(
+    (observation) => observation.status === "stale",
+  ).length;
   const latestUpdatedAt =
     availableObservations
       .map((observation) => observation.updatedAt)
@@ -420,6 +443,8 @@ function buildNetwork(
   return {
     status,
     available: availableObservations.length,
+    live,
+    stale,
     total: observations.length,
     latestUpdatedAt,
     observations,
