@@ -55,7 +55,10 @@ type ForecastDayPayload = {
 type GeminiGenerateContentResponse = {
   candidates?: Array<{
     content?: {
-      parts?: Array<{ text?: string }>;
+      parts?: Array<{
+        text?: string;
+        thought?: boolean;
+      }>;
     };
   }>;
 };
@@ -103,6 +106,46 @@ const blockedClaims = [
   /evacue/i,
   /abandone sua casa/i,
 ];
+
+const narrativeJsonSchema = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    today: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        headline: {
+          type: "string",
+          description: "Título editorial curto, sem números e sem markdown.",
+        },
+        summary: {
+          type: "string",
+          description:
+            "Resumo meteorológico em português do Brasil, sem números, markdown ou recomendações de emergência.",
+        },
+      },
+      required: ["headline", "summary"],
+    },
+    tomorrow: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        headline: {
+          type: "string",
+          description: "Título editorial curto, sem números e sem markdown.",
+        },
+        summary: {
+          type: "string",
+          description:
+            "Resumo meteorológico em português do Brasil, sem números, markdown ou recomendações de emergência.",
+        },
+      },
+      required: ["headline", "summary"],
+    },
+  },
+  required: ["today", "tomorrow"],
+} as const;
 
 function unavailableSummaries(): WeatherAiSummaries {
   return {
@@ -218,20 +261,55 @@ function parseNarrative(value: unknown): ForecastNarrative | null {
 }
 
 function extractResponseText(response: GeminiGenerateContentResponse) {
-  return response.candidates?.[0]?.content?.parts
-    ?.map((part) => part.text ?? "")
+  const parts = response.candidates?.[0]?.content?.parts ?? [];
+  const answerParts = parts.filter((part) => part.thought !== true);
+  const answer = answerParts
+    .map((part) => part.text ?? "")
     .join("")
     .trim();
+
+  if (answer) return answer;
+
+  return [...parts]
+    .reverse()
+    .map((part) => part.text ?? "")
+    .find((text) => text.trim())
+    ?.trim();
 }
 
-function parseModelResponse(text: string) {
-  const normalized = text
+function extractJsonCandidate(text: string) {
+  const withoutFences = text
     .replace(/^```json\s*/i, "")
     .replace(/^```\s*/i, "")
     .replace(/\s*```$/i, "")
     .trim();
+  const firstBrace = withoutFences.indexOf("{");
+  const lastBrace = withoutFences.lastIndexOf("}");
 
-  const parsed = JSON.parse(normalized) as Record<string, unknown>;
+  if (firstBrace < 0 || lastBrace <= firstBrace) return withoutFences;
+  return withoutFences.slice(firstBrace, lastBrace + 1);
+}
+
+function parseJsonObject(text: string) {
+  const candidate = extractJsonCandidate(text);
+  const attempts = [candidate, candidate.replace(/,\s*([}\]])/g, "$1")];
+
+  for (const attempt of attempts) {
+    try {
+      const parsed = JSON.parse(attempt) as unknown;
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        return parsed as Record<string, unknown>;
+      }
+    } catch {
+      // Tenta a próxima normalização antes de declarar a resposta inválida.
+    }
+  }
+
+  throw new WeatherAiGenerationError("invalid_response", "invalid_json");
+}
+
+function parseModelResponse(text: string) {
+  const parsed = parseJsonObject(text);
   const today = parseNarrative(parsed.today);
   const tomorrow = parseNarrative(parsed.tomorrow);
 
@@ -252,11 +330,72 @@ function buildPrompt(payload: SummaryPayload) {
     "Destaque apenas tendência de chuva, variação térmica, condição predominante e vento quando forem relevantes.",
     "Cada headline deve ter entre três e nove palavras.",
     "Cada summary deve ter entre trinta e sessenta palavras, sem markdown.",
-    "Responda somente com JSON válido neste formato:",
-    '{"today":{"headline":"...","summary":"..."},"tomorrow":{"headline":"...","summary":"..."}}',
+    "Responda somente com o objeto JSON solicitado.",
     "Dados:",
     JSON.stringify(payload),
   ].join("\n");
+}
+
+async function requestGemini(
+  payload: SummaryPayload,
+  model: string,
+  apiKey: string,
+  signal: AbortSignal,
+  structured: boolean,
+) {
+  const generationConfig: Record<string, unknown> = {
+    temperature: 0.2,
+    maxOutputTokens: 650,
+    responseMimeType: "application/json",
+  };
+
+  if (structured) {
+    generationConfig.responseJsonSchema = narrativeJsonSchema;
+  }
+
+  return fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: buildPrompt(payload) }],
+          },
+        ],
+        generationConfig,
+      }),
+      cache: "no-store",
+      signal,
+    },
+  );
+}
+
+async function generateGeminiResponse(
+  payload: SummaryPayload,
+  model: string,
+  apiKey: string,
+  signal: AbortSignal,
+) {
+  let response = await requestGemini(payload, model, apiKey, signal, true);
+
+  if (response.status === 400) {
+    response = await requestGemini(payload, model, apiKey, signal, false);
+  }
+
+  if (!response.ok) {
+    throw new WeatherAiGenerationError(
+      "api_error",
+      `${response.status} ${response.statusText}`.trim(),
+    );
+  }
+
+  return (await response.json()) as GeminiGenerateContentResponse;
 }
 
 const generateCachedSummaries = unstable_cache(
@@ -267,58 +406,28 @@ const generateCachedSummaries = unstable_cache(
     }
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8_000);
+    const timeout = setTimeout(() => controller.abort(), 10_000);
 
     try {
       const payload = JSON.parse(payloadJson) as SummaryPayload;
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": key.apiKey,
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: buildPrompt(payload) }],
-              },
-            ],
-            generationConfig: {
-              temperature: 0.2,
-              maxOutputTokens: 650,
-              responseMimeType: "application/json",
-            },
-          }),
-          cache: "no-store",
-          signal: controller.signal,
-        },
+      const body = await generateGeminiResponse(
+        payload,
+        model,
+        key.apiKey,
+        controller.signal,
       );
-
-      if (!response.ok) {
-        throw new WeatherAiGenerationError(
-          "api_error",
-          `${response.status} ${response.statusText}`.trim(),
-        );
-      }
-
-      const body = (await response.json()) as GeminiGenerateContentResponse;
       const text = extractResponseText(body);
+
       if (!text) {
         throw new WeatherAiGenerationError("empty_response");
       }
 
-      let parsed: ReturnType<typeof parseModelResponse>;
-      try {
-        parsed = parseModelResponse(text);
-      } catch {
-        throw new WeatherAiGenerationError("invalid_response", "invalid_json");
-      }
-
+      const parsed = parseModelResponse(text);
       if (!parsed) {
-        throw new WeatherAiGenerationError("invalid_response", "content_rejected");
+        throw new WeatherAiGenerationError(
+          "invalid_response",
+          "content_rejected",
+        );
       }
 
       return {
@@ -341,7 +450,7 @@ const generateCachedSummaries = unstable_cache(
       clearTimeout(timeout);
     }
   },
-  ["weather-ai-summaries-v2"],
+  ["weather-ai-summaries-v3"],
   { revalidate: 1_800 },
 );
 
