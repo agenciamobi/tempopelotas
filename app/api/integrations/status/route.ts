@@ -5,8 +5,35 @@ function configured(value: string | undefined) {
   return Boolean(value?.trim());
 }
 
-export function GET() {
+async function getGoogleProviderStatus(url: string, key: string) {
+  try {
+    const response = await fetch(`${url}/auth/v1/settings`, {
+      headers: {
+        Accept: "application/json",
+        apikey: key,
+      },
+      next: { revalidate: 300 },
+      signal: AbortSignal.timeout(6_000),
+    });
+
+    if (!response.ok) return null;
+
+    const body = (await response.json()) as {
+      external?: { google?: boolean };
+    };
+
+    return body.external?.google === true;
+  } catch {
+    return null;
+  }
+}
+
+export async function GET() {
   const supabase = getSupabasePublicConfig();
+  const googleProviderEnabled = await getGoogleProviderStatus(
+    supabase.url,
+    supabase.key,
+  );
 
   const response = NextResponse.json({
     generatedAt: new Date().toISOString(),
@@ -24,6 +51,7 @@ export function GET() {
       supabaseAuth: {
         configured: Boolean(supabase.url && supabase.key),
         projectRef: "ovcpgjyomwjteapbvfwk",
+        googleProviderEnabled,
       },
       googleMaps: {
         browserConfigured: configured(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY),
