@@ -5,6 +5,11 @@ const homeSections = [
     description: "Horas e próximos dias",
   },
   {
+    href: "#regiao",
+    label: "Radar e satélite",
+    description: "Chuva e nuvens na região",
+  },
+  {
     href: "#observacao-embrapa",
     label: "Medições locais",
     description: "Dados da Embrapa",
