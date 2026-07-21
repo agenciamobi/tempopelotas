@@ -30,8 +30,9 @@ const baseRoutes = [
   { path: "/alertas", priority: 0.88, changeFrequency: "hourly" },
 ] as const;
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const hasOnlineCamera = getWeatherCameras().some(
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const cameras = await getWeatherCameras();
+  const hasOnlineCamera = cameras.some(
     (camera) => camera.status === "online",
   );
   const routes = hasOnlineCamera
