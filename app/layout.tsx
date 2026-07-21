@@ -89,6 +89,7 @@ import "./home-next-days-cards-v14.css";
 import "./home-hero-cleanup-v16.css";
 import "./home-observation-refinement-v17.css";
 import "./home-water-refinement-v18.css";
+import "./home-explore-refinement-v19.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
