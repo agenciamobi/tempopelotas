@@ -1,27 +1,40 @@
 import type { Metadata } from "next";
 import { ForecastPageShell } from "@/components/forecast-page-shell";
 import { PelotasHydrologyWidget } from "@/components/pelotas-hydrology-widget";
-import { absoluteUrl } from "@/lib/site";
+import { getLaranjalLevelData } from "@/lib/laranjal-level";
 import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
+import { absoluteUrl } from "@/lib/site";
 import { getPelotasWeather } from "@/lib/weather-service";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Monitoramento da Lagoa dos Patos no Laranjal",
+  title: "Nível da Lagoa dos Patos no Laranjal",
   description:
-    "Consulte o painel público do LabHidroSens/UFPel para acompanhar a Estação Laranjal, em Pelotas.",
+    "Acompanhe a leitura atual e o histórico recente da Estação Laranjal, com dados públicos do LabHidroSens/UFPel.",
   alternates: { canonical: "/nivel-da-lagoa-dos-patos-laranjal" },
   openGraph: {
-    title: "Monitoramento da Lagoa dos Patos no Laranjal",
+    title: "Nível da Lagoa dos Patos no Laranjal",
     description:
-      "Acesse o painel público da UFPel para consultar a Estação Laranjal.",
+      "Veja a medição atual, a variação recente e o horário da última leitura da Estação Laranjal.",
     url: "/nivel-da-lagoa-dos-patos-laranjal",
   },
 };
 
+function formatLevel(value: number | null) {
+  if (value === null) return "UFPel";
+
+  return `${new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value)} m`;
+}
+
 export default async function NivelDaLagoaPage() {
-  const weather = await getPelotasWeather();
+  const [weather, laranjal] = await Promise.all([
+    getPelotasWeather(),
+    getLaranjalLevelData(),
+  ]);
   const today = weather.daily[0];
   const maxHourlyGust = Math.max(
     weather.current.windGust,
@@ -31,10 +44,10 @@ export default async function NivelDaLagoaPage() {
   const webpageSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Monitoramento da Lagoa dos Patos na Estação Laranjal",
+    name: "Nível da Lagoa dos Patos na Estação Laranjal",
     url: absoluteUrl("/nivel-da-lagoa-dos-patos-laranjal"),
     description:
-      "Acesso ao painel público da Estação Laranjal, em Pelotas, com contexto meteorológico local.",
+      "Leitura atual e histórico recente da Estação Laranjal, em Pelotas, com contexto meteorológico local.",
     inLanguage: "pt-BR",
     about: {
       "@type": "BodyOfWater",
@@ -51,14 +64,27 @@ export default async function NivelDaLagoaPage() {
     <ForecastPageShell
       weather={weather}
       eyebrow="Praia do Laranjal"
-      title="Monitoramento da Lagoa dos Patos"
-      description="Consulte o painel público da UFPel. O TEMPO Pelotas não calcula nível, tendência, cota ou situação de risco para esta estação."
+      title="Nível da Lagoa dos Patos"
+      description="Acompanhe a leitura da Estação Laranjal e a variação das últimas horas. Os dados vêm da telemetria pública do LabHidroSens/UFPel; o TEMPO Pelotas não define cota de risco ou ordem de saída."
       currentPath="/nivel-da-lagoa-dos-patos-laranjal"
       heroStat={{
-        label: "Fonte local",
-        value: "UFPel",
-        detail: "Painel público do LabHidroSens",
-        ariaLabel: "Fonte local: painel público do LabHidroSens e UFPel",
+        label:
+          laranjal.status === "live"
+            ? "Leitura atual"
+            : laranjal.status === "stale"
+              ? "Última leitura disponível"
+              : "Fonte local",
+        value: formatLevel(laranjal.currentLevel),
+        detail:
+          laranjal.status === "live"
+            ? "Estação Laranjal atualizada"
+            : laranjal.status === "stale"
+              ? "dados com atualização atrasada"
+              : "LabHidroSens/UFPel",
+        ariaLabel:
+          laranjal.currentLevel === null
+            ? "Fonte local: LabHidroSens e UFPel"
+            : `Nível atual da Lagoa dos Patos no Laranjal: ${formatLevel(laranjal.currentLevel)}`,
         tone: "water",
       }}
     >
@@ -69,16 +95,28 @@ export default async function NivelDaLagoaPage() {
         }}
       />
 
-      <PelotasHydrologyWidget />
+      <PelotasHydrologyWidget
+        initialData={laranjal}
+        weather={{
+          windSpeed: weather.current.windSpeed,
+          windDirection: weather.current.windDirection,
+          windGust: maxHourlyGust,
+          precipitation: today?.precipitation ?? 0,
+        }}
+      />
 
-      <section className="topic-section lagoon-explanation" aria-labelledby="lagoon-explanation-title">
+      <section
+        className="topic-section lagoon-explanation"
+        aria-labelledby="lagoon-explanation-title"
+      >
         <div className="section-heading">
           <div>
             <span className="eyebrow">Contexto meteorológico</span>
             <h2 id="lagoon-explanation-title">Vento e chuva em Pelotas</h2>
           </div>
           <p>
-            Os números meteorológicos abaixo permanecem separados do painel hidrológico e não são usados pelo portal para classificar a situação do Laranjal.
+            Os dados meteorológicos ajudam a contextualizar o comportamento da água,
+            mas não são usados pelo portal para classificar risco no Laranjal.
           </p>
         </div>
 
@@ -103,9 +141,11 @@ export default async function NivelDaLagoaPage() {
         </div>
 
         <div className="lagoon-disclaimer">
-          <strong>Fonte e critérios permanecem com a UFPel</strong>
+          <strong>Medição e referencial permanecem com a UFPel</strong>
           <p>
-            Para confirmar a leitura ou interpretar o painel, consulte a fonte original. Em situações de risco, siga os comunicados da Defesa Civil e das autoridades responsáveis.
+            O portal organiza a telemetria pública para facilitar a leitura. Para
+            conferência técnica, consulte o painel original. Em situações de risco,
+            siga a Defesa Civil e as autoridades responsáveis.
           </p>
         </div>
       </section>
