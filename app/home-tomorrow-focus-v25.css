@@ -87,8 +87,9 @@
 .site-shell--home-editorial .home-next-days__tomorrow-summary::before {
   position: absolute;
   inset: 0 auto 0 0;
-  z-index: -1;
+  z-index: 0;
   width: 5px;
+  pointer-events: none;
   background: linear-gradient(180deg, #18bdcd, #5e2ced 58%, #e70b85);
   content: "";
 }
@@ -97,16 +98,22 @@
   position: absolute;
   right: -70px;
   bottom: -95px;
-  z-index: -1;
+  z-index: 0;
   width: 240px;
   height: 240px;
+  pointer-events: none;
   border: 1px solid rgba(94, 44, 237, 0.11);
   border-radius: 50%;
   content: "";
 }
 
-.site-shell--home-editorial .home-next-days__tomorrow-summary > div {
+.site-shell--home-editorial .home-next-days__tomorrow-summary > div,
+.site-shell--home-editorial .home-next-days__tomorrow-summary > section {
   position: relative;
+  z-index: 1;
+}
+
+.site-shell--home-editorial .home-next-days__tomorrow-summary > div {
   padding-top: 38px;
 }
 
