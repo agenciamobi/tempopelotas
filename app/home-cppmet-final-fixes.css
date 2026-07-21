@@ -54,42 +54,53 @@
 /*
  * Corrige a composição do resumo de amanhã.
  * A grade histórica de duas colunas fazia o novo card cair na coluna estreita
- * da esquerda e mantinha os links na coluna direita.
+ * da esquerda e mantinha os links na coluna direita. Os !important abaixo são
+ * intencionais: esta é a camada final de compatibilidade contra estilos legados.
  */
 .site-shell--home-editorial .home-next-days {
-  grid-template-columns: minmax(0, 1fr);
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-auto-flow: row !important;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
 }
 
 .site-shell--home-editorial .home-next-days > .home-next-days__heading,
 .site-shell--home-editorial .home-next-days > .home-next-days__list,
 .site-shell--home-editorial .home-next-days > .home-next-days__tomorrow-summary,
 .site-shell--home-editorial .home-next-days > .home-inline-links {
-  grid-column: 1 / -1;
-  width: 100%;
-  min-width: 0;
+  grid-column: 1 / -1 !important;
+  justify-self: stretch !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
 }
 
 .site-shell--home-editorial .home-next-days__tomorrow-summary {
   box-sizing: border-box;
-  grid-template-columns: minmax(170px, 0.24fr) minmax(0, 1fr);
+  display: grid !important;
+  grid-template-columns: minmax(170px, 0.24fr) minmax(0, 1fr) !important;
   align-items: start;
   justify-self: stretch;
-  max-width: none;
+  overflow: hidden;
 }
 
 .site-shell--home-editorial .home-next-days__tomorrow-summary > div,
 .site-shell--home-editorial .home-next-days__tomorrow-summary > section {
+  width: 100%;
   min-width: 0;
 }
 
 .site-shell--home-editorial .home-next-days__tomorrow-summary h3,
 .site-shell--home-editorial .home-next-days__tomorrow-summary p {
+  max-width: none;
   word-break: normal;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 760px) {
   .site-shell--home-editorial .home-next-days__tomorrow-summary {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 }
