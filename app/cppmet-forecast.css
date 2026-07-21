@@ -1,0 +1,139 @@
+.cppmet-forecast-summary {
+  margin: clamp(28px, 4vw, 58px) 0;
+  padding: clamp(24px, 3.2vw, 42px);
+  border: 1px solid rgba(7, 30, 47, 0.1);
+  border-radius: clamp(24px, 3vw, 34px);
+  background: #ffffff;
+  box-shadow: 0 18px 54px rgba(7, 30, 47, 0.06);
+}
+
+.cppmet-forecast-summary__heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.65fr);
+  align-items: end;
+  gap: clamp(24px, 4vw, 70px);
+  padding-bottom: clamp(22px, 2.8vw, 34px);
+  border-bottom: 1px solid rgba(7, 30, 47, 0.1);
+}
+
+.cppmet-forecast-summary__heading .eyebrow {
+  display: block;
+  margin-bottom: 10px;
+  color: #587080;
+  font-size: 0.69rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cppmet-forecast-summary__heading h2 {
+  margin: 0;
+  color: #071e2f;
+  font-size: clamp(1.75rem, 3vw, 3rem);
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.cppmet-forecast-summary__heading > p {
+  margin: 0;
+  color: #587080;
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.cppmet-forecast-summary__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: clamp(22px, 3vw, 34px);
+  overflow: hidden;
+  border: 1px solid rgba(7, 30, 47, 0.09);
+  border-radius: 20px;
+  background: rgba(7, 30, 47, 0.09);
+}
+
+.cppmet-forecast-summary__grid article {
+  min-width: 0;
+  padding: 20px;
+  background: #f8faf8;
+}
+
+.cppmet-forecast-summary__day {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.cppmet-forecast-summary__day strong {
+  color: #071e2f;
+  font-size: 0.85rem;
+}
+
+.cppmet-forecast-summary__day > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #365769;
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.cppmet-forecast-summary__day i {
+  color: #9aabb4;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.cppmet-forecast-summary__grid p {
+  margin: 14px 0 0;
+  color: #4c6575;
+  font-size: 0.82rem;
+  line-height: 1.58;
+}
+
+.cppmet-forecast-summary > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 20px;
+  color: #6b818e;
+  font-size: 0.68rem;
+}
+
+.cppmet-forecast-summary > footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #183f53;
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .cppmet-forecast-summary__heading {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .cppmet-forecast-summary__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .cppmet-forecast-summary {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .cppmet-forecast-summary__grid article {
+    padding: 18px;
+  }
+
+  .cppmet-forecast-summary > footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
