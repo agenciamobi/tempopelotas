@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { LaranjalLevelData } from "@/lib/laranjal-level";
+import {
+  getWaterLevelTrendDirection,
+  getWaterLevelVisualState,
+  waterLevelStateClass,
+} from "@/lib/water-level-state";
 
 const CHART_WIDTH = 720;
 const CHART_HEIGHT = 160;
@@ -56,38 +61,39 @@ function formatUpdatedAt(value: string | null) {
 
 function getTrend(data: LaranjalLevelData) {
   const rate = data.trendCmPerHour;
+  const direction = getWaterLevelTrendDirection(rate);
 
-  if (rate === null) {
+  if (direction === "unavailable") {
     return {
       label: "Sem comparação disponível",
       detail: "faltam leituras anteriores suficientes",
-      direction: "unavailable" as const,
+      direction,
       symbol: "·",
     };
   }
 
-  if (Math.abs(rate) < 0.1) {
+  if (direction === "stable") {
     return {
       label: "Estável",
       detail: "sem mudança importante nas últimas horas",
-      direction: "stable" as const,
+      direction,
       symbol: "→",
     };
   }
 
-  if (rate > 0) {
+  if (direction === "rising") {
     return {
       label: "Subindo",
       detail: `${formatSignedCentimeters(rate)} por hora`,
-      direction: "rising" as const,
+      direction,
       symbol: "↑",
     };
   }
 
   return {
     label: "Baixando",
-    detail: `${formatSignedCentimeters(Math.abs(rate))} por hora`,
-    direction: "falling" as const,
+    detail: `${formatSignedCentimeters(Math.abs(rate!))} por hora`,
+    direction,
     symbol: "↓",
   };
 }
@@ -132,9 +138,17 @@ export function PelotasHydrologyWidgetClient({
 }: PelotasHydrologyWidgetClientProps) {
   const [data, setData] = useState(initialData);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const trend = useMemo(() => getTrend(data), [data]);
-  const chart = useMemo(() => buildChartPath(data), [data]);
   const available = data.status !== "unavailable" && data.currentLevel !== null;
+  const trend = useMemo(() => getTrend(data), [data]);
+  const visualState = useMemo(
+    () =>
+      getWaterLevelVisualState({
+        rate: data.trendCmPerHour,
+        available,
+      }),
+    [available, data.trendCmPerHour],
+  );
+  const chart = useMemo(() => buildChartPath(data), [data]);
   const Heading = headingLevel;
   const rootClassName = ["laranjal-monitor", "pelotas-hydrology-widget", className]
     .filter(Boolean)
@@ -189,7 +203,7 @@ export function PelotasHydrologyWidgetClient({
   return (
     <section className={rootClassName} aria-labelledby="pelotas-hydrology-widget-title">
       <article
-        className={`guaiba-level-card laranjal-level-card guaiba-level-card--${data.status}`}
+        className={`guaiba-level-card laranjal-level-card guaiba-level-card--${data.status} ${waterLevelStateClass(visualState)}`}
       >
         <div className="guaiba-level-card-header">
           <div>
