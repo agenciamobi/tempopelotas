@@ -2,33 +2,19 @@ import "server-only";
 
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-
-function getServerConfig() {
-  const url = (
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL
-  )?.trim();
-  const key = (
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-    process.env.SUPABASE_PUBLISHABLE_KEY ??
-    process.env.SUPABASE_ANON_KEY
-  )?.trim();
-
-  if (!url || !key) return null;
-  return { url, key };
-}
+import { getSupabasePublicConfig } from "@/lib/supabase/config";
+import type { Database } from "@/lib/supabase/database.types";
 
 export function isSupabaseServerConfigured() {
-  return getServerConfig() !== null;
+  const { url, key } = getSupabasePublicConfig();
+  return Boolean(url && key);
 }
 
 export async function createClient() {
-  const config = getServerConfig();
-  if (!config) return null;
-
+  const { url, key } = getSupabasePublicConfig();
   const cookieStore = await cookies();
 
-  return createServerClient(config.url, config.key, {
+  return createServerClient<Database>(url, key, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
