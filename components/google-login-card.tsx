@@ -9,6 +9,11 @@ const AUTH_ERRORS: Record<string, string> = {
   oauth: "Não foi possível concluir o login. Tente novamente.",
 };
 
+function safeNextPath(value: string | null) {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";
+  return value;
+}
+
 function GoogleIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -38,7 +43,9 @@ export function GoogleLoginCard() {
     setLoading(true);
     setError(null);
 
-    const redirectTo = `${window.location.origin}/auth/callback?next=/`;
+    const params = new URLSearchParams(window.location.search);
+    const nextPath = safeNextPath(params.get("next"));
+    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
     const { error: signInError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -61,7 +68,8 @@ export function GoogleLoginCard() {
       <span className="eyebrow">Conta TEMPO Pelotas</span>
       <h1 id="login-card-title">Entre para personalizar sua experiência</h1>
       <p>
-        O login será usado para recursos opcionais, como preferências e alertas. A previsão e os dados públicos continuam acessíveis sem conta.
+        O login é usado para preferências e alertas opcionais. A previsão e os
+        dados públicos continuam acessíveis sem conta.
       </p>
       <button type="button" onClick={signIn} disabled={loading || !configured}>
         <GoogleIcon />
@@ -72,8 +80,15 @@ export function GoogleLoginCard() {
           A autenticação está temporariamente indisponível.
         </p>
       ) : null}
-      {error ? <p className="login-card__error" role="alert">{error}</p> : null}
-      <small>Ao continuar, você autoriza apenas os dados básicos de identificação fornecidos pelo Google.</small>
+      {error ? (
+        <p className="login-card__error" role="alert">
+          {error}
+        </p>
+      ) : null}
+      <small>
+        Ao continuar, você autoriza apenas os dados básicos de identificação
+        fornecidos pelo Google.
+      </small>
     </section>
   );
 }
