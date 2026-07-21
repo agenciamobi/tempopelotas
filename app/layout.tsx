@@ -79,6 +79,8 @@ import "./home-hero-stripe-adaptation.css";
 import "./home-alert-flow-v7.css";
 import "./home-forecast-refinement-v8.css";
 import "./home-alert-flow-v9.css";
+import "./home-detail-navigation-v10.css";
+import "./home-detail-content-v10.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
