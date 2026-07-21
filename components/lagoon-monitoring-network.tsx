@@ -46,8 +46,12 @@ function formatUpdatedAt(value: string | null) {
 function getRiskLabel(observation: LagoonMonitoringObservation) {
   if (observation.status === "unavailable") return "Indisponível";
   if (observation.status === "stale") return "Leitura atrasada";
-  if (observation.risk === "flooding") return "Na cota ou acima";
-  if (observation.risk === "attention") return "Próximo da cota";
+  if (
+    observation.currentLevelCm !== null &&
+    observation.currentLevelCm >= observation.floodLevelCm
+  ) {
+    return "Na cota ou acima";
+  }
   return "Abaixo da cota";
 }
 
@@ -207,6 +211,16 @@ export function LagoonMonitoringNetwork({
         {data.observations.map((observation) => {
           const hasReading = observation.currentLevelCm !== null;
           const isCurrent = hasReading && observation.status === "live";
+          const isAtOrAboveThreshold = Boolean(
+            isCurrent &&
+              observation.currentLevelCm !== null &&
+              observation.currentLevelCm >= observation.floodLevelCm,
+          );
+          const presentationRisk = isCurrent
+            ? isAtOrAboveThreshold
+              ? "flooding"
+              : "normal"
+            : "unavailable";
           const progress = Math.max(
             0,
             Math.min(observation.floodThresholdPercentage ?? 0, 100),
@@ -222,7 +236,7 @@ export function LagoonMonitoringNetwork({
 
           return (
             <article
-              className={`lagoon-monitoring-card is-${observation.status} risk-${observation.risk} ${waterLevelStateClass(visualState)}`}
+              className={`lagoon-monitoring-card is-${observation.status} risk-${presentationRisk} ${waterLevelStateClass(visualState)}`}
               key={observation.station.id}
             >
               <div className="lagoon-monitoring-card-head">
@@ -352,7 +366,8 @@ export function LagoonMonitoringNetwork({
             janela temporal compatível. As cotas de inundação e os máximos de
             maio de 2024 são reproduzidos do portal preliminar da FURG e Portos
             RS. Compare cada leitura somente com a referência do mesmo card.
-            Dados atrasados ficam neutros e não representam condição atual. Estes
+            Dados atrasados ficam neutros e não representam condição atual. O
+            portal não cria uma faixa intermediária própria de atenção. Estes
             dados não substituem avisos da Defesa Civil.
           </p>
         </div>
