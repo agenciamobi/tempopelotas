@@ -5,7 +5,6 @@ import type { WeatherData } from "@/lib/weather-data";
 import {
   getWeatherAdvisory,
   type AdvisoryLevel,
-  type WeatherAdvisory,
 } from "@/lib/weather-insights";
 
 type WeatherHeroProps = {
@@ -17,7 +16,6 @@ type WeatherHeroProps = {
 type HeroMetricIconName = "humidity" | "wind" | "gust" | "visibility";
 
 type HeroPresentation = {
-  badge: string;
   kicker: string;
   title: string;
   highlightedTitle: string;
@@ -36,7 +34,6 @@ type HeroPresentation = {
 
 const heroPresentationByLevel = {
   normal: {
-    badge: "Condições atualizadas",
     kicker: "Tempo em Pelotas agora",
     title: "Veja como está o tempo.",
     highlightedTitle: "Planeje o restante do dia.",
@@ -55,7 +52,6 @@ const heroPresentationByLevel = {
     photoCredit: "Foto: Sebastian2112 / CC BY-SA 4.0",
   },
   attention: {
-    badge: "Mudança importante na previsão",
     kicker: "Atenção nas próximas horas",
     title: "Chuva e vento podem se intensificar.",
     highlightedTitle: "Confira os horários de maior risco.",
@@ -74,7 +70,6 @@ const heroPresentationByLevel = {
     photoCredit: "Foto: Kane Morley / CC BY-SA 4.0",
   },
   warning: {
-    badge: "Risco elevado nas próximas horas",
     kicker: "Risco de tempo forte em Pelotas",
     title: "Há risco de tempo forte.",
     highlightedTitle: "Confira os períodos de maior risco.",
@@ -93,20 +88,6 @@ const heroPresentationByLevel = {
   },
 } satisfies Record<AdvisoryLevel, HeroPresentation>;
 
-function getHeroPresentation(
-  advisory: WeatherAdvisory,
-  level: AdvisoryLevel,
-): HeroPresentation {
-  const presentation = heroPresentationByLevel[level];
-
-  if (level === "normal" || level !== advisory.level) return presentation;
-
-  return {
-    ...presentation,
-    badge: advisory.eyebrow,
-  };
-}
-
 function capitalizeSentence(value: string) {
   return value.replace(/^./, (character) => character.toUpperCase());
 }
@@ -121,10 +102,6 @@ function getCurrentSourceMeta(current: WeatherData["current"]) {
   }
 
   return `${current.updatedAt} · ${current.source.name}`;
-}
-
-function getOfficialAlertLabel(count: number) {
-  return count === 1 ? "1 aviso oficial ativo" : `${count} avisos oficiais ativos`;
 }
 
 function getOfficialAlertReason(count: number) {
@@ -178,7 +155,7 @@ export function WeatherHero({
   const { current } = weather;
   const advisory = getWeatherAdvisory(weather);
   const resolvedLevel = advisoryLevel ?? advisory.level;
-  const presentation = getHeroPresentation(advisory, resolvedLevel);
+  const presentation = heroPresentationByLevel[resolvedLevel];
   const today = weather.daily[0];
   const officialAlertReason = officialAlertCount > 0
     ? getOfficialAlertReason(officialAlertCount)
@@ -189,9 +166,6 @@ export function WeatherHero({
   const reasons = [officialAlertReason, ...weatherReasons]
     .filter((reason): reason is string => Boolean(reason))
     .slice(0, 2);
-  const statusLabel = officialAlertCount > 0
-    ? getOfficialAlertLabel(officialAlertCount)
-    : presentation.badge;
   const currentSourceMeta = getCurrentSourceMeta(current);
 
   return (
@@ -207,13 +181,6 @@ export function WeatherHero({
 
       <div className="weather-hero-content">
         <div className="weather-hero-copy">
-          <span
-            className={`weather-hero-status weather-hero-status--${resolvedLevel}${officialAlertCount > 0 ? " weather-hero-status--official" : ""}`}
-          >
-            <i aria-hidden="true" />
-            {statusLabel}
-          </span>
-
           <p className="weather-hero-kicker">{presentation.kicker}</p>
           <h1 id="weather-hero-title">
             {presentation.title} <span>{presentation.highlightedTitle}</span>
@@ -286,11 +253,6 @@ export function WeatherHero({
             <HeroMetric icon="visibility" label="Visibilidade" value={`${current.visibility} km`} />
           </div>
         </div>
-      </div>
-
-      <div className="weather-hero-scroll">
-        <span>Continue para a previsão detalhada</span>
-        <i aria-hidden="true">↓</i>
       </div>
 
       <a
