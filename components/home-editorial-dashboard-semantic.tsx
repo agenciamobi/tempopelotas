@@ -63,6 +63,12 @@ const stationStateLabels: Record<string, string> = {
   "Sem sinal de atenção": "Abaixo da cota local",
 };
 
+const editorialCopyReplacements: Record<string, string> = {
+  "Próximos dias": "Tendência do tempo",
+  "Previsão para os próximos dias": "Como o tempo deve evoluir",
+  "Resumo para amanhã": "Destaque da previsão",
+};
+
 function formatNumber(value: number, maximumFractionDigits = 1) {
   return new Intl.NumberFormat("pt-BR", {
     maximumFractionDigits,
@@ -115,7 +121,7 @@ function TomorrowForecastSummary({
       aria-labelledby="home-tomorrow-summary-title"
     >
       <div>
-        <span>Resumo para amanhã</span>
+        <span>Destaque da previsão</span>
         <small>
           {tomorrow.weekday} · {tomorrow.date}
         </small>
@@ -155,7 +161,13 @@ function appendClass(className: string, token: string) {
 
 function normalizeTextNode(node: ReactNode): ReactNode {
   if (typeof node !== "string") return node;
-  if (node.trim() === "por volta de Agora") return "neste momento";
+
+  const trimmed = node.trim();
+  if (trimmed === "por volta de Agora") return "neste momento";
+  if (editorialCopyReplacements[trimmed]) {
+    return node.replace(trimmed, editorialCopyReplacements[trimmed]);
+  }
+
   return node;
 }
 

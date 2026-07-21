@@ -38,7 +38,7 @@ type HeroPresentation = {
 
 const heroPresentationByLevel = {
   normal: {
-    title: "Veja como está o tempo.",
+    title: "Veja as condições para hoje.",
     highlightedTitle: "Planeje o restante do dia.",
     description:
       "Consulte a temperatura, a chuva e o vento agora e veja a previsão para as próximas horas.",
@@ -56,7 +56,7 @@ const heroPresentationByLevel = {
   },
   attention: {
     title: "O tempo pode mudar nas próximas horas.",
-    highlightedTitle: "Acompanhe os períodos mais instáveis.",
+    highlightedTitle: "Confira quando as condições pioram.",
     description:
       "Veja quando a chance de chuva e de rajadas aumenta e consulte os avisos oficiais antes de sair.",
     primaryAction: {
@@ -73,7 +73,7 @@ const heroPresentationByLevel = {
   },
   warning: {
     title: "Há risco de tempo forte.",
-    highlightedTitle: "Confira os períodos de maior risco.",
+    highlightedTitle: "Acompanhe chuva, vento e alertas.",
     description:
       "Consulte os avisos oficiais e os horários com maior risco de chuva intensa, temporal ou rajadas fortes.",
     primaryAction: {
@@ -112,7 +112,7 @@ function getDynamicTitle(
   if (level === "warning") {
     return {
       title: "Há risco de tempo forte.",
-      highlightedTitle: "Confira os períodos de maior risco.",
+      highlightedTitle: "Acompanhe chuva, vento e alertas.",
     };
   }
 
@@ -120,55 +120,55 @@ function getDynamicTitle(
     if ((today?.windGust ?? weather.current.windGust) >= 50 || has(/vento|rajada/)) {
       return {
         title: "O vento pode ganhar força.",
-        highlightedTitle: "Acompanhe as próximas horas.",
+        highlightedTitle: "Veja os horários com rajadas mais intensas.",
       };
     }
 
     return {
       title: "A chuva pode ganhar intensidade.",
-      highlightedTitle: "Veja quando o tempo muda.",
+      highlightedTitle: "Veja os horários mais instáveis.",
     };
   }
 
   if (has(/temporal|trovoada|pancada|instabil/)) {
     return {
       title: "O tempo pode ficar instável.",
-      highlightedTitle: "Acompanhe as mudanças ao longo do dia.",
+      highlightedTitle: "Acompanhe chuva, vento e trovoadas.",
     };
   }
 
   if ((today?.rainChance ?? 0) >= 60 || has(/chuva|garoa|precipit/)) {
     return {
       title: "A chuva deve marcar o dia.",
-      highlightedTitle: "Confira os períodos mais instáveis.",
+      highlightedTitle: "Veja quando a intensidade aumenta.",
     };
   }
 
   if (has(/nevoeiro|nevoa|visibilidade/)) {
     return {
       title: "A visibilidade pode ficar reduzida.",
-      highlightedTitle: "Acompanhe as condições em Pelotas.",
+      highlightedTitle: "Consulte as condições antes de sair.",
     };
   }
 
   if (has(/nublado|encoberto|muitas nuvens|nebulosidade/)) {
     return {
       title: "O céu permanece com muitas nuvens.",
-      highlightedTitle: "Veja como o tempo evolui.",
+      highlightedTitle: "Acompanhe a evolução ao longo do dia.",
     };
   }
 
   if (has(/sol|ensolarado|ceu claro|poucas nuvens/)) {
     return {
       title: "O dia terá períodos de sol.",
-      highlightedTitle: "Acompanhe temperatura e vento.",
+      highlightedTitle: "Confira temperatura e vento.",
     };
   }
 
   if ((today?.max ?? weather.current.temperature) <= 15) {
     return {
       title: "O frio permanece em Pelotas.",
-      highlightedTitle: "Veja como a temperatura muda.",
+      highlightedTitle: "Confira mínima, máxima e sensação.",
     };
   }
 
@@ -180,7 +180,7 @@ function getDynamicTitle(
   }
 
   return {
-    title: "Veja como está o tempo.",
+    title: "Veja as condições para hoje.",
     highlightedTitle: "Planeje o restante do dia.",
   };
 }
@@ -321,17 +321,17 @@ export function WeatherHero({
               aria-label="Resumo da previsão de hoje"
             >
               <div>
-                <dt>Máxima e mínima</dt>
+                <dt>Máx. e mín. previstas</dt>
                 <dd>
                   {today.max}° <small>/ {today.min}°</small>
                 </dd>
               </div>
               <div>
-                <dt>Chance de chuva</dt>
+                <dt>Chance máxima de chuva</dt>
                 <dd>{today.rainChance}%</dd>
               </div>
               <div>
-                <dt>Rajada mais forte</dt>
+                <dt>Rajada máxima prevista</dt>
                 <dd>
                   {today.windGust} <small>km/h</small>
                 </dd>
