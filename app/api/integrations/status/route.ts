@@ -34,6 +34,9 @@ export async function GET() {
     supabase.url,
     supabase.key,
   );
+  const directGoogleOAuthConfigured =
+    configured(process.env.GOOGLE_OAUTH_CLIENT_ID) &&
+    configured(process.env.GOOGLE_OAUTH_CLIENT_SECRET);
 
   const response = NextResponse.json({
     generatedAt: new Date().toISOString(),
@@ -42,14 +45,28 @@ export async function GET() {
         configured: configured(
           process.env.GOOGLE_API_KEY ?? process.env.GEMINI_API_KEY,
         ),
+        inUse: true,
         model: process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash",
       },
       youtube: {
         configured: configured(process.env.YOUTUBE_API_KEY),
+        inUse: true,
         channel: process.env.YOUTUBE_CHANNEL_HANDLE?.trim() || "@praiadolaranjal",
+        publicPageFallback: true,
+        manualFallbackConfigured: configured(
+          process.env.YOUTUBE_LARANJAL_VIDEO_ID,
+        ),
+      },
+      redemet: {
+        configured: configured(process.env.REDEMET_API_KEY),
+        inUse: true,
+        radarArea: process.env.REDEMET_RADAR_AREA?.trim() || "cn",
+        radarProduct:
+          process.env.REDEMET_RADAR_PRODUCT?.trim() || "maxcappi",
       },
       supabaseAuth: {
         configured: Boolean(supabase.url && supabase.key),
+        inUse: true,
         projectRef: "ovcpgjyomwjteapbvfwk",
         googleProviderEnabled,
       },
@@ -57,14 +74,17 @@ export async function GET() {
         browserConfigured: configured(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY),
         embedConfigured: configured(process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY),
         serverConfigured: configured(process.env.GOOGLE_MAPS_SERVER_API_KEY),
+        inUse: false,
       },
       pageSpeed: {
         configured: configured(process.env.GOOGLE_PAGESPEED_API_KEY),
+        inUse: false,
       },
       googleOAuth: {
-        configured:
-          configured(process.env.GOOGLE_OAUTH_CLIENT_ID) &&
-          configured(process.env.GOOGLE_OAUTH_CLIENT_SECRET),
+        configured: directGoogleOAuthConfigured,
+        inUseDirectly: false,
+        authenticationProvider: "supabase",
+        providerEnabledInSupabase: googleProviderEnabled,
       },
     },
   });
