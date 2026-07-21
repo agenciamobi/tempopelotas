@@ -91,6 +91,8 @@ import "./home-observation-refinement-v17.css";
 import "./home-water-refinement-v18.css";
 import "./home-explore-refinement-v19.css";
 import "./home-final-cohesion-v20.css";
+import "./home-operational-bridge-v21.css";
+import "./home-operational-bridge-v21-fix.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
