@@ -115,7 +115,7 @@ const megaMenus: MegaMenuDefinition[] = [
     featured: {
       eyebrow: "Imagens oficiais",
       label: "Radar e satélite da região",
-      href: "/#radar-e-satelite",
+      href: "/#regiao",
       description:
         "Acompanhe chuva, nuvens e trovoadas com os produtos integrados ao portal.",
     },
@@ -369,7 +369,8 @@ export function SiteHeader({
                   setOpenMenu((current) => (current === menu.id ? null : current))
                 }
                 onBlur={(event) => {
-                  if (!event.currentTarget.contains(event.relatedTarget)) {
+                  const nextTarget = event.relatedTarget as Node | null;
+                  if (!event.currentTarget.contains(nextTarget)) {
                     setOpenMenu((current) =>
                       current === menu.id ? null : current,
                     );
