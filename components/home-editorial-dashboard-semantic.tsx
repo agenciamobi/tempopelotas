@@ -49,6 +49,12 @@ type ElementProps = Record<string, unknown> & {
   title?: string;
 };
 
+const stationStateLabels: Record<string, string> = {
+  "Acima do nível de atenção": "Acima da cota local",
+  "Perto do nível de atenção": "Próximo da cota local",
+  "Sem sinal de atenção": "Abaixo da cota local",
+};
+
 function getTextContent(node: ReactNode): string {
   if (typeof node === "string" || typeof node === "number") {
     return String(node);
@@ -168,6 +174,21 @@ function transformDashboardNode(
   }
 
   const textContent = getTextContent(props.children);
+  const normalizedText = textContent.trim();
+
+  if (
+    isDomElement &&
+    node.type === "small" &&
+    !nextContext.guaibaContext &&
+    stationStateLabels[normalizedText]
+  ) {
+    return cloneElement(
+      node as ReactElement<ElementProps>,
+      undefined,
+      stationStateLabels[normalizedText],
+    );
+  }
+
   const hasMissingValue = textContent.includes("—");
 
   if (isDomElement && hasMissingValue) {
