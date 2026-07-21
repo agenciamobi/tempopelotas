@@ -85,6 +85,7 @@ import "./home-cohesion-v12.css";
 import "./home-cohesion-v12-content.css";
 import "./home-cohesion-v12-water.css";
 import "./home-navigation-v13.css";
+import "./home-next-days-cards-v14.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
