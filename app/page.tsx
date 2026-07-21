@@ -9,6 +9,7 @@ import { getInmetAlerts } from "@/lib/inmet-alerts";
 import { getLagoonMonitoringNetwork } from "@/lib/lagoon-monitoring-network";
 import { getLaranjalLevelData } from "@/lib/laranjal-level";
 import { absoluteUrl } from "@/lib/site";
+import { getWeatherAiSummaries } from "@/lib/weather-ai-summary";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/lib/weather-insights";
 import { getPelotasWeatherWithObservation } from "@/lib/weather-service";
 
@@ -52,6 +53,7 @@ export default async function Home() {
     getLaranjalLevelData(),
     getInmetAlerts(),
   ]);
+  const summaries = await getWeatherAiSummaries(weather);
   const advisory = getWeatherAdvisory(weather);
   const pelotasOfficialAlerts = inmetAlerts.alerts.filter((alert) => alert.relevance === "pelotas");
   const officialLevel: AdvisoryLevel = pelotasOfficialAlerts.some(
@@ -90,6 +92,7 @@ export default async function Home() {
           <HomeSectionNavigation />
           <HomeEditorialDashboard
             weather={weather}
+            summaries={summaries}
             advisoryLevel={headerLevel}
             observation={embrapaObservation}
             laranjal={laranjalObservation}
