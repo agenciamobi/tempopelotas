@@ -1,2 +1,2 @@
-// Marcador técnico para reprocessar o deployment após atualização de variáveis na Vercel.
-export const deploymentTrigger = "2026-07-21-google-credentials";
+// Marcador técnico para reprocessar o deployment após atualização das integrações.
+export const deploymentTrigger = "2026-07-21-portal-integrations-v22";
