@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server";
+import { getSupabasePublicConfig } from "@/lib/supabase/config";
 
 function configured(value: string | undefined) {
   return Boolean(value?.trim());
 }
 
 export function GET() {
-  const supabaseUrl =
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
-  const supabasePublicKey =
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-    process.env.SUPABASE_PUBLISHABLE_KEY ??
-    process.env.SUPABASE_ANON_KEY;
+  const supabase = getSupabasePublicConfig();
 
   const response = NextResponse.json({
     generatedAt: new Date().toISOString(),
@@ -27,9 +22,8 @@ export function GET() {
         channel: process.env.YOUTUBE_CHANNEL_HANDLE?.trim() || "@praiadolaranjal",
       },
       supabaseAuth: {
-        configured: configured(supabaseUrl) && configured(supabasePublicKey),
-        urlConfigured: configured(supabaseUrl),
-        publishableKeyConfigured: configured(supabasePublicKey),
+        configured: Boolean(supabase.url && supabase.key),
+        projectRef: "ovcpgjyomwjteapbvfwk",
       },
       googleMaps: {
         browserConfigured: configured(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY),
