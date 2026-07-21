@@ -21,3 +21,32 @@
     inset 4px 0 0 var(--home-water-state-accent),
     0 28px 72px rgba(3, 18, 29, 0.16) !important;
 }
+
+/*
+ * Reduz a altura da primeira dobra e melhora a leitura do título editorial.
+ * Esta camada é importada por último para consolidar a escala após os estilos
+ * históricos do hero.
+ */
+.site-shell--home-editorial .weather-hero h1 {
+  font-size: clamp(3.9rem, 5vw, 4.6rem);
+  line-height: 0.94;
+}
+
+@media (max-width: 1240px) {
+  .site-shell--home-editorial .weather-hero h1 {
+    font-size: clamp(3.45rem, 5.1vw, 4.15rem);
+  }
+}
+
+@media (max-width: 900px) {
+  .site-shell--home-editorial .weather-hero h1 {
+    font-size: clamp(3rem, 8vw, 3.7rem);
+  }
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial .weather-hero h1 {
+    font-size: clamp(2.45rem, 10.5vw, 3rem);
+    line-height: 0.96;
+  }
+}
