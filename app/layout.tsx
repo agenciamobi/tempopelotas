@@ -101,6 +101,7 @@ import "./footer-production-cleanup.css";
 import "./water-level-semantic-colors.css";
 import "./home-cppmet-layout-water-audit.css";
 import "./home-cppmet-final-fixes.css";
+import "./safety-alerts.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
