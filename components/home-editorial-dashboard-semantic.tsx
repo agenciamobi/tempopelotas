@@ -175,6 +175,7 @@ function transformDashboardNode(
   if (
     isDomElement &&
     node.type === "small" &&
+    !nextContext.guaibaContext &&
     [
       "Acima do nível de atenção",
       "Perto do nível de atenção",
@@ -219,10 +220,12 @@ function transformDashboardNode(
     transformDashboardNode(child, nextContext),
   );
 
-  const normalizedClassName = className
-    .split(/\s+/)
-    .filter((token) => !token.startsWith("risk-"))
-    .join(" ");
+  const normalizedClassName = nextContext.guaibaContext
+    ? className
+    : className
+        .split(/\s+/)
+        .filter((token) => !token.startsWith("risk-"))
+        .join(" ");
 
   return cloneElement(
     node as ReactElement<ElementProps>,
