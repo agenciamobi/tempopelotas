@@ -12,7 +12,6 @@ import type { EmbrapaObservationData } from "@/lib/embrapa-observation";
 import type { GuaibaObservationData } from "@/lib/guaiba-monitor";
 import type { LagoonMonitoringNetworkData } from "@/lib/lagoon-monitoring-network";
 import type { LaranjalLevelData } from "@/lib/laranjal-level";
-import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
 import type { WeatherAiSummaries } from "@/lib/weather-ai-summary";
 import type { WeatherData } from "@/lib/weather-data";
 import type { AdvisoryLevel } from "@/lib/weather-insights";
@@ -29,6 +28,7 @@ type HomeEditorialDashboardProps = {
 
 type SemanticContext = {
   currentHour: boolean;
+  laranjalUnavailable: boolean;
   stationUnavailable: boolean;
   guaibaContext: boolean;
 };
@@ -65,43 +65,6 @@ function normalizeTextNode(node: ReactNode): ReactNode {
   return node;
 }
 
-function UfpelHomePanel() {
-  return (
-    <article className="home-water-focus home-water-focus--ufpel">
-      <div className="home-water-focus__topline">
-        <div>
-          <span>Praia do Laranjal</span>
-          <small>Painel público do LabHidroSens/UFPel</small>
-        </div>
-        <b>Fonte local</b>
-      </div>
-      <div className="home-water-focus__source-copy">
-        <strong>Monitoramento da Lagoa dos Patos</strong>
-        <p>
-          O painel é exibido diretamente pela UFPel. O TEMPO Pelotas não define
-          cota, estado de risco ou tendência própria para o Laranjal.
-        </p>
-      </div>
-      <div className="home-water-focus__ufpel-frame">
-        <iframe
-          src={LAGOON_LEVEL_SOURCE.dashboardUrl}
-          title="Painel público da Estação Laranjal do LabHidroSens e UFPel"
-          loading="lazy"
-          referrerPolicy="strict-origin-when-cross-origin"
-        />
-      </div>
-      <a
-        className="home-water-focus__source-link"
-        href={LAGOON_LEVEL_SOURCE.dashboardUrl}
-        target="_blank"
-        rel="noreferrer"
-      >
-        Abrir painel original <span aria-hidden="true">↗</span>
-      </a>
-    </article>
-  );
-}
-
 function transformDashboardNode(
   node: ReactNode,
   context: SemanticContext,
@@ -115,19 +78,15 @@ function transformDashboardNode(
   const props = node.props;
   const className = typeof props.className === "string" ? props.className : "";
   const isDomElement = typeof node.type === "string";
-
-  if (
-    isDomElement &&
-    node.type === "article" &&
-    hasClass(className, "home-water-focus")
-  ) {
-    return <UfpelHomePanel />;
-  }
-
   const nextContext: SemanticContext = {
     currentHour:
       context.currentHour ||
       (node.type === "article" && hasClass(className, "is-current")),
+    laranjalUnavailable:
+      context.laranjalUnavailable ||
+      (node.type === "article" &&
+        hasClass(className, "home-water-focus") &&
+        hasClass(className, "is-unavailable")),
     stationUnavailable:
       context.stationUnavailable ||
       (node.type === "article" && hasClass(className, "is-unavailable")),
@@ -152,6 +111,44 @@ function transformDashboardNode(
       node as ReactElement<ElementProps>,
       undefined,
       transformDashboardNode(timeLabel, nextContext),
+    );
+  }
+
+  if (
+    isDomElement &&
+    node.type === "div" &&
+    hasClass(className, "home-water-focus__reading") &&
+    nextContext.laranjalUnavailable
+  ) {
+    return cloneElement(
+      node as ReactElement<ElementProps>,
+      undefined,
+      <strong>Sem leitura</strong>,
+    );
+  }
+
+  if (
+    isDomElement &&
+    node.type === "p" &&
+    hasClass(className, "home-water-trend") &&
+    hasClass(className, "is-unknown")
+  ) {
+    return cloneElement(
+      node as ReactElement<ElementProps>,
+      undefined,
+      "Tendência indisponível",
+    );
+  }
+
+  if (
+    isDomElement &&
+    node.type === "span" &&
+    hasClass(className, "is-unknown")
+  ) {
+    return cloneElement(
+      node as ReactElement<ElementProps>,
+      undefined,
+      "Tendência indisponível",
     );
   }
 
@@ -243,6 +240,7 @@ export function HomeEditorialDashboard({
   const dashboard = HomeEditorialDashboardBase(dashboardProps);
   const transformedDashboard = transformDashboardNode(dashboard, {
     currentHour: false,
+    laranjalUnavailable: false,
     stationUnavailable: false,
     guaibaContext: false,
   });
