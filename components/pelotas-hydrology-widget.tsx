@@ -3,6 +3,13 @@ import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
 type WidgetHeading = "h2" | "h3";
 
 export type PelotasHydrologyWidgetProps = {
+  initialData?: unknown;
+  weather?: {
+    windSpeed: number;
+    windDirection: string;
+    windGust: number;
+    precipitation: number;
+  };
   headingLevel?: WidgetHeading;
   className?: string;
 };
