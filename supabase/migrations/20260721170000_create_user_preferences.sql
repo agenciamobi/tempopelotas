@@ -68,6 +68,11 @@ begin
 end;
 $$;
 
+revoke execute on function public.handle_new_user_preferences() from public;
+revoke execute on function public.handle_new_user_preferences() from anon;
+revoke execute on function public.handle_new_user_preferences() from authenticated;
+grant execute on function public.handle_new_user_preferences() to supabase_auth_admin;
+
 create trigger on_auth_user_created_create_preferences
 after insert on auth.users
 for each row execute function public.handle_new_user_preferences();
