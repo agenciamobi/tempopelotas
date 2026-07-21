@@ -236,7 +236,14 @@
   }
 
   .sourceBadge {
-    display: none;
+    top: 10px;
+    right: 52px;
+    max-width: calc(100% - 70px);
+    padding: 7px 9px;
+  }
+
+  .sourceBadge strong {
+    font-size: 0.58rem;
   }
 
   .satelliteSwitcher {
