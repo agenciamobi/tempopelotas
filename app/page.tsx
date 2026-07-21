@@ -13,6 +13,7 @@ import { getWeatherAiSummaries } from "@/lib/weather-ai-summary";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/lib/weather-insights";
 import { getPelotasWeatherWithObservation } from "@/lib/weather-service";
 
+// Atualiza dados e resumo editorial da homepage a cada cinco minutos.
 export const revalidate = 300;
 
 const websiteSchema = {
