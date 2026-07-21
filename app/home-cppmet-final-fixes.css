@@ -95,8 +95,10 @@
 .site-shell--home-editorial .home-next-days__tomorrow-summary h3,
 .site-shell--home-editorial .home-next-days__tomorrow-summary p {
   max-width: none;
+  white-space: normal;
   word-break: normal;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  hyphens: none;
 }
 
 @media (max-width: 760px) {
