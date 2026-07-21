@@ -95,6 +95,7 @@ import "./home-operational-bridge-v21.css";
 import "./home-operational-bridge-v21-fix.css";
 import "./weather-ai-summary.css";
 import "./integrations-v22.css";
+import "./account-v24.css";
 import "./footer-editorial-v23.css";
 
 export const metadata: Metadata = {

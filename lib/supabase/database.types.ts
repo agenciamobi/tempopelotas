@@ -39,6 +39,36 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_preferences: {
+        Row: {
+          community_updates: boolean;
+          created_at: string;
+          daily_summary: boolean;
+          updated_at: string;
+          user_id: string;
+          water_alerts: boolean;
+          weather_alerts: boolean;
+        };
+        Insert: {
+          community_updates?: boolean;
+          created_at?: string;
+          daily_summary?: boolean;
+          updated_at?: string;
+          user_id: string;
+          water_alerts?: boolean;
+          weather_alerts?: boolean;
+        };
+        Update: {
+          community_updates?: boolean;
+          created_at?: string;
+          daily_summary?: boolean;
+          updated_at?: string;
+          user_id?: string;
+          water_alerts?: boolean;
+          weather_alerts?: boolean;
+        };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
@@ -48,3 +78,5 @@ export type Database = {
 };
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type UserPreferences =
+  Database["public"]["Tables"]["user_preferences"]["Row"];

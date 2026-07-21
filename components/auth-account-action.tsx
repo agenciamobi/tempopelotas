@@ -12,11 +12,6 @@ export function AuthAccountAction() {
 
   useEffect(() => {
     const supabase = createClient();
-    if (!supabase) {
-      setReady(true);
-      return;
-    }
-
     let active = true;
 
     void supabase.auth.getUser().then(({ data }) => {
@@ -45,7 +40,7 @@ export function AuthAccountAction() {
 
   if (!user) {
     return (
-      <Link className="header-account-link" href="/entrar">
+      <Link className="header-account-link" href="/entrar?next=/minha-conta">
         Entrar
       </Link>
     );
@@ -53,16 +48,20 @@ export function AuthAccountAction() {
 
   const name =
     (typeof user.user_metadata?.full_name === "string" && user.user_metadata.full_name) ||
+    (typeof user.user_metadata?.name === "string" && user.user_metadata.name) ||
     user.email ||
     "Conta";
   const initial = name.trim().charAt(0).toUpperCase() || "U";
 
   return (
-    <form action="/auth/signout" method="post" className="header-account-form">
-      <button type="submit" className="header-account-link is-authenticated" title={`Sair da conta ${name}`}>
-        <span aria-hidden="true">{initial}</span>
-        <strong>{name.split(" ")[0]}</strong>
-      </button>
-    </form>
+    <Link
+      className="header-account-link is-authenticated"
+      href="/minha-conta"
+      title={`Abrir a conta de ${name}`}
+      aria-label={`Abrir minha conta, conectado como ${name}`}
+    >
+      <span aria-hidden="true">{initial}</span>
+      <strong>{name.split(" ")[0]}</strong>
+    </Link>
   );
 }
