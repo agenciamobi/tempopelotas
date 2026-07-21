@@ -231,7 +231,7 @@ const getCachedPublicLiveStream = unstable_cache(
   async (handle: string): Promise<YouTubeLatestStream | null> => {
     const normalizedHandle = handle.startsWith("@") ? handle : `@${handle}`;
     const response = await fetch(
-      `${YOUTUBE_ORIGIN}/${encodeURIComponent(normalizedHandle)}/streams`,
+      `${YOUTUBE_ORIGIN}/${normalizedHandle}/streams`,
       {
         headers: {
           Accept: "text/html,application/xhtml+xml",
@@ -255,6 +255,17 @@ const getCachedPublicLiveStream = unstable_cache(
   { revalidate: 180 },
 );
 
+function logResolvedStream(
+  source: "manual" | "api" | "public-page",
+  stream: YouTubeLatestStream,
+) {
+  console.info("[youtube-laranjal] transmissão localizada", {
+    source,
+    status: stream.status,
+    videoId: stream.videoId,
+  });
+}
+
 export async function getLatestLaranjalStream() {
   const apiKey = process.env.YOUTUBE_API_KEY?.trim();
   const handle = process.env.YOUTUBE_CHANNEL_HANDLE?.trim() || "@praiadolaranjal";
@@ -263,13 +274,18 @@ export async function getLatestLaranjalStream() {
   );
 
   if (manualVideoId) {
-    return streamFromVideoId(manualVideoId);
+    const manualStream = streamFromVideoId(manualVideoId);
+    logResolvedStream("manual", manualStream);
+    return manualStream;
   }
 
   if (apiKey) {
     try {
       const apiStream = await getCachedLatestStream(apiKey, handle);
-      if (apiStream) return apiStream;
+      if (apiStream) {
+        logResolvedStream("api", apiStream);
+        return apiStream;
+      }
     } catch (error) {
       console.warn("[youtube-laranjal] API indisponível; tentando página pública", {
         error: error instanceof Error ? error.message : "unknown",
@@ -278,7 +294,17 @@ export async function getLatestLaranjalStream() {
   }
 
   try {
-    return await getCachedPublicLiveStream(handle);
+    const publicStream = await getCachedPublicLiveStream(handle);
+    if (publicStream) {
+      logResolvedStream("public-page", publicStream);
+      return publicStream;
+    }
+
+    console.info("[youtube-laranjal] nenhuma transmissão ao vivo localizada", {
+      source: "public-page",
+      apiConfigured: Boolean(apiKey),
+    });
+    return null;
   } catch (error) {
     console.warn("[youtube-laranjal] transmissão indisponível", {
       error: error instanceof Error ? error.message : "unknown",
