@@ -1,6 +1,7 @@
 import { HomeEditorialDashboard } from "@/components/home-editorial-dashboard-semantic";
 import { HomeSectionNavigation } from "@/components/home-section-navigation";
 import { InmetAlertsPanel } from "@/components/inmet-alerts-panel";
+import { SafetyAlertBanner } from "@/components/safety-alerts";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WeatherHero } from "@/components/weather-hero";
@@ -12,6 +13,7 @@ import { getGuaibaObservation } from "@/lib/guaiba-monitor";
 import { getInmetAlerts } from "@/lib/inmet-alerts";
 import { getLagoonMonitoringNetwork } from "@/lib/lagoon-monitoring-network";
 import { getLaranjalLevelData } from "@/lib/laranjal-level";
+import { getFeaturedSafetyBanner } from "@/lib/safety-banners";
 import { absoluteUrl } from "@/lib/site";
 import { getWeatherAiSummaries } from "@/lib/weather-ai-summary";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/lib/weather-insights";
@@ -81,6 +83,9 @@ export default async function Home() {
     pelotasOfficialAlerts.length > 0
       ? "home-editorial-main has-official-alerts"
       : "home-editorial-main";
+  const featuredSafetyBanner = getFeaturedSafetyBanner(
+    pelotasOfficialAlerts.length > 0,
+  );
 
   return (
     <>
@@ -109,6 +114,7 @@ export default async function Home() {
 
         <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
           <InmetAlertsPanel data={inmetAlerts} variant="home" />
+          <SafetyAlertBanner banner={featuredSafetyBanner} />
           <HomeSectionNavigation />
           <HomeEditorialDashboard
             weather={weather}

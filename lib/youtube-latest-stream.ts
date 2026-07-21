@@ -3,6 +3,7 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 
 const YOUTUBE_API = "https://www.googleapis.com/youtube/v3";
+const YOUTUBE_ORIGIN = "https://www.youtube.com";
 export const YOUTUBE_LARANJAL_CHANNEL_URL =
   "https://www.youtube.com/@praiadolaranjal/streams";
 
@@ -87,6 +88,65 @@ function thumbnailUrl(
   );
 }
 
+function streamFromVideoId(
+  videoId: string,
+  title = "Praia do Laranjal ao vivo",
+): YouTubeLatestStream {
+  return {
+    videoId,
+    title,
+    status: "live",
+    watchUrl: `${YOUTUBE_ORIGIN}/watch?v=${videoId}`,
+    embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`,
+    thumbnailUrl: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+    publishedAt: new Date().toISOString(),
+  };
+}
+
+function normalizeVideoId(value: string | undefined) {
+  const videoId = value?.trim();
+  return videoId && /^[A-Za-z0-9_-]{11}$/.test(videoId) ? videoId : null;
+}
+
+function decodeJsonText(value: string | undefined) {
+  if (!value) return null;
+
+  try {
+    return JSON.parse(`"${value.replace(/"/g, '\\"')}"`) as string;
+  } catch {
+    return value.replace(/\\u0026/g, "&").replace(/\\n/g, " ").trim();
+  }
+}
+
+function extractPublicLiveStream(html: string) {
+  const liveMarkers = [...html.matchAll(/"isLiveNow":true/g)];
+
+  for (const marker of liveMarkers) {
+    const markerIndex = marker.index ?? 0;
+    const start = Math.max(0, markerIndex - 12_000);
+    const context = html.slice(start, markerIndex + 2_000);
+    const videoMatches = [...context.matchAll(/"videoId":"([A-Za-z0-9_-]{11})"/g)];
+    const videoId = videoMatches.at(-1)?.[1];
+
+    if (!videoId) continue;
+
+    const videoIndex = context.lastIndexOf(`"videoId":"${videoId}"`);
+    const titleContext = context.slice(Math.max(0, videoIndex - 2_000), videoIndex + 4_000);
+    const title =
+      decodeJsonText(
+        titleContext.match(/"title":\{"runs":\[\{"text":"((?:\\.|[^"\\])*)"/)?.[1],
+      ) ??
+      decodeJsonText(
+        titleContext.match(/"title":\{"simpleText":"((?:\\.|[^"\\])*)"/)?.[1],
+      ) ??
+      "Praia do Laranjal ao vivo";
+
+    return streamFromVideoId(videoId, title);
+  }
+
+  return null;
+}
+
 const getCachedLatestStream = unstable_cache(
   async (apiKey: string, handle: string): Promise<YouTubeLatestStream | null> => {
     const channels = await youtubeRequest<ChannelResponse>(
@@ -157,7 +217,7 @@ const getCachedLatestStream = unstable_cache(
       videoId: selected.id,
       title: selected.snippet!.title!,
       status,
-      watchUrl: `https://www.youtube.com/watch?v=${selected.id}`,
+      watchUrl: `${YOUTUBE_ORIGIN}/watch?v=${selected.id}`,
       embedUrl: `https://www.youtube-nocookie.com/embed/${selected.id}`,
       thumbnailUrl: thumbnailUrl(selected.snippet?.thumbnails),
       publishedAt: selected.snippet!.publishedAt!,
@@ -167,14 +227,84 @@ const getCachedLatestStream = unstable_cache(
   { revalidate: 300 },
 );
 
+const getCachedPublicLiveStream = unstable_cache(
+  async (handle: string): Promise<YouTubeLatestStream | null> => {
+    const normalizedHandle = handle.startsWith("@") ? handle : `@${handle}`;
+    const response = await fetch(
+      `${YOUTUBE_ORIGIN}/${normalizedHandle}/streams`,
+      {
+        headers: {
+          Accept: "text/html,application/xhtml+xml",
+          "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.7",
+          "User-Agent":
+            "Mozilla/5.0 (compatible; TempoPelotas/1.0; +https://www.tempopelotas.com.br)",
+        },
+        next: { revalidate: 180 },
+        signal: AbortSignal.timeout(8_000),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Página pública do YouTube respondeu com status ${response.status}`);
+    }
+
+    const html = await response.text();
+    return extractPublicLiveStream(html);
+  },
+  ["youtube-laranjal-public-live-v1"],
+  { revalidate: 180 },
+);
+
+function logResolvedStream(
+  source: "manual" | "api" | "public-page",
+  stream: YouTubeLatestStream,
+) {
+  console.info("[youtube-laranjal] transmissão localizada", {
+    source,
+    status: stream.status,
+    videoId: stream.videoId,
+  });
+}
+
 export async function getLatestLaranjalStream() {
   const apiKey = process.env.YOUTUBE_API_KEY?.trim();
   const handle = process.env.YOUTUBE_CHANNEL_HANDLE?.trim() || "@praiadolaranjal";
+  const manualVideoId = normalizeVideoId(
+    process.env.YOUTUBE_LARANJAL_VIDEO_ID,
+  );
 
-  if (!apiKey) return null;
+  if (manualVideoId) {
+    const manualStream = streamFromVideoId(manualVideoId);
+    logResolvedStream("manual", manualStream);
+    return manualStream;
+  }
+
+  if (apiKey) {
+    try {
+      const apiStream = await getCachedLatestStream(apiKey, handle);
+      if (apiStream) {
+        logResolvedStream("api", apiStream);
+        return apiStream;
+      }
+    } catch (error) {
+      console.warn("[youtube-laranjal] API indisponível; tentando página pública", {
+        error: error instanceof Error ? error.message : "unknown",
+      });
+    }
+  }
 
   try {
-    return await getCachedLatestStream(apiKey, handle);
+    const publicStream = await getCachedPublicLiveStream(handle);
+    if (publicStream) {
+      logResolvedStream("public-page", publicStream);
+      return publicStream;
+    }
+
+    console.info("[youtube-laranjal] nenhuma transmissão ao vivo localizada", {
+      source: "public-page",
+      apiConfigured: Boolean(apiKey),
+    });
+    return null;
   } catch (error) {
     console.warn("[youtube-laranjal] transmissão indisponível", {
       error: error instanceof Error ? error.message : "unknown",
