@@ -1,7 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient, isSupabaseBrowserConfigured } from "@/lib/supabase/client";
+
+const AUTH_ERRORS: Record<string, string> = {
+  configuracao: "A autenticação não está disponível neste ambiente.",
+  codigo: "O Google não devolveu um código de autenticação válido.",
+  oauth: "Não foi possível concluir o login. Tente novamente.",
+};
 
 function GoogleIcon() {
   return (
@@ -19,12 +25,15 @@ export function GoogleLoginCard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get("erro");
+    if (code && AUTH_ERRORS[code]) {
+      setError(AUTH_ERRORS[code]);
+    }
+  }, []);
+
   const signIn = async () => {
     const supabase = createClient();
-    if (!supabase) {
-      setError("A autenticação ainda não está configurada neste ambiente.");
-      return;
-    }
 
     setLoading(true);
     setError(null);
@@ -60,7 +69,7 @@ export function GoogleLoginCard() {
       </button>
       {!configured ? (
         <p className="login-card__notice" role="status">
-          Configure NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY para liberar o login.
+          A autenticação está temporariamente indisponível.
         </p>
       ) : null}
       {error ? <p className="login-card__error" role="alert">{error}</p> : null}
