@@ -232,7 +232,10 @@ async function getPublicAccessToken() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ publicId: PUBLIC_CUSTOMER_ID }),
-    cache: "no-store",
+    next: {
+      revalidate: 300,
+      tags: ["laranjal-public-token"],
+    },
     signal: AbortSignal.timeout(8_000),
   });
 
@@ -273,7 +276,10 @@ export async function getLaranjalLevelData(): Promise<LaranjalLevelData> {
           Accept: "application/json",
           "X-Authorization": `Bearer ${token}`,
         },
-        cache: "no-store",
+        next: {
+          revalidate: 30,
+          tags: ["laranjal-level"],
+        },
         signal: AbortSignal.timeout(12_000),
       },
     );
