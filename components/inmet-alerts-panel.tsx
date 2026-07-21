@@ -60,6 +60,22 @@ function displayHeadline(alert: InmetAlert) {
   return headline;
 }
 
+function homeAreaLabel(alert: InmetAlert) {
+  if (alert.relevance === "pelotas") return "Inclui o município de Pelotas";
+  if (alert.relevance === "regional") return alert.areas[0] || "Áreas próximas à Zona Sul";
+  return alert.areas[0] || "Outras áreas do Rio Grande do Sul";
+}
+
+function homeAlertCountLabel(data: InmetAlertsData) {
+  if (data.counts.pelotas > 0) {
+    return `${data.counts.pelotas} ${data.counts.pelotas === 1 ? "aviso" : "avisos"} para Pelotas`;
+  }
+  if (data.counts.regional > 0) {
+    return `${data.counts.regional} ${data.counts.regional === 1 ? "aviso regional" : "avisos regionais"}`;
+  }
+  return `${data.counts.total} ${data.counts.total === 1 ? "aviso no RS" : "avisos no RS"}`;
+}
+
 function AlertRow({ alert }: { alert: InmetAlert }) {
   const areaText = alert.areas[0] ||
     (alert.municipalities.length ? `${alert.municipalities.length} municípios informados` : "Confira a área no aviso original");
@@ -95,17 +111,40 @@ function AlertRow({ alert }: { alert: InmetAlert }) {
 function HomePanel({ data }: { data: InmetAlertsData }) {
   if (data.status !== "live" || data.alerts.length === 0) return null;
 
-  const primary = data.alerts[0];
+  const primary = data.alerts.find((alert) => alert.relevance === "pelotas")
+    ?? data.alerts.find((alert) => alert.relevance === "regional")
+    ?? data.alerts[0];
 
   return (
     <section className={`home-inmet-alerts severity-${primary.severity}`} aria-labelledby="home-inmet-title">
-      <div className="home-inmet-alerts__mark" aria-hidden="true">!</div>
-      <div className="home-inmet-alerts__copy">
-        <span>Aviso oficial do INMET</span>
-        <h2 id="home-inmet-title">{relevanceSummary(data)}</h2>
-        <p>{primary.event} · {periodLabel(primary)}</p>
+      <div className="home-inmet-alerts__main">
+        <div className="home-inmet-alerts__mark" aria-hidden="true">
+          <small>INMET</small>
+          <strong>!</strong>
+        </div>
+        <div className="home-inmet-alerts__copy">
+          <div className="home-inmet-alerts__topline">
+            <span>Aviso oficial em destaque</span>
+            <b>{primary.severityLabel}</b>
+          </div>
+          <h2 id="home-inmet-title">{displayHeadline(primary)}</h2>
+          <div className="home-inmet-alerts__meta">
+            <span>
+              <small>Abrangência</small>
+              <strong>{homeAreaLabel(primary)}</strong>
+            </span>
+            <span>
+              <small>Validade</small>
+              <strong>{periodLabel(primary)}</strong>
+            </span>
+          </div>
+        </div>
       </div>
-      <Link href="/alertas">Ver detalhes e área afetada <span aria-hidden="true">→</span></Link>
+      <div className="home-inmet-alerts__aside">
+        <strong>{homeAlertCountLabel(data)}</strong>
+        <small>Consulte os demais avisos e as orientações oficiais.</small>
+        <Link href="/alertas">Ver todos os avisos <span aria-hidden="true">→</span></Link>
+      </div>
     </section>
   );
 }

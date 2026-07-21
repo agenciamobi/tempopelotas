@@ -63,6 +63,9 @@ export default async function Home() {
   const headerLevel = advisoryRank[officialLevel] > advisoryRank[advisory.level]
     ? officialLevel
     : advisory.level;
+  const mainClassName = pelotasOfficialAlerts.length > 0
+    ? "home-editorial-main has-official-alerts"
+    : "home-editorial-main";
 
   return (
     <>
@@ -81,7 +84,7 @@ export default async function Home() {
           officialAlertCount={pelotasOfficialAlerts.length}
         />
 
-        <main className="home-editorial-main" id="conteudo-principal" tabIndex={-1}>
+        <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
           <InmetAlertsPanel data={inmetAlerts} variant="home" />
           <HomeEditorialDashboard
             weather={weather}
