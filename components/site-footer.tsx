@@ -20,7 +20,7 @@ const footerGroups = [
     title: "Águas e alertas",
     links: [
       { label: "Situação hidrológica", href: "/situacao-hidrologica-pelotas" },
-      { label: "Nível da Lagoa dos Patos", href: "/nivel-da-lagoa-dos-patos-laranjal" },
+      { label: "Lagoa dos Patos no Laranjal", href: "/nivel-da-lagoa-dos-patos-laranjal" },
       { label: "Avisos meteorológicos", href: "/alertas" },
       { label: "Câmeras de Pelotas", href: "/cameras-ao-vivo-pelotas" },
     ],
@@ -77,18 +77,19 @@ export function SiteFooter({ source }: SiteFooterProps) {
   ).slice(0, 3);
 
   return (
-    <footer className="site-footer-v2">
-      <div className="portal-footer--theme">
-        <div className="portal-footer-atmosphere" aria-hidden="true">
+    <footer className="site-footer-v3">
+      <div className="editorial-footer">
+        <div className="editorial-footer__brand-line" aria-hidden="true">
+          <span />
+          <span />
           <span />
           <span />
         </div>
 
-        <section className="portal-footer-lead" aria-labelledby="portal-footer-title">
-          <div className="portal-footer-identity">
-            <Link className="portal-footer-brand" href="/" aria-label="TEMPO Pelotas — página inicial">
+        <section className="editorial-footer__lead" aria-labelledby="editorial-footer-title">
+          <div className="editorial-footer__lead-copy">
+            <Link className="editorial-footer__brand" href="/" aria-label="TEMPO Pelotas — página inicial">
               <img
-                className="portal-footer-logo"
                 src="/brand/tempo-pelotas-header"
                 alt="TEMPO Pelotas"
                 width={900}
@@ -98,64 +99,41 @@ export function SiteFooter({ source }: SiteFooterProps) {
               />
             </Link>
 
+            <span className="editorial-footer__eyebrow">Tempo e águas de Pelotas</span>
+            <h2 id="editorial-footer-title">
+              Informação local para acompanhar o dia e agir com antecedência.
+            </h2>
             <p>
-              Previsão do tempo, medições locais e níveis das águas para Pelotas e a Zona Sul do Rio
-              Grande do Sul.
+              Previsão, medições locais, avisos oficiais e situação das águas reunidos em uma leitura direta
+              para Pelotas e a Zona Sul do Rio Grande do Sul.
             </p>
-
-            <div className="portal-footer-identity-tags" aria-label="Abrangência da plataforma">
-              <span>Pelotas · RS</span>
-              <span>Tempo · Águas · Alertas</span>
-            </div>
           </div>
 
-          <div className="portal-footer-message">
-            <span className="portal-footer-kicker">Informação local sobre tempo e águas</span>
-            <h2 id="portal-footer-title">Consulte a previsão, os avisos e o nível das águas.</h2>
-            <p>
-              Veja as condições atuais, a previsão, a chuva, o vento e os níveis da Lagoa dos Patos
-              em um só lugar.
-            </p>
-
-            <div className="portal-footer-main-actions">
-              <Link className="portal-footer-primary-action" href="/alertas">
-                Ver avisos meteorológicos
-                <ArrowIcon />
-              </Link>
-              <Link className="portal-footer-secondary-action" href="/tempo-hoje-pelotas">
-                Ver previsão de hoje
-              </Link>
-            </div>
-          </div>
-
-          <aside className={`portal-footer-source-panel${source.isFallback ? " is-fallback" : ""}`}>
-            <div className="portal-footer-source-heading">
-              <span className="portal-footer-status-dot" aria-hidden="true" />
+          <div className="editorial-footer__lead-aside">
+            <div className={`editorial-footer__status${source.isFallback ? " is-fallback" : ""}`}>
+              <span aria-hidden="true" />
               <div>
                 <small>Estado dos dados</small>
                 <strong>{sourceStatus}</strong>
               </div>
             </div>
 
-            <ul aria-label="Fontes meteorológicas em uso">
-              {activeSources.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-
-            <Link href="/metodologia">
-              Entenda as fontes e a metodologia
-              <ArrowIcon />
-            </Link>
-          </aside>
+            <div className="editorial-footer__actions">
+              <Link className="editorial-footer__action editorial-footer__action--primary" href="/tempo-hoje-pelotas">
+                Ver previsão de hoje
+                <ArrowIcon />
+              </Link>
+              <Link className="editorial-footer__action" href="/alertas">
+                Consultar avisos
+              </Link>
+            </div>
+          </div>
         </section>
 
-        <div className="portal-footer-rule" aria-hidden="true" />
-
-        <section className="portal-footer-body" aria-label="Navegação e acessos prioritários">
-          <div className="portal-footer-directory">
+        <section className="editorial-footer__directory" aria-label="Navegação do portal">
+          <div className="editorial-footer__groups">
             {footerGroups.map((group) => (
-              <nav className="portal-footer-column" aria-label={group.title} key={group.title}>
+              <nav className="editorial-footer__group" aria-label={group.title} key={group.title}>
                 <strong>{group.title}</strong>
                 <ul>
                   {group.links.map((link) => (
@@ -171,11 +149,11 @@ export function SiteFooter({ source }: SiteFooterProps) {
             ))}
           </div>
 
-          <aside className="portal-footer-priority">
-            <span className="portal-footer-kicker">Acesso rápido</span>
+          <aside className="editorial-footer__operational" aria-label="Acessos operacionais">
+            <span className="editorial-footer__eyebrow">Acesso operacional</span>
 
-            <Link className="portal-footer-priority-card portal-footer-priority-card--alert" href="/alertas">
-              <span className="portal-footer-priority-icon">
+            <Link className="editorial-footer__operational-link" href="/alertas">
+              <span className="editorial-footer__operational-icon editorial-footer__operational-icon--alert">
                 <AlertIcon />
               </span>
               <span>
@@ -186,37 +164,53 @@ export function SiteFooter({ source }: SiteFooterProps) {
             </Link>
 
             <Link
-              className="portal-footer-priority-card portal-footer-priority-card--water"
+              className="editorial-footer__operational-link"
               href="/nivel-da-lagoa-dos-patos-laranjal"
             >
-              <span className="portal-footer-priority-icon">
+              <span className="editorial-footer__operational-icon editorial-footer__operational-icon--water">
                 <WaterIcon />
               </span>
               <span>
-                <small>Estação Laranjal</small>
-                <strong>Nível da Lagoa dos Patos</strong>
+                <small>Painel público da UFPel</small>
+                <strong>Lagoa dos Patos no Laranjal</strong>
               </span>
               <ArrowIcon />
             </Link>
           </aside>
         </section>
 
-        <section className="portal-footer-guidance" aria-label="Orientação de segurança">
-          <span aria-hidden="true">i</span>
-          <p>
-            O TEMPO Pelotas reúne dados para acompanhamento. Em situações de risco, siga sempre os
-            comunicados da Defesa Civil, do INMET e das autoridades locais.
-          </p>
-          <Link href="/metodologia">Ver fontes e limitações</Link>
-        </section>
+        <aside className="editorial-footer__mobi-banner" aria-label="Desenvolvimento de sites pela Agência MOBI">
+          <div className="editorial-footer__mobi-mark" aria-hidden="true">
+            <span>M</span>
+            <span>O</span>
+            <span>B</span>
+            <span>I</span>
+          </div>
+          <div className="editorial-footer__mobi-copy">
+            <small>Agência MOBI · Pelotas</small>
+            <strong>Desenvolvimento de sites inteligentes.</strong>
+            <p>Estratégia, tecnologia e presença digital para empresas que precisam crescer.</p>
+          </div>
+          <a href={MOBI_SITE_URL} target="_blank" rel="noreferrer">
+            Conheça a MOBI
+            <ArrowIcon />
+          </a>
+        </aside>
 
-        <div className="portal-footer-bottom">
-          <div className="portal-footer-copyright">
-            <strong>TEMPO Pelotas</strong>
-            <span>© {currentYear} · Informação meteorológica e hidrológica local.</span>
+        <section className="editorial-footer__transparency" aria-label="Fontes e orientação de segurança">
+          <div className="editorial-footer__sources">
+            <span>Fontes meteorológicas em uso</span>
+            <p>{activeSources.length ? activeSources.join(" · ") : "Fontes públicas meteorológicas"}</p>
           </div>
 
-          <nav className="portal-footer-legal" aria-label="Links institucionais">
+          <div className="editorial-footer__guidance">
+            <span aria-hidden="true">i</span>
+            <p>
+              Em situações de risco, siga os comunicados da Defesa Civil, do INMET e das autoridades locais.
+            </p>
+          </div>
+
+          <nav className="editorial-footer__legal" aria-label="Transparência e fontes">
             <Link href="/metodologia">Metodologia</Link>
             {source.url ? (
               <a href={source.url} target="_blank" rel="noreferrer">
@@ -224,11 +218,17 @@ export function SiteFooter({ source }: SiteFooterProps) {
               </a>
             ) : null}
           </nav>
+        </section>
 
-          <a className="portal-footer-mobi" href={MOBI_SITE_URL} target="_blank" rel="noreferrer">
-            <span>Estratégia e tecnologia</span>
-            <strong>MOBI ↗</strong>
-          </a>
+        <div className="editorial-footer__base">
+          <span>© {currentYear}</span>
+          <p>
+            Tempo Pelotas é um projeto do{" "}
+            <a href={MOBI_SITE_URL} target="_blank" rel="noreferrer">
+              Ecossistema MOBI - Marketing Inteligente
+            </a>
+          </p>
+          <Link href="/metodologia">Fontes e limitações</Link>
         </div>
       </div>
     </footer>
