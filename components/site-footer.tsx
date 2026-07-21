@@ -10,6 +10,7 @@ const footerGroups = [
     links: [
       { label: "Tempo agora", href: "/" },
       { label: "Previsão para hoje", href: "/tempo-hoje-pelotas" },
+      { label: "Previsão para amanhã", href: "/tempo-amanha-pelotas" },
       { label: "Próximos 7 dias", href: "/previsao-7-dias-pelotas" },
       { label: "Chuva em Pelotas", href: "/chuva-em-pelotas" },
       { label: "Vento em Pelotas", href: "/vento-em-pelotas" },
@@ -27,6 +28,7 @@ const footerGroups = [
   {
     title: "Dados e transparência",
     links: [
+      { label: "Clima em Pelotas", href: "/clima-em-pelotas" },
       { label: "Estação Embrapa", href: "/estacao-embrapa-pelotas" },
       { label: "Histórico climático", href: "/historico-climatico-pelotas" },
       { label: "Metodologia e fontes", href: "/metodologia" },
