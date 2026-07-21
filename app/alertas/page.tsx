@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ForecastPageShell } from "@/components/forecast-page-shell";
 import { InmetAlertsPanel } from "@/components/inmet-alerts-panel";
+import { SafetyChannelsDirectory } from "@/components/safety-alerts";
 import { getInmetAlerts } from "@/lib/inmet-alerts";
+import {
+  DEFESA_CIVIL_GUIDANCE_SOURCE,
+  SAFETY_BANNERS,
+} from "@/lib/safety-banners";
 import { formatMillimeters, getWeatherAdvisory } from "@/lib/weather-insights";
 import { getPelotasWeather } from "@/lib/weather-service";
 
@@ -61,6 +66,12 @@ export default async function AlertasPage() {
       }}
     >
       <InmetAlertsPanel data={inmetAlerts} />
+
+      <SafetyChannelsDirectory
+        banners={SAFETY_BANNERS}
+        sourceName={DEFESA_CIVIL_GUIDANCE_SOURCE.name}
+        sourceUrl={DEFESA_CIVIL_GUIDANCE_SOURCE.url}
+      />
 
       <section className={`advisory-panel advisory-panel--${advisory.level}`} aria-labelledby="advisory-title">
         <div className="advisory-symbol" aria-hidden="true">
