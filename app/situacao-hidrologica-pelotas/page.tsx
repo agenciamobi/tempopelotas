@@ -11,48 +11,41 @@ import {
   SGB_SACE_URL,
 } from "@/lib/hydrology";
 import { getLagoonMonitoringNetwork } from "@/lib/lagoon-monitoring-network";
-import { getLaranjalLevelData } from "@/lib/laranjal-level";
 import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
 import { getNivelGuaibaRegionalObservations } from "@/lib/nivel-guaiba-regional";
 import { absoluteUrl } from "@/lib/site";
 import { getPelotasWeather } from "@/lib/weather-service";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Situação das águas em Pelotas e na Lagoa dos Patos",
   description:
-    "Acompanhe primeiro o nível no Laranjal e depois a rede da Lagoa dos Patos, o Guaíba, o vento e a chuva para entender melhor a situação das águas em Pelotas.",
+    "Consulte o painel local da UFPel e acompanhe o contexto da Lagoa dos Patos, do Guaíba e das cidades monitoradas pelo NivelGuaíba.",
   alternates: { canonical: "/situacao-hidrologica-pelotas" },
   openGraph: {
     title: "Situação das águas em Pelotas",
     description:
-      "Veja primeiro o nível no Laranjal e depois a rede da Lagoa dos Patos, o Guaíba e as condições que podem influenciar Pelotas.",
+      "Painel local da UFPel e contexto regional da Lagoa dos Patos e do Guaíba.",
     url: "/situacao-hidrologica-pelotas",
   },
 };
 
 export default async function SituacaoHidrologicaPelotasPage() {
-  const [weather, guaiba, guaibaRegional, lagoonMonitoring, laranjalLevel] =
+  const [weather, guaiba, guaibaRegional, lagoonMonitoring] =
     await Promise.all([
       getPelotasWeather(),
       getGuaibaObservation(),
       getNivelGuaibaRegionalObservations(),
       getLagoonMonitoringNetwork(),
-      getLaranjalLevelData(),
     ]);
-  const today = weather.daily[0];
-  const maxHourlyGust = Math.max(
-    weather.current.windGust,
-    ...weather.hourly.map((hour) => hour.windGust),
-  );
 
   const datasetSchema = {
     "@context": "https://schema.org",
     "@type": "Dataset",
     name: "Informações sobre as águas relacionadas a Pelotas",
     description:
-      "Informações públicas sobre o nível no Laranjal, o Guaíba, a Lagoa dos Patos e outros pontos monitorados no Rio Grande do Sul.",
+      "Referências públicas sobre o painel local da UFPel, o Guaíba, a Lagoa dos Patos e outros pontos monitorados no Rio Grande do Sul.",
     url: absoluteUrl("/situacao-hidrologica-pelotas"),
     spatialCoverage: "Pelotas, Lagoa dos Patos e Rio Grande do Sul",
     isAccessibleForFree: true,
@@ -60,12 +53,11 @@ export default async function SituacaoHidrologicaPelotasPage() {
       "@type": "Organization",
       name: "TEMPO Pelotas",
     },
+    isBasedOn: [
+      LAGOON_LEVEL_SOURCE.dashboardUrl,
+      "https://nivelguaiba.com.br/",
+    ],
     distribution: [
-      {
-        "@type": "DataDownload",
-        encodingFormat: "application/json",
-        contentUrl: absoluteUrl("/api/hydrology/laranjal"),
-      },
       {
         "@type": "DataDownload",
         encodingFormat: "application/json",
@@ -89,7 +81,7 @@ export default async function SituacaoHidrologicaPelotasPage() {
       weather={weather}
       eyebrow="Águas e segurança em Pelotas"
       title="Situação das águas"
-      description="Comece pela medição local do Laranjal. Depois acompanhe a Lagoa dos Patos, o Guaíba e os demais fatores que ajudam a compreender o que pode afetar as áreas mais baixas de Pelotas."
+      description="Comece pelo painel público da UFPel para o Laranjal. Depois consulte a rede da Lagoa dos Patos e os estados regionais informados pelo NivelGuaíba."
       currentPath="/situacao-hidrologica-pelotas"
     >
       <script
@@ -104,15 +96,14 @@ export default async function SituacaoHidrologicaPelotasPage() {
           <span className="eyebrow">Ordem recomendada</span>
           <strong>Leia do local para o regional</strong>
           <p>
-            O nível medido em Pelotas tem prioridade. As demais redes ajudam a explicar o contexto, mas não
-            substituem a leitura local nem os avisos oficiais.
+            O painel da UFPel é a referência local exibida para o Laranjal. As redes regionais ajudam a compreender o contexto e mantêm os critérios das respectivas fontes.
           </p>
         </div>
         <div className="hydrology-page-index-links">
           <a href="#nivel-laranjal">
             <span>01</span>
             <strong>Pelotas e Laranjal</strong>
-            <small>Medição local prioritária</small>
+            <small>Painel público da UFPel</small>
           </a>
           <a href="#rede-lagoa">
             <span>02</span>
@@ -122,11 +113,11 @@ export default async function SituacaoHidrologicaPelotasPage() {
           <a href="#guaiba-regional">
             <span>03</span>
             <strong>Guaíba e região</strong>
-            <small>Contexto de entrada da lagoa</small>
+            <small>Estados informados pelo NivelGuaíba</small>
           </a>
           <a href="#interpretacao">
             <span>04</span>
-            <strong>Interpretação</strong>
+            <strong>Contexto</strong>
             <small>Caminho da água e segurança</small>
           </a>
         </div>
@@ -139,56 +130,48 @@ export default async function SituacaoHidrologicaPelotasPage() {
       >
         <div className="section-heading hydrology-priority-heading">
           <div>
-            <span className="eyebrow">01 · Prioridade local</span>
-            <h2 id="hydrology-local-title">Comece pelo nível medido em Pelotas</h2>
+            <span className="eyebrow">01 · Fonte local</span>
+            <h2 id="hydrology-local-title">Painel da UFPel para o Laranjal</h2>
           </div>
           <p>
-            A estação do Laranjal é a referência mais próxima para acompanhar a situação local. Observe o
-            valor, a tendência, o horário da medição, o vento e a chuva antes de consultar o cenário regional.
+            O TEMPO Pelotas incorpora o painel público sem recalcular nível, tendência, cota ou situação de risco para a estação local.
           </p>
         </div>
 
         <div className="hydrology-priority-grid">
           <PelotasHydrologyWidget
             headingLevel="h3"
-            initialData={laranjalLevel}
-            weather={{
-              windSpeed: weather.current.windSpeed,
-              windDirection: weather.current.windDirection,
-              windGust: maxHourlyGust,
-              precipitation: today?.precipitation ?? 0,
-            }}
             className="pelotas-hydrology-widget--priority"
           />
 
-          <aside className="hydrology-priority-context" aria-label="Como interpretar a medição local">
-            <span className="eyebrow">Como ler este painel</span>
-            <h3>A medição local vem antes de qualquer comparação</h3>
+          <aside className="hydrology-priority-context" aria-label="Como consultar o painel local">
+            <span className="eyebrow">Como consultar</span>
+            <h3>Confirme as informações na própria fonte</h3>
             <ol>
               <li>
                 <span>1</span>
                 <div>
                   <strong>Confira o horário</strong>
-                  <p>Uma leitura antiga pode não representar a condição atual.</p>
+                  <p>Use a atualização informada dentro do painel da UFPel.</p>
                 </div>
               </li>
               <li>
                 <span>2</span>
                 <div>
-                  <strong>Observe a tendência</strong>
-                  <p>A sequência de subidas ou descidas importa mais que uma leitura isolada.</p>
+                  <strong>Leia os números no painel</strong>
+                  <p>Os valores e eventuais indicadores pertencem à fonte incorporada.</p>
                 </div>
               </li>
               <li>
                 <span>3</span>
                 <div>
-                  <strong>Considere vento e chuva</strong>
-                  <p>Esses fatores podem empurrar, represar ou acelerar a movimentação da água.</p>
+                  <strong>Siga os avisos oficiais</strong>
+                  <p>O painel apoia o acompanhamento, mas não substitui Defesa Civil e autoridades locais.</p>
                 </div>
               </li>
             </ol>
             <a href={LAGOON_LEVEL_SOURCE.dashboardUrl} target="_blank" rel="noreferrer">
-              Abrir medidor original do Laranjal
+              Abrir painel original do Laranjal
               <span aria-hidden="true">↗</span>
             </a>
           </aside>
@@ -200,7 +183,7 @@ export default async function SituacaoHidrologicaPelotasPage() {
           <span>02</span>
           <div>
             <small>Rede ao longo da lagoa</small>
-            <strong>Compare Pelotas com pontos ao norte e ao sul</strong>
+            <strong>Leituras de pontos ao norte e ao sul de Pelotas</strong>
           </div>
         </div>
         <LagoonMonitoringNetwork data={lagoonMonitoring} variant="full" />
@@ -214,19 +197,17 @@ export default async function SituacaoHidrologicaPelotasPage() {
         <div className="section-heading">
           <div>
             <span className="eyebrow">03 · Contexto regional</span>
-            <h2 id="hydrology-guaiba-title">Guaíba e outros pontos do Rio Grande do Sul</h2>
+            <h2 id="hydrology-guaiba-title">Guaíba e cidades monitoradas</h2>
           </div>
           <p>
-            O Guaíba é uma das entradas da Lagoa dos Patos. Os demais pontos ajudam a acompanhar o cenário
-            estadual, mas cada cidade possui régua, referência e dinâmica próprias.
+            Nível, cota, estado e indicação de subida ou descida para esses locais são apresentados conforme o NivelGuaíba e as fontes identificadas pelo serviço.
           </p>
         </div>
 
         <div className="hydrology-guaiba-note">
-          <strong>Não compare apenas os números absolutos</strong>
+          <strong>Cada cidade possui referência própria</strong>
           <p>
-            Use principalmente a tendência de cada local — subindo, estável ou baixando — e sempre verifique
-            data, horário e fonte da medição.
+            Não transfira a cota ou o valor absoluto de uma estação para outra. Consulte data, horário, fonte e situação informada para cada local.
           </p>
         </div>
 
@@ -240,12 +221,11 @@ export default async function SituacaoHidrologicaPelotasPage() {
       >
         <div className="section-heading">
           <div>
-            <span className="eyebrow">04 · Interpretação</span>
-            <h2 id="hydrology-path-title">Como a água pode influenciar Pelotas</h2>
+            <span className="eyebrow">04 · Contexto geográfico</span>
+            <h2 id="hydrology-path-title">Como as águas se relacionam com Pelotas</h2>
           </div>
           <p>
-            A água que chega ao Laranjal não vem apenas do Guaíba. Rios, arroios, chuva, vento e a saída para
-            o oceano atuam em conjunto e podem alterar o comportamento da lagoa.
+            Guaíba, rios, arroios, chuva, vento, Canal São Gonçalo e a saída para o oceano integram um sistema amplo. Esta seção explica relações gerais, sem produzir previsão hidrológica.
           </p>
         </div>
 
@@ -267,8 +247,7 @@ export default async function SituacaoHidrologicaPelotasPage() {
             <h2 id="station-network-title">Estações relacionadas à Lagoa dos Patos</h2>
           </div>
           <p>
-            Consulte a fonte original quando precisar confirmar uma medição. Cada estação pode utilizar
-            metodologia, cota e referencial próprios.
+            Consulte a fonte original para confirmar uma medição. Cada estação pode utilizar metodologia, cota e referencial próprios.
           </p>
         </div>
 
@@ -295,26 +274,25 @@ export default async function SituacaoHidrologicaPelotasPage() {
             <h2 id="hydrology-guidance-title">O que observar antes de agir</h2>
           </div>
           <p>
-            Não tome decisões por uma única leitura. Acompanhe a evolução, confirme a atualização e siga as
-            orientações emitidas pelas autoridades responsáveis.
+            Não tome decisões por uma única leitura. Confirme a atualização, consulte a fonte original e siga orientações emitidas pelas autoridades responsáveis.
           </p>
         </div>
 
         <div className="methodology-rules-grid hydrology-guidance-grid">
           <article>
-            <h3>Veja se o nível continua subindo</h3>
-            <p>Uma sequência de altas merece mais atenção do que uma pequena mudança isolada.</p>
+            <h3>Confira a fonte de cada estado</h3>
+            <p>Normal, atenção, alerta ou inundação devem permanecer associados ao serviço que publicou a classificação.</p>
           </article>
           <article>
-            <h3>Considere todos os rios e arroios</h3>
-            <p>O Guaíba é importante, mas outras bacias também alimentam a Lagoa dos Patos.</p>
+            <h3>Considere rios, lagoas e arroios</h3>
+            <p>O Guaíba é relevante, mas outras bacias também se relacionam com a Lagoa dos Patos.</p>
           </article>
           <article>
-            <h3>Observe vento, chuva e saída para o mar</h3>
-            <p>Esses fatores podem alterar a velocidade e a direção da movimentação da água.</p>
+            <h3>Observe vento e chuva</h3>
+            <p>Os dados meteorológicos ajudam a contextualizar o cenário, sem substituir uma análise hidrológica oficial.</p>
           </article>
           <article>
-            <h3>Confira a data e o horário</h3>
+            <h3>Confira data e horário</h3>
             <p>Sensores podem atrasar ou ficar fora do ar. Verifique sempre a atualização.</p>
           </article>
           <article>
@@ -325,10 +303,9 @@ export default async function SituacaoHidrologicaPelotasPage() {
 
         <div className="hydrology-final-panel">
           <div className="lagoon-disclaimer">
-            <strong>O portal ajuda no acompanhamento</strong>
+            <strong>O portal organiza fontes públicas</strong>
             <p>
-              O TEMPO Pelotas não determina quando uma área vai alagar e não emite ordem de saída. Em
-              situações de risco, siga sempre os avisos oficiais.
+              O TEMPO Pelotas não determina quando uma área vai alagar e não emite ordem de saída. Em situações de risco, siga sempre os avisos oficiais.
             </p>
           </div>
 
