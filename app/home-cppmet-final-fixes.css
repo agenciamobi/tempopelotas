@@ -1,0 +1,23 @@
+/* Ordena o resumo de amanhã antes dos links finais da seção. */
+.site-shell--home-editorial .home-next-days__heading {
+  order: 1;
+}
+
+.site-shell--home-editorial .home-next-days__list {
+  order: 2;
+}
+
+.site-shell--home-editorial .home-next-days__tomorrow-summary {
+  order: 3;
+}
+
+.site-shell--home-editorial .home-next-days > .home-inline-links {
+  order: 4;
+}
+
+/* Mantém a profundidade do card escuro junto da faixa semântica. */
+.site-shell--home-editorial .home-water-focus {
+  box-shadow:
+    inset 4px 0 0 var(--home-water-state-accent),
+    0 28px 72px rgba(3, 18, 29, 0.16) !important;
+}
