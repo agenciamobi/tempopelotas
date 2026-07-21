@@ -93,6 +93,7 @@ import "./home-explore-refinement-v19.css";
 import "./home-final-cohesion-v20.css";
 import "./home-operational-bridge-v21.css";
 import "./home-operational-bridge-v21-fix.css";
+import "./weather-ai-summary.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

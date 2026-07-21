@@ -6,16 +6,19 @@ import {
   type ReactNode,
 } from "react";
 import { HomeEditorialDashboard as HomeEditorialDashboardBase } from "@/components/home-editorial-dashboard";
+import { HomeWeatherAiSummaries } from "@/components/weather-ai-summary";
 import { WeatherIcon } from "@/components/weather-icon";
 import type { EmbrapaObservationData } from "@/lib/embrapa-observation";
 import type { GuaibaObservationData } from "@/lib/guaiba-monitor";
 import type { LagoonMonitoringNetworkData } from "@/lib/lagoon-monitoring-network";
 import type { LaranjalLevelData } from "@/lib/laranjal-level";
+import type { WeatherAiSummaries } from "@/lib/weather-ai-summary";
 import type { WeatherData } from "@/lib/weather-data";
 import type { AdvisoryLevel } from "@/lib/weather-insights";
 
 type HomeEditorialDashboardProps = {
   weather: WeatherData;
+  summaries: WeatherAiSummaries;
   advisoryLevel?: AdvisoryLevel;
   observation: EmbrapaObservationData;
   laranjal: LaranjalLevelData;
@@ -188,13 +191,25 @@ function transformDashboardNode(
   );
 }
 
-export function HomeEditorialDashboard(props: HomeEditorialDashboardProps) {
-  const dashboard = HomeEditorialDashboardBase(props);
-
-  return transformDashboardNode(dashboard, {
+export function HomeEditorialDashboard({
+  summaries,
+  ...dashboardProps
+}: HomeEditorialDashboardProps) {
+  const dashboard = HomeEditorialDashboardBase(dashboardProps);
+  const transformedDashboard = transformDashboardNode(dashboard, {
     currentHour: false,
     laranjalUnavailable: false,
     stationUnavailable: false,
     guaibaContext: false,
   });
+
+  return (
+    <>
+      <HomeWeatherAiSummaries
+        weather={dashboardProps.weather}
+        summaries={summaries}
+      />
+      {transformedDashboard}
+    </>
+  );
 }

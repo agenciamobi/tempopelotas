@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { WeatherNarrativeBand } from "@/components/weather-ai-summary";
 import { WeatherNavigation } from "@/components/weather-navigation";
+import { getWeatherAiSummaries } from "@/lib/weather-ai-summary";
 import type { WeatherData } from "@/lib/weather-data";
 import { getWeatherAdvisory } from "@/lib/weather-insights";
 
@@ -87,7 +89,7 @@ const contextualHeroStats: Record<string, HeroStat> = {
   },
 };
 
-export function ForecastPageShell({
+export async function ForecastPageShell({
   weather,
   eyebrow,
   title,
@@ -98,6 +100,14 @@ export function ForecastPageShell({
 }: ForecastPageShellProps) {
   const advisoryLevel = getWeatherAdvisory(weather).level;
   const topicKey = currentPath.split("/").filter(Boolean)[0] ?? "geral";
+  const summaryPeriod = currentPath === "/tempo-hoje-pelotas"
+    ? "today"
+    : currentPath === "/tempo-amanha-pelotas"
+      ? "tomorrow"
+      : null;
+  const summaries = summaryPeriod
+    ? await getWeatherAiSummaries(weather)
+    : null;
   const defaultWeatherStat: HeroStat = {
     label: `${weather.current.updatedAt} · ${weather.current.source.name}`,
     value: `${weather.current.temperature}°`,
@@ -127,6 +137,13 @@ export function ForecastPageShell({
             <small>{resolvedHeroStat.detail}</small>
           </div>
         </section>
+
+        {summaryPeriod && summaries ? (
+          <WeatherNarrativeBand
+            period={summaryPeriod}
+            narrative={summaryPeriod === "today" ? summaries.today : summaries.tomorrow}
+          />
+        ) : null}
 
         {children}
 
