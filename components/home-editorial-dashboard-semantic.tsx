@@ -15,6 +15,11 @@ import type { LaranjalLevelData } from "@/lib/laranjal-level";
 import type { WeatherAiSummaries } from "@/lib/weather-ai-summary";
 import type { WeatherData } from "@/lib/weather-data";
 import type { AdvisoryLevel } from "@/lib/weather-insights";
+import {
+  getWaterLevelVisualState,
+  type WaterLevelVisualState,
+  waterLevelStateClass,
+} from "@/lib/water-level-state";
 
 type HomeEditorialDashboardProps = {
   weather: WeatherData;
@@ -33,10 +38,21 @@ type SemanticContext = {
   guaibaContext: boolean;
 };
 
+type WaterVisualStates = {
+  laranjal: WaterLevelVisualState;
+  guaiba: WaterLevelVisualState;
+};
+
 type ElementProps = Record<string, unknown> & {
   children?: ReactNode;
   className?: string;
   title?: string;
+};
+
+const stationStateLabels: Record<string, string> = {
+  "Acima do nível de atenção": "Acima da cota local",
+  "Perto do nível de atenção": "Próximo da cota local",
+  "Sem sinal de atenção": "Abaixo da cota local",
 };
 
 function getTextContent(node: ReactNode): string {
@@ -59,6 +75,10 @@ function hasClass(className: string, token: string) {
   return className.split(/\s+/).includes(token);
 }
 
+function appendClass(className: string, token: string) {
+  return className ? `${className} ${token}` : token;
+}
+
 function normalizeTextNode(node: ReactNode): ReactNode {
   if (typeof node !== "string") return node;
   if (node.trim() === "por volta de Agora") return "neste momento";
@@ -68,6 +88,7 @@ function normalizeTextNode(node: ReactNode): ReactNode {
 function transformDashboardNode(
   node: ReactNode,
   context: SemanticContext,
+  waterStates: WaterVisualStates,
 ): ReactNode {
   if (typeof node === "string") return normalizeTextNode(node);
 
@@ -110,7 +131,7 @@ function transformDashboardNode(
     return cloneElement(
       node as ReactElement<ElementProps>,
       undefined,
-      transformDashboardNode(timeLabel, nextContext),
+      transformDashboardNode(timeLabel, nextContext, waterStates),
     );
   }
 
@@ -153,36 +174,18 @@ function transformDashboardNode(
   }
 
   const textContent = getTextContent(props.children);
-
-  if (
-    isDomElement &&
-    node.type === "span" &&
-    !nextContext.guaibaContext &&
-    (hasClass(className, "is-rising") ||
-      hasClass(className, "is-falling") ||
-      hasClass(className, "is-stable"))
-  ) {
-    return cloneElement(
-      node as ReactElement<ElementProps>,
-      { className: "is-source-neutral" },
-      "Variação disponível na fonte",
-    );
-  }
+  const normalizedText = textContent.trim();
 
   if (
     isDomElement &&
     node.type === "small" &&
     !nextContext.guaibaContext &&
-    [
-      "Acima do nível de atenção",
-      "Perto do nível de atenção",
-      "Sem sinal de atenção",
-    ].includes(textContent.trim())
+    stationStateLabels[normalizedText]
   ) {
     return cloneElement(
       node as ReactElement<ElementProps>,
       undefined,
-      "Sem classificação própria",
+      stationStateLabels[normalizedText],
     );
   }
 
@@ -214,15 +217,24 @@ function transformDashboardNode(
   }
 
   const transformedChildren = Children.map(props.children, (child) =>
-    transformDashboardNode(child, nextContext),
+    transformDashboardNode(child, nextContext, waterStates),
   );
 
-  const normalizedClassName = nextContext.guaibaContext
-    ? className
-    : className
-        .split(/\s+/)
-        .filter((token) => !token.startsWith("risk-"))
-        .join(" ");
+  let normalizedClassName = className;
+
+  if (hasClass(className, "home-water-focus")) {
+    normalizedClassName = appendClass(
+      normalizedClassName,
+      waterLevelStateClass(waterStates.laranjal),
+    );
+  }
+
+  if (hasClass(className, "home-water-context")) {
+    normalizedClassName = appendClass(
+      normalizedClassName,
+      waterLevelStateClass(waterStates.guaiba),
+    );
+  }
 
   return cloneElement(
     node as ReactElement<ElementProps>,
@@ -238,12 +250,32 @@ export function HomeEditorialDashboard({
   ...dashboardProps
 }: HomeEditorialDashboardProps) {
   const dashboard = HomeEditorialDashboardBase(dashboardProps);
-  const transformedDashboard = transformDashboardNode(dashboard, {
-    currentHour: false,
-    laranjalUnavailable: false,
-    stationUnavailable: false,
-    guaibaContext: false,
-  });
+  const waterStates: WaterVisualStates = {
+    laranjal: getWaterLevelVisualState({
+      rate: dashboardProps.laranjal.trendCmPerHour,
+      available:
+        dashboardProps.laranjal.status !== "unavailable" &&
+        dashboardProps.laranjal.currentLevel !== null,
+    }),
+    guaiba: getWaterLevelVisualState({
+      rate: dashboardProps.guaiba.trendCmPerHour,
+      available:
+        dashboardProps.guaiba.status !== "unavailable" &&
+        dashboardProps.guaiba.currentLevel !== null,
+      currentLevel: dashboardProps.guaiba.currentLevel,
+      threshold: dashboardProps.guaiba.floodReference,
+    }),
+  };
+  const transformedDashboard = transformDashboardNode(
+    dashboard,
+    {
+      currentHour: false,
+      laranjalUnavailable: false,
+      stationUnavailable: false,
+      guaibaContext: false,
+    },
+    waterStates,
+  );
 
   return (
     <>
