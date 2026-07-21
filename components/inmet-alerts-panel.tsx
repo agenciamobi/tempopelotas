@@ -68,7 +68,7 @@ function homeAreaLabel(alert: InmetAlert) {
 
 function homeAlertCountLabel(data: InmetAlertsData) {
   if (data.counts.pelotas > 0) {
-    return `${data.counts.pelotas} ${data.counts.pelotas === 1 ? "aviso" : "avisos"} para Pelotas`;
+    return `${data.counts.pelotas} ${data.counts.pelotas === 1 ? "aviso" : "avisos"} incluindo Pelotas`;
   }
   if (data.counts.regional > 0) {
     return `${data.counts.regional} ${data.counts.regional === 1 ? "aviso regional" : "avisos regionais"}`;
@@ -124,7 +124,7 @@ function HomePanel({ data }: { data: InmetAlertsData }) {
         </div>
         <div className="home-inmet-alerts__copy">
           <div className="home-inmet-alerts__topline">
-            <span>Aviso oficial em destaque</span>
+            <span>Aviso oficial do INMET</span>
             <b>{primary.severityLabel}</b>
           </div>
           <h2 id="home-inmet-title">{displayHeadline(primary)}</h2>
@@ -141,9 +141,9 @@ function HomePanel({ data }: { data: InmetAlertsData }) {
         </div>
       </div>
       <div className="home-inmet-alerts__aside">
-        <strong>{homeAlertCountLabel(data)}</strong>
-        <small>Consulte os demais avisos e as orientações oficiais.</small>
-        <Link href="/alertas">Ver todos os avisos <span aria-hidden="true">→</span></Link>
+        <strong>Áreas e orientações oficiais</strong>
+        <small>{homeAlertCountLabel(data)}</small>
+        <Link href="/alertas">Consultar avisos <span aria-hidden="true">→</span></Link>
       </div>
     </section>
   );
