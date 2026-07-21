@@ -46,7 +46,7 @@ function formatUpdatedAt(value: string | null) {
 function getRiskLabel(observation: LagoonMonitoringObservation) {
   if (observation.status === "unavailable") return "Indisponível";
   if (observation.status === "stale") return "Leitura atrasada";
-  if (observation.risk === "flooding") return "Acima da cota";
+  if (observation.risk === "flooding") return "Na cota ou acima";
   if (observation.risk === "attention") return "Próximo da cota";
   return "Abaixo da cota";
 }
@@ -56,17 +56,26 @@ function getDistanceLabel(observation: LagoonMonitoringObservation) {
   if (distance === null) return "Sem comparação disponível";
 
   if (distance > 0) {
-    return `${formatLevel(distance)} cm abaixo da cota local`;
+    return `${formatLevel(distance)} cm abaixo da cota de inundação informada`;
   }
 
   if (distance < 0) {
-    return `${formatLevel(Math.abs(distance))} cm acima da cota local`;
+    return `${formatLevel(Math.abs(distance))} cm acima da cota de inundação informada`;
   }
 
-  return "Na cota de inundação local";
+  return "Na cota de inundação informada pela fonte";
 }
 
 function getTrend(observation: LagoonMonitoringObservation) {
+  if (observation.status === "stale") {
+    return {
+      direction: "unavailable" as const,
+      symbol: "·",
+      label: "Sem tendência atual",
+      detail: "leitura atrasada",
+    };
+  }
+
   const rate = observation.trendCmPerHour;
   const direction = getWaterLevelTrendDirection(rate);
 
@@ -140,6 +149,16 @@ function buildChart(observation: LagoonMonitoringObservation) {
   };
 }
 
+function networkSummary(data: LagoonMonitoringNetworkData) {
+  if (data.available === 0) return "Nenhuma estação com leitura disponível";
+  if (data.live === data.total) return `${data.live}/${data.total} estações atualizadas`;
+  if (data.live > 0 && data.stale > 0) {
+    return `${data.live} atualizadas · ${data.stale} atrasadas`;
+  }
+  if (data.live > 0) return `${data.live}/${data.total} estações atualizadas`;
+  return `${data.stale} estações com leitura atrasada`;
+}
+
 export function LagoonMonitoringNetwork({
   data,
   variant = "full",
@@ -156,14 +175,16 @@ export function LagoonMonitoringNetwork({
     >
       <div className="lagoon-monitoring-heading">
         <div>
-          <span className="eyebrow">FURG & Portos RS</span>
+          <span className="eyebrow">FURG &amp; Portos RS</span>
           <h3 id={`lagoon-monitoring-title-${variant}`}>
-            {compact ? "Níveis ao longo da Lagoa dos Patos" : "Rede de Monitoramento da Lagoa dos Patos"}
+            {compact
+              ? "Níveis ao longo da Lagoa dos Patos"
+              : "Rede de Monitoramento da Lagoa dos Patos"}
           </h3>
           <p>
             {compact
               ? "Compare as leituras mais recentes de cinco pontos monitorados entre o norte e o sul da lagoa."
-              : "Leituras diretas da API pública dos linígrafos, com série recente, tendência e comparação com a cota de inundação de cada local."}
+              : "Leituras da API pública dos linígrafos, com série recente, tendência calculada e comparação com as cotas de inundação informadas pela própria fonte."}
           </p>
         </div>
         <a href={data.source.url} target="_blank" rel="noreferrer">
@@ -174,9 +195,7 @@ export function LagoonMonitoringNetwork({
 
       <div className="lagoon-monitoring-summary" role="status">
         <span className="lagoon-monitoring-summary-dot" aria-hidden="true" />
-        <strong>
-          {data.available}/{data.total} estações com leitura
-        </strong>
+        <strong>{networkSummary(data)}</strong>
         <small>
           {data.latestUpdatedAt
             ? `Leitura mais recente: ${formatUpdatedAt(data.latestUpdatedAt)}`
@@ -186,17 +205,18 @@ export function LagoonMonitoringNetwork({
 
       <div className="lagoon-monitoring-grid">
         {data.observations.map((observation) => {
-          const available = observation.currentLevelCm !== null;
+          const hasReading = observation.currentLevelCm !== null;
+          const isCurrent = hasReading && observation.status === "live";
           const progress = Math.max(
             0,
             Math.min(observation.floodThresholdPercentage ?? 0, 100),
           );
           const trend = getTrend(observation);
           const visualState = getWaterLevelVisualState({
-            rate: observation.trendCmPerHour,
-            available,
-            currentLevel: observation.currentLevelCm,
-            threshold: observation.floodLevelCm,
+            rate: isCurrent ? observation.trendCmPerHour : null,
+            available: isCurrent,
+            currentLevel: isCurrent ? observation.currentLevelCm : null,
+            threshold: isCurrent ? observation.floodLevelCm : null,
           });
           const chart = compact ? null : buildChart(observation);
 
@@ -215,7 +235,7 @@ export function LagoonMonitoringNetwork({
                 <span>{getRiskLabel(observation)}</span>
               </div>
 
-              {available ? (
+              {hasReading ? (
                 <>
                   <div className="lagoon-monitoring-reading-row">
                     <div className="lagoon-monitoring-reading">
@@ -239,7 +259,7 @@ export function LagoonMonitoringNetwork({
                   </p>
                   <div
                     className="lagoon-monitoring-progress"
-                    aria-label={`${formatLevel(observation.floodThresholdPercentage)}% da cota de inundação local`}
+                    aria-label={`${formatLevel(observation.floodThresholdPercentage)}% da cota de inundação informada pela fonte`}
                   >
                     <span style={{ width: `${progress}%` }} />
                   </div>
@@ -271,9 +291,11 @@ export function LagoonMonitoringNetwork({
                     </div>
                   ) : null}
 
-                  <dl className={`lagoon-monitoring-metrics${compact ? " is-compact" : ""}`}>
+                  <dl
+                    className={`lagoon-monitoring-metrics${compact ? " is-compact" : ""}`}
+                  >
                     <div>
-                      <dt>Cota local</dt>
+                      <dt>Cota informada</dt>
                       <dd>{formatLevel(observation.floodLevelCm)} cm</dd>
                     </div>
                     <div>
@@ -295,7 +317,9 @@ export function LagoonMonitoringNetwork({
                 </div>
               )}
 
-              {!compact ? (
+              {observation.error && hasReading ? (
+                <p className="lagoon-monitoring-role">{observation.error}</p>
+              ) : !compact ? (
                 <p className="lagoon-monitoring-role">
                   {observation.station.role}
                 </p>
@@ -303,7 +327,7 @@ export function LagoonMonitoringNetwork({
               <footer>
                 <small>
                   {observation.updatedAt
-                    ? `Atualizado em ${formatUpdatedAt(observation.updatedAt)}`
+                    ? `Leitura de ${formatUpdatedAt(observation.updatedAt)}`
                     : "Aguardando atualização da fonte"}
                 </small>
                 <a
@@ -324,9 +348,11 @@ export function LagoonMonitoringNetwork({
         <div className="lagoon-monitoring-note">
           <strong>Como interpretar</strong>
           <p>
-            A tendência e a variação são calculadas a partir da série pública de
-            cinco dias. Cada município possui sua própria cota de inundação:
-            compare cada leitura somente com a cota exibida no mesmo card. Estes
+            As tendências e variações são calculadas apenas quando existe uma
+            janela temporal compatível. As cotas de inundação e os máximos de
+            maio de 2024 são reproduzidos do portal preliminar da FURG e Portos
+            RS. Compare cada leitura somente com a referência do mesmo card.
+            Dados atrasados ficam neutros e não representam condição atual. Estes
             dados não substituem avisos da Defesa Civil.
           </p>
         </div>
