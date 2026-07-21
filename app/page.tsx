@@ -1,4 +1,5 @@
 import { HomeEditorialDashboard } from "@/components/home-editorial-dashboard";
+import { HomeSectionNavigation } from "@/components/home-section-navigation";
 import { InmetAlertsPanel } from "@/components/inmet-alerts-panel";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -86,6 +87,7 @@ export default async function Home() {
 
         <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
           <InmetAlertsPanel data={inmetAlerts} variant="home" />
+          <HomeSectionNavigation />
           <HomeEditorialDashboard
             weather={weather}
             advisoryLevel={headerLevel}
