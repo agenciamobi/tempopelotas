@@ -1,25 +1,42 @@
-/* Homepage v14 — corrige a grade interna dos cards de próximos dias. */
+/* Homepage v15 — isola os cards de próximos dias das grades legadas. */
 
-.site-shell--home-editorial .home-next-days__list article {
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
-  grid-template-areas:
-    "topline"
-    "condition"
-    "rain"
-    "temperatures";
-  align-content: stretch;
-  align-items: stretch;
-  gap: 14px;
+.site-shell--home-editorial .home-next-days__list article,
+.site-shell--home-editorial .home-next-days__list article:first-child,
+.site-shell--home-editorial .home-next-days__list article:nth-child(2),
+.site-shell--home-editorial .home-next-days__list article:nth-child(3),
+.site-shell--home-editorial .home-next-days__list article:last-child {
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  align-content: normal !important;
+  justify-content: flex-start !important;
+  gap: 14px !important;
+  min-width: 0;
+  min-height: 252px;
+}
+
+.site-shell--home-editorial .home-next-days__list article > .home-next-days__topline,
+.site-shell--home-editorial .home-next-days__list article > .home-next-days__condition,
+.site-shell--home-editorial .home-next-days__list article > .home-next-days__rain-meter,
+.site-shell--home-editorial .home-next-days__list article > .home-next-days__temperatures {
+  position: static !important;
+  inset: auto !important;
+  grid-area: auto !important;
+  align-self: stretch !important;
+  width: auto !important;
+  min-width: 0;
+  transform: none !important;
 }
 
 .site-shell--home-editorial .home-next-days__list article > .home-next-days__topline {
-  grid-area: topline;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  order: 1;
+  display: flex !important;
+  flex: 0 0 auto;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
   gap: 12px;
-  min-width: 0;
+  margin: 0 !important;
 }
 
 .site-shell--home-editorial .home-next-days__topline > div {
@@ -27,6 +44,7 @@
   align-content: start;
   gap: 3px;
   min-width: 0;
+  margin: 0 !important;
 }
 
 .site-shell--home-editorial .home-next-days__topline > div strong {
@@ -60,45 +78,55 @@
 }
 
 .site-shell--home-editorial .home-next-days__list article > .home-next-days__condition {
-  grid-area: condition;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  order: 2;
+  display: flex !important;
+  flex: 0 0 auto;
+  align-items: center !important;
+  justify-content: space-between !important;
   gap: 14px;
-  min-width: 0;
-  padding: 5px 0 2px;
+  min-height: 54px;
+  margin: 0 !important;
+  padding: 1px 0 0 !important;
 }
 
 .site-shell--home-editorial .home-next-days__condition svg {
-  width: 52px;
-  height: 52px;
+  grid-area: auto !important;
+  align-self: center !important;
+  width: 50px;
+  height: 50px;
   flex: 0 0 auto;
   color: #12394c;
 }
 
 .site-shell--home-editorial .home-next-days__condition > span {
+  grid-area: auto !important;
+  align-self: center !important;
+  max-width: 120px;
   color: #466573;
   font-size: 0.78rem;
   font-weight: 760;
   line-height: 1.3;
   text-align: right;
+  white-space: normal;
 }
 
 .site-shell--home-editorial .home-next-days__list article > .home-next-days__rain-meter {
-  grid-area: rain;
-  display: grid;
-  align-content: end;
-  align-self: stretch;
+  order: 3;
+  display: grid !important;
+  flex: 0 0 auto;
+  align-content: start !important;
   gap: 7px;
-  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .site-shell--home-editorial .home-next-days__rain-meter > div {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
   gap: 10px;
   min-width: 0;
+  margin: 0 !important;
 }
 
 .site-shell--home-editorial .home-next-days__rain-meter > div span {
@@ -146,18 +174,20 @@
 }
 
 .site-shell--home-editorial .home-next-days__list article > .home-next-days__temperatures {
-  grid-area: temperatures;
-  display: grid;
+  order: 4;
+  display: grid !important;
+  flex: 0 0 auto;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: end;
+  align-items: end !important;
   gap: 0;
-  min-width: 0;
-  padding-top: 13px;
+  margin: auto 0 0 !important;
+  padding-top: 13px !important;
   border-top: 1px solid rgba(7, 30, 47, 0.09);
 }
 
 .site-shell--home-editorial .home-next-days__temperatures > span {
   display: grid;
+  align-self: end !important;
   gap: 3px;
   min-width: 0;
 }
@@ -186,14 +216,23 @@
 }
 
 @media (max-width: 980px) {
-  .site-shell--home-editorial .home-next-days__list article {
+  .site-shell--home-editorial .home-next-days__list article,
+  .site-shell--home-editorial .home-next-days__list article:first-child,
+  .site-shell--home-editorial .home-next-days__list article:nth-child(2),
+  .site-shell--home-editorial .home-next-days__list article:nth-child(3),
+  .site-shell--home-editorial .home-next-days__list article:last-child {
     min-height: 238px;
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 680px) {
   .site-shell--home-editorial .home-next-days__list {
-    grid-template-columns: 1fr;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+    margin-right: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
   }
 
   .site-shell--home-editorial .home-next-days__list article,
@@ -201,16 +240,10 @@
   .site-shell--home-editorial .home-next-days__list article:nth-child(2),
   .site-shell--home-editorial .home-next-days__list article:nth-child(3),
   .site-shell--home-editorial .home-next-days__list article:last-child {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto auto auto;
-    grid-template-areas:
-      "topline"
-      "condition"
-      "rain"
-      "temperatures";
+    flex: none !important;
     min-height: 0;
     padding: 19px;
-    border-right: 0;
-    border-bottom: 0;
+    border-right: 1px solid rgba(7, 30, 47, 0.09);
+    border-bottom: 1px solid rgba(7, 30, 47, 0.09);
   }
 }
