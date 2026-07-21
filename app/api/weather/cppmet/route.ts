@@ -1,5 +1,6 @@
 import { getCppmetForecast } from "@/lib/cppmet-forecast";
 
+export const runtime = "nodejs";
 export const revalidate = 600;
 
 export async function GET() {
