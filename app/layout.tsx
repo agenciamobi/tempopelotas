@@ -124,17 +124,23 @@ export const metadata: Metadata = {
       },
       { url: "/pwa-icons/192", sizes: "192x192", type: "image/png" },
     ],
-    apple: [{ url: "/pwa-icons/192", sizes: "192x192", type: "image/png" }],
-    shortcut: [{ url: "/brand/tempo-pelotas-icon", type: "image/svg+xml" }],
+    shortcut: {
+      url: "/brand/tempo-pelotas-icon",
+      type: "image/svg+xml",
+    },
+    apple: [
+      { url: "/pwa-icons/192", sizes: "192x192", type: "image/png" },
+    ],
   },
+  alternates: { canonical: "/" },
   openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: "/",
+    siteName: "TEMPO Pelotas",
     title: "TEMPO Pelotas | Tempo e situação das águas em Pelotas, RS",
     description:
       "Previsão do tempo, chuva, vento, radar e nível da Lagoa dos Patos para Pelotas, RS.",
-    url: siteUrl,
-    siteName: "TEMPO Pelotas",
-    locale: "pt_BR",
-    type: "website",
   },
   twitter: {
     card: "summary_large_image",
@@ -147,13 +153,10 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
       "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
     },
-  },
-  alternates: {
-    canonical: siteUrl,
   },
 };
 
