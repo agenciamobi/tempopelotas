@@ -81,6 +81,9 @@ import "./home-forecast-refinement-v8.css";
 import "./home-alert-flow-v9.css";
 import "./home-detail-navigation-v10.css";
 import "./home-detail-content-v10.css";
+import "./home-cohesion-v12.css";
+import "./home-cohesion-v12-content.css";
+import "./home-cohesion-v12-water.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
