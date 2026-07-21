@@ -6,13 +6,15 @@ import {
   type ReactNode,
 } from "react";
 import { HomeEditorialDashboard as HomeEditorialDashboardBase } from "@/components/home-editorial-dashboard";
-import { HomeWeatherAiSummaries } from "@/components/weather-ai-summary";
 import { WeatherIcon } from "@/components/weather-icon";
 import type { EmbrapaObservationData } from "@/lib/embrapa-observation";
 import type { GuaibaObservationData } from "@/lib/guaiba-monitor";
 import type { LagoonMonitoringNetworkData } from "@/lib/lagoon-monitoring-network";
 import type { LaranjalLevelData } from "@/lib/laranjal-level";
-import type { WeatherAiSummaries } from "@/lib/weather-ai-summary";
+import type {
+  ForecastNarrative,
+  WeatherAiSummaries,
+} from "@/lib/weather-ai-summary";
 import type { WeatherData } from "@/lib/weather-data";
 import type { AdvisoryLevel } from "@/lib/weather-insights";
 import {
@@ -43,6 +45,12 @@ type WaterVisualStates = {
   guaiba: WaterLevelVisualState;
 };
 
+type StationVisualState = {
+  city: string;
+  name: string;
+  state: WaterLevelVisualState;
+};
+
 type ElementProps = Record<string, unknown> & {
   children?: ReactNode;
   className?: string;
@@ -54,6 +62,71 @@ const stationStateLabels: Record<string, string> = {
   "Perto do nível de atenção": "Próximo da cota local",
   "Sem sinal de atenção": "Abaixo da cota local",
 };
+
+function formatNumber(value: number, maximumFractionDigits = 1) {
+  return new Intl.NumberFormat("pt-BR", {
+    maximumFractionDigits,
+    minimumFractionDigits: value % 1 === 0 ? 0 : 1,
+  }).format(value);
+}
+
+function buildTomorrowFallback(weather: WeatherData): ForecastNarrative | null {
+  const tomorrow = weather.daily[1];
+  if (!tomorrow) return null;
+
+  const headline =
+    tomorrow.icon === "storm" || tomorrow.windGust >= 50
+      ? "Amanhã exige atenção ao tempo"
+      : tomorrow.rainChance >= 70
+        ? "Chuva deve marcar o dia de amanhã"
+        : tomorrow.rainChance >= 35
+          ? "Amanhã pode ter períodos de chuva"
+          : tomorrow.icon === "sun"
+            ? "Amanhã terá períodos de sol"
+            : "Amanhã terá variação de nuvens";
+
+  const rainDescription =
+    tomorrow.rainChance >= 70
+      ? `A chance de chuva é alta, com ${formatNumber(tomorrow.precipitation)} mm previstos.`
+      : tomorrow.rainChance >= 35
+        ? `Há possibilidade de chuva, com ${formatNumber(tomorrow.precipitation)} mm previstos.`
+        : "A chance de chuva é baixa e não há volume relevante indicado.";
+
+  return {
+    headline,
+    summary: `${rainDescription} A temperatura deve variar entre ${tomorrow.min}° e ${tomorrow.max}°, com rajadas de até ${tomorrow.windGust} km/h.`,
+  };
+}
+
+function TomorrowForecastSummary({
+  weather,
+  narrative,
+}: {
+  weather: WeatherData;
+  narrative: ForecastNarrative | null;
+}) {
+  const tomorrow = weather.daily[1];
+  const resolvedNarrative = narrative ?? buildTomorrowFallback(weather);
+  if (!tomorrow || !resolvedNarrative) return null;
+
+  return (
+    <article
+      className="home-next-days__tomorrow-summary"
+      aria-labelledby="home-tomorrow-summary-title"
+    >
+      <div>
+        <span>Resumo para amanhã</span>
+        <small>
+          {tomorrow.weekday} · {tomorrow.date}
+        </small>
+      </div>
+      <section>
+        <h3 id="home-tomorrow-summary-title">{resolvedNarrative.headline}</h3>
+        <p>{resolvedNarrative.summary}</p>
+      </section>
+    </article>
+  );
+}
 
 function getTextContent(node: ReactNode): string {
   if (typeof node === "string" || typeof node === "number") {
@@ -76,6 +149,7 @@ function hasClass(className: string, token: string) {
 }
 
 function appendClass(className: string, token: string) {
+  if (hasClass(className, token)) return className;
   return className ? `${className} ${token}` : token;
 }
 
@@ -89,6 +163,8 @@ function transformDashboardNode(
   node: ReactNode,
   context: SemanticContext,
   waterStates: WaterVisualStates,
+  stationStates: StationVisualState[],
+  tomorrowSummary: ReactNode,
 ): ReactNode {
   if (typeof node === "string") return normalizeTextNode(node);
 
@@ -131,7 +207,13 @@ function transformDashboardNode(
     return cloneElement(
       node as ReactElement<ElementProps>,
       undefined,
-      transformDashboardNode(timeLabel, nextContext, waterStates),
+      transformDashboardNode(
+        timeLabel,
+        nextContext,
+        waterStates,
+        stationStates,
+        tomorrowSummary,
+      ),
     );
   }
 
@@ -217,7 +299,13 @@ function transformDashboardNode(
   }
 
   const transformedChildren = Children.map(props.children, (child) =>
-    transformDashboardNode(child, nextContext, waterStates),
+    transformDashboardNode(
+      child,
+      nextContext,
+      waterStates,
+      stationStates,
+      tomorrowSummary,
+    ),
   );
 
   let normalizedClassName = className;
@@ -236,11 +324,43 @@ function transformDashboardNode(
     );
   }
 
-  return cloneElement(
-    node as ReactElement<ElementProps>,
+  if (isDomElement && node.type === "article" && className.includes("risk-")) {
+    const stationState = stationStates.find(
+      (station) =>
+        normalizedText.includes(station.city) &&
+        normalizedText.includes(station.name),
+    );
+
+    if (stationState) {
+      normalizedClassName = appendClass(
+        normalizedClassName,
+        waterLevelStateClass(stationState.state),
+      );
+    }
+  }
+
+  const nextProps =
     normalizedClassName !== className
       ? { className: normalizedClassName || undefined }
-      : undefined,
+      : undefined;
+
+  if (
+    isDomElement &&
+    node.type === "div" &&
+    hasClass(className, "home-next-days") &&
+    tomorrowSummary
+  ) {
+    return cloneElement(
+      node as ReactElement<ElementProps>,
+      nextProps,
+      transformedChildren,
+      tomorrowSummary,
+    );
+  }
+
+  return cloneElement(
+    node as ReactElement<ElementProps>,
+    nextProps,
     transformedChildren,
   );
 }
@@ -266,7 +386,25 @@ export function HomeEditorialDashboard({
       threshold: dashboardProps.guaiba.floodReference,
     }),
   };
-  const transformedDashboard = transformDashboardNode(
+  const stationStates = dashboardProps.lagoon.observations.map((station) => ({
+    city: station.station.city,
+    name: station.station.name,
+    state: getWaterLevelVisualState({
+      rate: station.trendCmPerHour,
+      available:
+        station.status !== "unavailable" && station.currentLevelCm !== null,
+      currentLevel: station.currentLevelCm,
+      threshold: station.floodLevelCm,
+    }),
+  }));
+  const tomorrowSummary = (
+    <TomorrowForecastSummary
+      weather={dashboardProps.weather}
+      narrative={summaries.tomorrow}
+    />
+  );
+
+  return transformDashboardNode(
     dashboard,
     {
       currentHour: false,
@@ -275,15 +413,7 @@ export function HomeEditorialDashboard({
       guaibaContext: false,
     },
     waterStates,
-  );
-
-  return (
-    <>
-      <HomeWeatherAiSummaries
-        weather={dashboardProps.weather}
-        summaries={summaries}
-      />
-      {transformedDashboard}
-    </>
+    stationStates,
+    tomorrowSummary,
   );
 }

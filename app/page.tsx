@@ -4,6 +4,10 @@ import { InmetAlertsPanel } from "@/components/inmet-alerts-panel";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WeatherHero } from "@/components/weather-hero";
+import {
+  getCppmetForecast,
+  getCppmetForecastItemForDate,
+} from "@/lib/cppmet-forecast";
 import { getGuaibaObservation } from "@/lib/guaiba-monitor";
 import { getInmetAlerts } from "@/lib/inmet-alerts";
 import { getLagoonMonitoringNetwork } from "@/lib/lagoon-monitoring-network";
@@ -43,20 +47,25 @@ const advisoryRank: Record<AdvisoryLevel, number> = {
 export default async function Home() {
   const [
     { weather, observation: embrapaObservation },
+    cppmetForecast,
     guaibaObservation,
     lagoonMonitoring,
     laranjalObservation,
     inmetAlerts,
   ] = await Promise.all([
     getPelotasWeatherWithObservation(),
+    getCppmetForecast(),
     getGuaibaObservation(),
     getLagoonMonitoringNetwork(),
     getLaranjalLevelData(),
     getInmetAlerts(),
   ]);
   const summaries = await getWeatherAiSummaries(weather);
+  const cppmetToday = getCppmetForecastItemForDate(cppmetForecast);
   const advisory = getWeatherAdvisory(weather);
-  const pelotasOfficialAlerts = inmetAlerts.alerts.filter((alert) => alert.relevance === "pelotas");
+  const pelotasOfficialAlerts = inmetAlerts.alerts.filter(
+    (alert) => alert.relevance === "pelotas",
+  );
   const officialLevel: AdvisoryLevel = pelotasOfficialAlerts.some(
     (alert) => alert.severity === "danger" || alert.severity === "great-danger",
   )
@@ -64,12 +73,14 @@ export default async function Home() {
     : pelotasOfficialAlerts.some((alert) => alert.severity === "potential")
       ? "attention"
       : "normal";
-  const headerLevel = advisoryRank[officialLevel] > advisoryRank[advisory.level]
-    ? officialLevel
-    : advisory.level;
-  const mainClassName = pelotasOfficialAlerts.length > 0
-    ? "home-editorial-main has-official-alerts"
-    : "home-editorial-main";
+  const headerLevel =
+    advisoryRank[officialLevel] > advisoryRank[advisory.level]
+      ? officialLevel
+      : advisory.level;
+  const mainClassName =
+    pelotasOfficialAlerts.length > 0
+      ? "home-editorial-main has-official-alerts"
+      : "home-editorial-main";
 
   return (
     <>
@@ -86,6 +97,14 @@ export default async function Home() {
           weather={weather}
           advisoryLevel={headerLevel}
           officialAlertCount={pelotasOfficialAlerts.length}
+          cppmetForecast={
+            cppmetToday
+              ? {
+                  item: cppmetToday,
+                  sourceUrl: cppmetForecast.source.url,
+                }
+              : null
+          }
         />
 
         <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
