@@ -65,7 +65,7 @@ export default async function NivelDaLagoaPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(webpageSchema).replace(/</g, "\u003c"),
+          __html: JSON.stringify(webpageSchema).replace(/</g, "\\u003c"),
         }}
       />
 
