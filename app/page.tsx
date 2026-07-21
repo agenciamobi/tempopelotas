@@ -1,9 +1,11 @@
+import { CppmetForecastSummary } from "@/components/cppmet-forecast-summary";
 import { HomeEditorialDashboard } from "@/components/home-editorial-dashboard-semantic";
 import { HomeSectionNavigation } from "@/components/home-section-navigation";
 import { InmetAlertsPanel } from "@/components/inmet-alerts-panel";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WeatherHero } from "@/components/weather-hero";
+import { getCppmetForecast } from "@/lib/cppmet-forecast";
 import { getGuaibaObservation } from "@/lib/guaiba-monitor";
 import { getInmetAlerts } from "@/lib/inmet-alerts";
 import { getLagoonMonitoringNetwork } from "@/lib/lagoon-monitoring-network";
@@ -43,12 +45,14 @@ const advisoryRank: Record<AdvisoryLevel, number> = {
 export default async function Home() {
   const [
     { weather, observation: embrapaObservation },
+    cppmetForecast,
     guaibaObservation,
     lagoonMonitoring,
     laranjalObservation,
     inmetAlerts,
   ] = await Promise.all([
     getPelotasWeatherWithObservation(),
+    getCppmetForecast(),
     getGuaibaObservation(),
     getLagoonMonitoringNetwork(),
     getLaranjalLevelData(),
@@ -91,6 +95,7 @@ export default async function Home() {
         <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
           <InmetAlertsPanel data={inmetAlerts} variant="home" />
           <HomeSectionNavigation />
+          <CppmetForecastSummary data={cppmetForecast} />
           <HomeEditorialDashboard
             weather={weather}
             summaries={summaries}
