@@ -1,4 +1,4 @@
-import { HomeEditorialDashboard } from "@/components/home-editorial-dashboard";
+import { HomeEditorialDashboard } from "@/components/home-editorial-dashboard-semantic";
 import { HomeSectionNavigation } from "@/components/home-section-navigation";
 import { InmetAlertsPanel } from "@/components/inmet-alerts-panel";
 import { SiteFooter } from "@/components/site-footer";
