@@ -60,6 +60,26 @@ type GeminiGenerateContentResponse = {
   }>;
 };
 
+type GeminiKeySource = "GOOGLE_API_KEY" | "GEMINI_API_KEY";
+type WeatherAiFailureReason =
+  | "missing_api_key"
+  | "invalid_weather_payload"
+  | "api_error"
+  | "empty_response"
+  | "invalid_response"
+  | "timeout"
+  | "unexpected_error";
+
+class WeatherAiGenerationError extends Error {
+  constructor(
+    readonly reason: WeatherAiFailureReason,
+    readonly detail?: string,
+  ) {
+    super(reason);
+    this.name = "WeatherAiGenerationError";
+  }
+}
+
 const conditionLabels: Record<WeatherIconName, string> = {
   sun: "predomínio de sol",
   moon: "céu limpo durante a noite",
@@ -92,6 +112,37 @@ function unavailableSummaries(): WeatherAiSummaries {
     generatedAt: null,
     model: null,
   };
+}
+
+function resolveGeminiApiKey(): {
+  apiKey: string;
+  source: GeminiKeySource;
+} | null {
+  const googleApiKey = process.env.GOOGLE_API_KEY?.trim();
+  if (googleApiKey) {
+    return { apiKey: googleApiKey, source: "GOOGLE_API_KEY" };
+  }
+
+  const geminiApiKey = process.env.GEMINI_API_KEY?.trim();
+  if (geminiApiKey) {
+    return { apiKey: geminiApiKey, source: "GEMINI_API_KEY" };
+  }
+
+  return null;
+}
+
+function logUnavailable(
+  reason: WeatherAiFailureReason,
+  detail?: string,
+  model?: string,
+  keySource?: GeminiKeySource,
+) {
+  console.warn("[weather-ai-summary] unavailable", {
+    reason,
+    detail: detail || undefined,
+    model: model || undefined,
+    keySource: keySource || undefined,
+  });
 }
 
 function dayPayload(day: DailyForecast): ForecastDayPayload {
@@ -210,8 +261,10 @@ function buildPrompt(payload: SummaryPayload) {
 
 const generateCachedSummaries = unstable_cache(
   async (payloadJson: string, model: string): Promise<WeatherAiSummaries> => {
-    const apiKey = process.env.GEMINI_API_KEY?.trim();
-    if (!apiKey) return unavailableSummaries();
+    const key = resolveGeminiApiKey();
+    if (!key) {
+      throw new WeatherAiGenerationError("missing_api_key");
+    }
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8_000);
@@ -224,7 +277,7 @@ const generateCachedSummaries = unstable_cache(
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-goog-api-key": apiKey,
+            "x-goog-api-key": key.apiKey,
           },
           body: JSON.stringify({
             contents: [
@@ -244,14 +297,29 @@ const generateCachedSummaries = unstable_cache(
         },
       );
 
-      if (!response.ok) return unavailableSummaries();
+      if (!response.ok) {
+        throw new WeatherAiGenerationError(
+          "api_error",
+          `${response.status} ${response.statusText}`.trim(),
+        );
+      }
 
       const body = (await response.json()) as GeminiGenerateContentResponse;
       const text = extractResponseText(body);
-      if (!text) return unavailableSummaries();
+      if (!text) {
+        throw new WeatherAiGenerationError("empty_response");
+      }
 
-      const parsed = parseModelResponse(text);
-      if (!parsed) return unavailableSummaries();
+      let parsed: ReturnType<typeof parseModelResponse>;
+      try {
+        parsed = parseModelResponse(text);
+      } catch {
+        throw new WeatherAiGenerationError("invalid_response", "invalid_json");
+      }
+
+      if (!parsed) {
+        throw new WeatherAiGenerationError("invalid_response", "content_rejected");
+      }
 
       return {
         status: "generated",
@@ -260,24 +328,43 @@ const generateCachedSummaries = unstable_cache(
         generatedAt: new Date().toISOString(),
         model,
       };
-    } catch {
-      return unavailableSummaries();
+    } catch (error) {
+      if (error instanceof WeatherAiGenerationError) throw error;
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new WeatherAiGenerationError("timeout");
+      }
+      throw new WeatherAiGenerationError(
+        "unexpected_error",
+        error instanceof Error ? error.name : "unknown",
+      );
     } finally {
       clearTimeout(timeout);
     }
   },
-  ["weather-ai-summaries-v1"],
+  ["weather-ai-summaries-v2"],
   { revalidate: 1_800 },
 );
 
 export async function getWeatherAiSummaries(
   weather: WeatherData,
 ): Promise<WeatherAiSummaries> {
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
   const payload = buildPayload(weather);
+  if (!payload) {
+    logUnavailable("invalid_weather_payload");
+    return unavailableSummaries();
+  }
 
-  if (!apiKey || !payload) return unavailableSummaries();
+  const key = resolveGeminiApiKey();
+  const model = process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash";
 
-  const model = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
-  return generateCachedSummaries(JSON.stringify(payload), model);
+  try {
+    return await generateCachedSummaries(JSON.stringify(payload), model);
+  } catch (error) {
+    if (error instanceof WeatherAiGenerationError) {
+      logUnavailable(error.reason, error.detail, model, key?.source);
+    } else {
+      logUnavailable("unexpected_error", "unknown", model, key?.source);
+    }
+    return unavailableSummaries();
+  }
 }
