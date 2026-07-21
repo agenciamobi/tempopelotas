@@ -5,7 +5,9 @@ import { getWeatherCameras } from "@/lib/weather-cameras";
 const baseRoutes = [
   { path: "/", priority: 1, changeFrequency: "hourly" },
   { path: "/tempo-hoje-pelotas", priority: 0.95, changeFrequency: "hourly" },
+  { path: "/tempo-amanha-pelotas", priority: 0.93, changeFrequency: "hourly" },
   { path: "/previsao-7-dias-pelotas", priority: 0.9, changeFrequency: "hourly" },
+  { path: "/clima-em-pelotas", priority: 0.84, changeFrequency: "daily" },
   { path: "/chuva-em-pelotas", priority: 0.85, changeFrequency: "hourly" },
   { path: "/vento-em-pelotas", priority: 0.85, changeFrequency: "hourly" },
   {
