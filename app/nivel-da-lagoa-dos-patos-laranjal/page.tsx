@@ -1,67 +1,40 @@
 import type { Metadata } from "next";
 import { ForecastPageShell } from "@/components/forecast-page-shell";
 import { PelotasHydrologyWidget } from "@/components/pelotas-hydrology-widget";
-import { getLaranjalLevelData } from "@/lib/laranjal-level";
 import { absoluteUrl } from "@/lib/site";
 import { LAGOON_LEVEL_SOURCE } from "@/lib/lagoon-level";
 import { getPelotasWeather } from "@/lib/weather-service";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Nível da Lagoa dos Patos no Laranjal em tempo real",
+  title: "Monitoramento da Lagoa dos Patos no Laranjal",
   description:
-    "Acompanhe o nível da Lagoa dos Patos na Estação Laranjal, em Pelotas, e veja a relação com vento e chuva.",
+    "Consulte o painel público do LabHidroSens/UFPel para acompanhar a Estação Laranjal, em Pelotas.",
   alternates: { canonical: "/nivel-da-lagoa-dos-patos-laranjal" },
   openGraph: {
-    title: "Nível da Lagoa dos Patos no Laranjal",
+    title: "Monitoramento da Lagoa dos Patos no Laranjal",
     description:
-      "Veja o nível medido na Praia do Laranjal e saiba o que observar.",
+      "Acesse o painel público da UFPel para consultar a Estação Laranjal.",
     url: "/nivel-da-lagoa-dos-patos-laranjal",
   },
 };
 
-function formatLevel(value: number | null) {
-  if (value === null) return "—";
-
-  return `${new Intl.NumberFormat("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value)} m`;
-}
-
-function describeLevelTrend(status: string, trendCmPerHour: number | null) {
-  if (status === "unavailable") return "medição temporariamente indisponível";
-  if (status === "stale") return "última leitura está atrasada";
-  if (trendCmPerHour === null) return "tendência ainda não calculada";
-  if (trendCmPerHour > 0.2) return "nível com tendência de alta";
-  if (trendCmPerHour < -0.2) return "nível com tendência de baixa";
-  return "nível relativamente estável";
-}
-
 export default async function NivelDaLagoaPage() {
-  const [weather, laranjalLevel] = await Promise.all([
-    getPelotasWeather(),
-    getLaranjalLevelData(),
-  ]);
+  const weather = await getPelotasWeather();
   const today = weather.daily[0];
   const maxHourlyGust = Math.max(
     weather.current.windGust,
     ...weather.hourly.map((hour) => hour.windGust),
   );
-  const levelValue = formatLevel(laranjalLevel.currentLevel);
-  const levelTrend = describeLevelTrend(
-    laranjalLevel.status,
-    laranjalLevel.trendCmPerHour,
-  );
 
   const webpageSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Nível da Lagoa dos Patos na Estação Laranjal",
+    name: "Monitoramento da Lagoa dos Patos na Estação Laranjal",
     url: absoluteUrl("/nivel-da-lagoa-dos-patos-laranjal"),
     description:
-      "Nível da Lagoa dos Patos na Praia do Laranjal, em Pelotas, com informações de vento e chuva.",
+      "Acesso ao painel público da Estação Laranjal, em Pelotas, com contexto meteorológico local.",
     inLanguage: "pt-BR",
     about: {
       "@type": "BodyOfWater",
@@ -78,14 +51,14 @@ export default async function NivelDaLagoaPage() {
     <ForecastPageShell
       weather={weather}
       eyebrow="Praia do Laranjal"
-      title="Nível da Lagoa dos Patos"
-      description="Veja a medição atual, acompanhe se o nível está subindo ou baixando e confira também o vento, a chuva e os avisos oficiais."
+      title="Monitoramento da Lagoa dos Patos"
+      description="Consulte o painel público da UFPel. O TEMPO Pelotas não calcula nível, tendência, cota ou situação de risco para esta estação."
       currentPath="/nivel-da-lagoa-dos-patos-laranjal"
       heroStat={{
-        label: "Estação Laranjal",
-        value: levelValue,
-        detail: levelTrend,
-        ariaLabel: `Nível atual da Lagoa dos Patos no Laranjal: ${levelValue}; ${levelTrend}`,
+        label: "Fonte local",
+        value: "UFPel",
+        detail: "Painel público do LabHidroSens",
+        ariaLabel: "Fonte local: painel público do LabHidroSens e UFPel",
         tone: "water",
       }}
     >
@@ -96,60 +69,43 @@ export default async function NivelDaLagoaPage() {
         }}
       />
 
-      <PelotasHydrologyWidget
-        initialData={laranjalLevel}
-        weather={{
-          windSpeed: weather.current.windSpeed,
-          windDirection: weather.current.windDirection,
-          windGust: maxHourlyGust,
-          precipitation: today?.precipitation ?? 0,
-        }}
-      />
+      <PelotasHydrologyWidget />
 
       <section className="topic-section lagoon-explanation" aria-labelledby="lagoon-explanation-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Use a informação com atenção</span>
-            <h2 id="lagoon-explanation-title">O que observar no medidor</h2>
+            <span className="eyebrow">Contexto meteorológico</span>
+            <h2 id="lagoon-explanation-title">Vento e chuva em Pelotas</h2>
           </div>
           <p>
-            Um único número não conta toda a situação. Observe como o nível muda ao longo das horas e
-            compare com o vento, a chuva e os comunicados das autoridades.
+            Os números meteorológicos abaixo permanecem separados do painel hidrológico e não são usados pelo portal para classificar a situação do Laranjal.
           </p>
         </div>
 
         <div className="lagoon-explanation-grid">
           <article>
             <span>01</span>
-            <h3>Veja se o nível continua subindo</h3>
+            <h3>Vento agora</h3>
             <p>
-              Acompanhe vários horários no gráfico. Uma alta contínua merece mais atenção do que uma
-              mudança pequena em uma única leitura.
+              {weather.current.windSpeed} km/h, direção {weather.current.windDirection}.
             </p>
           </article>
           <article>
             <span>02</span>
-            <h3>Observe o vento e a chuva</h3>
-            <p>
-              O vento pode empurrar ou segurar a água perto do Laranjal. A chuva em Pelotas e em outras
-              regiões que deságuam na lagoa também pode aumentar o nível.
-            </p>
+            <h3>Rajada prevista</h3>
+            <p>Até {maxHourlyGust} km/h nas próximas horas.</p>
           </article>
           <article>
             <span>03</span>
-            <h3>Confirme os avisos oficiais</h3>
-            <p>
-              Em caso de risco, siga as orientações da Defesa Civil, Prefeitura, Sanep e demais órgãos
-              responsáveis pela segurança da população.
-            </p>
+            <h3>Chuva prevista hoje</h3>
+            <p>{today?.precipitation ?? 0} mm na previsão diária para Pelotas.</p>
           </article>
         </div>
 
         <div className="lagoon-disclaimer">
-          <strong>O medidor ajuda no acompanhamento</strong>
+          <strong>Fonte e critérios permanecem com a UFPel</strong>
           <p>
-            O TEMPO Pelotas não determina quando um bairro vai alagar e não emite ordens de saída. Em
-            situações de risco, siga os avisos oficiais. A medição é fornecida pela fonte indicada no quadro.
+            Para confirmar a leitura ou interpretar o painel, consulte a fonte original. Em situações de risco, siga os comunicados da Defesa Civil e das autoridades responsáveis.
           </p>
         </div>
       </section>

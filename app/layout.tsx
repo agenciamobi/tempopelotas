@@ -94,6 +94,7 @@ import "./home-final-cohesion-v20.css";
 import "./home-operational-bridge-v21.css";
 import "./home-operational-bridge-v21-fix.css";
 import "./weather-ai-summary.css";
+import "./integrations-v22.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
