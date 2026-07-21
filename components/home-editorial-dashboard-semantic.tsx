@@ -78,7 +78,7 @@ function buildTomorrowFallback(weather: WeatherData): ForecastNarrative | null {
     tomorrow.icon === "storm" || tomorrow.windGust >= 50
       ? "Amanhã exige atenção ao tempo"
       : tomorrow.rainChance >= 70
-        ? "Chuva deve marcar a quarta-feira"
+        ? "Chuva deve marcar o dia de amanhã"
         : tomorrow.rainChance >= 35
           ? "Amanhã pode ter períodos de chuva"
           : tomorrow.icon === "sun"
@@ -116,7 +116,9 @@ function TomorrowForecastSummary({
     >
       <div>
         <span>Resumo para amanhã</span>
-        <small>{tomorrow.weekday} · {tomorrow.date}</small>
+        <small>
+          {tomorrow.weekday} · {tomorrow.date}
+        </small>
       </div>
       <section>
         <h3 id="home-tomorrow-summary-title">{resolvedNarrative.headline}</h3>
