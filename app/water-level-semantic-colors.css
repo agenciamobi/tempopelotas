@@ -181,16 +181,46 @@
   color: var(--water-level-stable);
 }
 
-.home-water-focus:has(.home-water-trend.is-rising),
+.home-water-trend.is-rising {
+  border-color: rgba(242, 112, 53, 0.3);
+  background: rgba(242, 112, 53, 0.11);
+}
+
+.home-water-trend.is-falling {
+  border-color: rgba(24, 189, 205, 0.3);
+  background: rgba(24, 189, 205, 0.11);
+}
+
+.home-water-focus.level-state--rising,
 .home-water-table__rows article:has(> span.is-rising),
 .home-water-context.level-state--rising {
   box-shadow: inset 4px 0 0 var(--water-level-rising);
 }
 
-.home-water-focus:has(.home-water-trend.is-falling),
+.home-water-focus.level-state--falling,
 .home-water-table__rows article:has(> span.is-falling),
 .home-water-context.level-state--falling {
   box-shadow: inset 4px 0 0 var(--water-level-falling);
+}
+
+.home-water-focus.level-state--rising .home-water-focus__reading,
+.home-water-focus.level-state--rising .home-water-trend {
+  color: #ffb18d;
+}
+
+.home-water-focus.level-state--falling .home-water-focus__reading,
+.home-water-focus.level-state--falling .home-water-trend {
+  color: #72e7ef;
+}
+
+.home-water-table__rows article:has(> span.is-rising) > b,
+.home-water-context.level-state--rising > b {
+  color: var(--water-level-rising-ink);
+}
+
+.home-water-table__rows article:has(> span.is-falling) > b,
+.home-water-context.level-state--falling > b {
+  color: var(--water-level-falling-ink);
 }
 
 .home-water-table__rows article.risk-flooding,
