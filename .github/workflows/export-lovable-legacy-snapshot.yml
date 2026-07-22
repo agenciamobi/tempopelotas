@@ -16,15 +16,17 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Checkout source
+      - name: Checkout canonical main
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 1
 
       - name: Prepare sanitized snapshot
         shell: bash
         run: |
           set -euo pipefail
+          SOURCE_SHA="$(git rev-parse HEAD)"
           mkdir -p snapshot
           rsync -a ./ snapshot/ \
             --exclude='.git' \
@@ -37,14 +39,14 @@ jobs:
             --exclude='.env.development' \
             --exclude='.env.production' \
             --exclude='*.tsbuildinfo'
-          printf '%s\n' "${GITHUB_SHA}" > snapshot/.source-commit
-          printf '%s\n' "${GITHUB_REF_NAME}" > snapshot/.source-ref
+          printf '%s\n' "${SOURCE_SHA}" > snapshot/.source-commit
+          printf '%s\n' "main" > snapshot/.source-ref
           find snapshot -type f | sort > snapshot/.source-files.txt
 
       - name: Upload sanitized snapshot
         uses: actions/upload-artifact@v4
         with:
-          name: tempopelotas-legacy-snapshot
+          name: tempopelotas-legacy-snapshot-main
           path: snapshot/
           if-no-files-found: error
           retention-days: 1
