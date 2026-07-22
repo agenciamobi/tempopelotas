@@ -1,0 +1,51 @@
+name: Export Lovable legacy snapshot
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/export-lovable-legacy-snapshot.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Prepare sanitized snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p snapshot
+          rsync -a ./ snapshot/ \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            --exclude='.vercel' \
+            --exclude='.diagnostics' \
+            --exclude='.env' \
+            --exclude='.env.local' \
+            --exclude='.env.development' \
+            --exclude='.env.production' \
+            --exclude='*.tsbuildinfo'
+          printf '%s\n' "${GITHUB_SHA}" > snapshot/.source-commit
+          printf '%s\n' "${GITHUB_REF_NAME}" > snapshot/.source-ref
+          find snapshot -type f | sort > snapshot/.source-files.txt
+
+      - name: Upload sanitized snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: tempopelotas-legacy-snapshot
+          path: snapshot/
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 6
