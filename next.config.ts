@@ -19,6 +19,27 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: "/embed/status-tempo-agora",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow, noarchive, nosnippet, noimageindex",
+          },
+          {
+            key: "Content-Language",
+            value: "pt-BR",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "no-referrer",
+          },
+        ],
+      },
     ];
   },
 };
