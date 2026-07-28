@@ -22,12 +22,13 @@ const conditionLabels: Record<WeatherIconName, string> = {
 
 export async function getObsWeatherStatus(): Promise<ObsWeatherStatusData> {
   const { weather, observation } = await getPelotasWeatherWithObservation();
-  const hasVerifiedEmbrapaReading =
-    weather.current.source.kind === "observation" &&
-    observation.status !== "unavailable" &&
-    observation.current.temperature !== null;
+  const measuredTemperature = observation.current.temperature;
 
-  if (!hasVerifiedEmbrapaReading) {
+  if (
+    weather.current.source.kind !== "observation" ||
+    observation.status === "unavailable" ||
+    measuredTemperature === null
+  ) {
     return {
       status: "unavailable",
       temperature: null,
@@ -41,7 +42,7 @@ export async function getObsWeatherStatus(): Promise<ObsWeatherStatusData> {
 
   return {
     status: "live",
-    temperature: Math.round(observation.current.temperature),
+    temperature: Math.round(measuredTemperature),
     condition: conditionLabels[icon],
     icon,
     updatedAt: observation.source.observationTime ?? observation.source.fetchedAt,
