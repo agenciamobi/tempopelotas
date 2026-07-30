@@ -1,0 +1,32 @@
+/* Header v26 — proteção estrutural para carregamento parcial de estilos. */
+
+/*
+ * Painéis fechados não podem participar do layout, mesmo que a camada visual
+ * principal do megamenu não seja carregada por cache ou por um deploy parcial.
+ */
+.mega-menu-panel[aria-hidden="true"] {
+  display: none !important;
+}
+
+@media (min-width: 901px) {
+  .main-nav--mega .mega-nav-item {
+    min-width: 0;
+  }
+
+  .main-nav--mega .mega-nav-trigger > svg {
+    width: 10px !important;
+    height: 7px !important;
+    flex: 0 0 auto;
+  }
+
+  .mega-menu-panel[aria-hidden="false"] {
+    display: block;
+  }
+}
+
+@media (max-width: 900px) {
+  .main-nav--mega,
+  .mega-menu-panel {
+    display: none !important;
+  }
+}
